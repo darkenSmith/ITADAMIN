@@ -1,0 +1,33 @@
+@media print {
+    #intake .ewc{
+    background-color:white;
+  }
+  
+  #intake .red{
+    background-color:#ffb2b2;
+  }
+  
+  
+  #intake #redtotal{
+    background-color:#ffb2b2;
+  }
+  
+  
+  
+  #intake .yellow{
+    background-color:#f4f499;
+  }
+  
+  #intake #yeltotal{
+    background-color:#f4f499;
+  }
+  
+  
+  #intake .green{
+    background-color:#b2d8b2 ;
+  }
+  
+  #intake .block{
+    background-color:grey ;
+  }
+}

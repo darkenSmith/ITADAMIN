@@ -43,10 +43,10 @@ Thumbs.db
 *.mov
 *.wmv
 
-/RS_Files/
 /vendor/
 *.DS_Store
 
 app.ini
 app.dev.ini
 app.live.ini
+/RS_Files/

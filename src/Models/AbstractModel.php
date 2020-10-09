@@ -21,5 +21,6 @@ abstract class AbstractModel
     public function __construct()
     {
         $this->rdb = Database::getInstance('recycling');
+        $this->sdb = Database::getInstance('sql01');
     }
 }

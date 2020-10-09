@@ -8,6 +8,7 @@ use App\Models\RS\BdmDetail;
 use App\Models\RS\BdView;
 use App\Models\RS\GoodInData;
 use App\Models\RS\GoodSoutData;
+use App\Models\RS\Bookingdata;
 use App\Models\User;
 
 /**
@@ -23,7 +24,16 @@ class RSController extends AbstractController
 
     public function booking()
     {
-        $this->template->view('RECBooking/bookedcollection', $this->getCommonData());
+        $data = new User();
+        $bookdata = new Bookingdata();
+        $data->getRoles();
+        $roles = $data->roles;
+
+        $booklist = $bookdata->getdata();
+        
+       
+        $this->template->view('RECBooking/bookedcollection', array_merge(['bookList' => $booklist],  $this->getCommonData()));
+        
     }
 
     // Checked
@@ -41,6 +51,8 @@ class RSController extends AbstractController
             'data' => $data,
             'roles' => $roles,
         ];
+
+
     }
 
     // Checked
@@ -448,7 +460,7 @@ class RSController extends AbstractController
         $data->getCustomers();
         $customers = $data->customers;
         $list = $applist->getlist();
-
+       
         $this->template->view(
             'RS/pages/approved-list-page',
             [

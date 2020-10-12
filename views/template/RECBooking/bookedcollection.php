@@ -1,6 +1,11 @@
 <?php
+             
 
-var_dump($bookList);
+
+
+$filter_txt = (isset($_POST) && !empty($_POST) ? " matching your filter" : "");
+
+$cust = "\"Request_id\"";
 
 ?>
 
@@ -457,7 +462,7 @@ console.log("Orders marked as hold");
             <option value="request_ID">RequestID</option>
             <option value="ORD">SalesOrderNumber</option>
             <option value="Request_date_added">Date Added</option>
-            <option selected value="collection_date">Collection Date</option>
+            <option selected value=" isnull(cast(collection_date as varchar(50)),'not set')">Collection Date</option>
             <option value="Customer_email">Customer eMail</option>
           </select>
           <select name="filter2">
@@ -470,10 +475,10 @@ console.log("Orders marked as hold");
          </select>
                  <select name="filterstatus">
                     <option selected value="and (laststatus not like 'On-Hold' or  laststatus in('Request', 'confirmed', 'booked', 'cancelled')) ">All</option>
-                    <option value="and been_collected = 1 AND collection_date IS NOT NULL and confirmed = 1 and( laststatus  like 'Confirmed')">Confirmed</option>
-            <option value="and collection_date IS NOT NULL and confirmed = 0 and ( laststatus = 'booked')">Booked</option>
-            <option value="and (been_collected = 0 or been_collected is null ) AND collection_date IS NULL and (laststatus not like 'unbooked' and laststatus not like 'On-Hold')">Requests</option>
-            <option value="and (been_collected = 0 or been_collected is null ) AND collection_date IS NULL and (laststatus like 'unbooked')">Unbooked</option>
+                    <option value="and been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and confirmed = 1 and( laststatus  like 'Confirmed')">Confirmed</option>
+            <option value="and  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and confirmed = 0 and ( laststatus = 'booked')">Booked</option>
+            <option value="and (been_collected = 0 or been_collected is null ) AND  isnull(cast(collection_date as varchar(50)),'not set') IS NULL and (laststatus not like 'unbooked' and laststatus not like 'On-Hold')">Requests</option>
+            <option value="and (been_collected = 0 or been_collected is null ) AND  isnull(cast(collection_date as varchar(50)),'not set') IS NULL and (laststatus like 'unbooked')">Unbooked</option>
             <option value="and laststatus like 'On-Hold'">On-Hold</option>
             <option value="deleted">show deleted</option>
           </select>
@@ -481,6 +486,14 @@ console.log("Orders marked as hold");
           <label>Area:</label>
           <select name="areafilter">
           <option selected value="%"> Default </option>
+          <?php
+          foreach($arealist as $area){
+
+            echo "<option  value='".$area['area1']."'> ".$area['area1']." </option>";
+
+          }
+          ?>
+
    
          
         
@@ -515,10 +528,144 @@ console.log("Orders marked as hold");
           </div>
           </div>
         </div>
+        
       </div>
+      <h2><?php echo count($bookList)." ".$filter_txt ?></h2>
+<table id='tbldata' width='100%'  class='sortable table table-striped'>
+<thead>
+  <tr>
+    <td><input hidden type='checkbox' class='chkparent' ></td>
+    <th hidden >port</th>
+    <th >Request date</th>
+    <th>RequestID</th>
+    <th>OrderNum</th>
+    <th >GDPR</th>
+    <th hidden>CustID</th>
+    <th>Status</th>
+    <th>Vehicle</th>
+    <th >Collection Date</th>
+    <th>name</th>
+    <th>town</th>
+    <th>postcode</th>
+    <th>weight</th>
+    <th>totalunits</th>
+    <th>Qualifying Units</th>
+    <th> Charge </th>
+    <th> Collection Instructions </th>
+    <th> Avaiblity </th>
+    <th> Approved </th>
+    <th> Process </th>
+    <th> EmailSent Date </th>
+    <th> Survey Complete </th>
+    <th> Prev Date </th>
+    <th> Owner </th>
+    <th><span onclick='sortTable(\"customer_contact\");'>contact</span></th>
+    <th>tel</th>
+    <th><span onclick='sortTable(\"customer_email\");'>email</span></th>
+    <th hidden> Status Notes </th>
+    </tr>
+    </thead>
+ 
+
+<tbody>
+
+  <?php
+
+  foreach($bookList as $b){
+
+    //$bookqaulify = $bookq->qualifying($b['id']);
+
+  //  var_dump($bookqaulify);
+
+
+   //die();
+
     
 
   
+$datecheck  = $b["coldate"];
+
+if($datecheck === 'not set'){
+
+ 
+  $time = '-';
+
+}else{
+
+  $time = date("d/m/Y",strtotime($datecheck));
+
+}
+
+
+$chargereq = $b["charge"];
+
+if($chargereq == 1){
+  $chargereq = 'YES';
+}else{
+  $chargereq = '-';
+}
+
+  
+//  $portalcheck = "SELECT COUNT(*) AS usercheck FROM recyc_users WHERE username ='".$row['email']."'";
+//  $portstmt = $conn3->prepare($portalcheck);
+//  $portstmt->execute();
+//  $port = $portstmt->fetch(PDO::FETCH_ASSOC);
+
+ $timesurv = date("d/m/Y",strtotime($b["emailsentdate"]));
+
+ if($timesurv == '01/01/1970' || $timesurv == '01/01/1900'){
+
+  $timesurv = '-';
+
+ }else{
+  $timesurv = date("d/m/Y",strtotime($b["emailsentdate"]));
+
+ }
+ 
+
+  echo "
+  <tr>
+    <td  ><input type='checkbox' class='checkboxes' value='".$b["id"]."' ></td>
+    <td hidden  ></td>
+    <td  >".date("d/m/Y",strtotime($b["requestdate"])). "</td>
+    <td  class='req'><a href='/RS/detialdoc?rowid=".$b["id"]."' target='_blank'><span class='reqnum'>".$b["id"]."</span></a></td>
+    <td  class='ordernum'>". $b["ordern"]. "</td>
+    <td  >" . $b["gdpr"] ."</td>
+    <td hidden  class='crmnum'>".$b["crm"]."</td>
+    <td  class='ordernumst'>". $b["Stat"]. "</td>
+    <td   class='tyy'> ".$b["typ"]." </td>
+    <td class='coltime' >".$time."</td>
+    <td  >" . $b["name"] ."</td>
+    <td >" . $b["town"] ."</td>
+    <td >" . $b["postcode"] ."</td>
+    <td > ".$b["totalweight"]."</td>
+    <td >".$b["totalunits"]."</td>
+    <td >".$b["commisionable"]."</td>
+    <td >".$chargereq."</td>
+    <td ><textarea>".$b["instructions"]."</textarea></td>
+    <td ><textarea>".$b["request_col_date"]."</textarea></td>
+    <td ><textarea class='approv'>".$b["approved"]."</textarea></td>
+    <td ><textarea  class='process'>".$b["process"]."</textarea></td>
+    <td >".$timesurv."</td>
+    <td >".$b["scomp"]."</td>
+    <td ><textarea>".$b["prev"]."</textarea></td> 
+    <td >".$b["Owner"]."</td>
+    <td  >" . $b["contact"] ."</td>
+    <td >" .$b["tel"]."</td>
+    <td  ><span class='emailsel_".$b["id"] ."'>".$b["email"] ."</span></td>
+    <td hidden >".$b["upnotes"]."</td> 
+    
+  </tr>
+ 
+  ";
+}
+echo "</tbody>
+</table>
+";
+
+
+
+?>
 
   </div>
   </div>

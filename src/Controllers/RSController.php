@@ -30,9 +30,11 @@ class RSController extends AbstractController
         $roles = $data->roles;
 
         $booklist = $bookdata->getdata();
+        $arealist = $bookdata->getareas();
         
        
-        $this->template->view('RECBooking/bookedcollection', array_merge(['bookList' => $booklist],  $this->getCommonData()));
+        $this->template->view('RECBooking/bookedcollection', array_merge(['bookList' => $booklist,
+                               'arealist'=>$arealist], $this->getCommonData()));
         
     }
 

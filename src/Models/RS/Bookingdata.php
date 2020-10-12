@@ -25,6 +25,10 @@ class Bookingdata extends AbstractModel
 
        
     }
+    
+
+
+    
 
     public function getdata()
     { 
@@ -37,23 +41,39 @@ class Bookingdata extends AbstractModel
                   $notes = $this->clean($_POST["notesja"]);
               }
               
+              if(isset($_SESSION['stat'])){
+
+                $_SESSION['stat'] = isset($_POST["filterstatus"]) ? $_SESSION['stat'] : "AND laststatus not like 'On-Hold'";
+             }
+
+             
+
+             
+              
               
               $sql = "
 
+
+
+
               SET LANGUAGE British;
-              
+
               set nocount on
               
               select 
               Request_id as id,
+                    SUM(qty) as totalunits,
+                    sum(qty * convert(DECIMAL(9 , 2),typicalweight)) as totalweight,
+                    (select sum(qty) from Req_Detail join productlist as p on product_ID = prod_id where req_id =Request_id  and commisionable = 1) as commisionable,
+                    (select sum(qty) from Req_Detail join productlist as p on product_ID = prod_id where req_id =Request_id  and commisionable = 0) as noncommisionable,
               prev_orders as prev,
               [SurveyComplete] as scomp,
               ISNULL(RT.Owner, BC.Owner) as Owner,
               approved,
               process,
               rt.ord ordern,
-              case when been_collected = 1 AND collection_date IS NOT NULL and (confirmed = 0  or confirmed is null) 
-              and laststatus like 'booked' then 'booked' When collection_date is not null and confirmed = 1 then 'confirmed' when been_collected = 1 AND collection_date IS NOT NULL and (confirmed = 1  and laststatus like 'confirmed') then 'Confirmed' when laststatus like 'On-Hold' then 'Hold'
+              case when been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and (confirmed = 0  or confirmed is null) 
+              and laststatus like 'booked' then 'booked' When  isnull(cast(collection_date as varchar(50)),'not set') is not null and confirmed = 1 then 'confirmed' when been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and (confirmed = 1  and laststatus like 'confirmed') then 'Confirmed' when laststatus like 'On-Hold' then 'Hold'
                when laststatus like 'cancelled' then  'cancelled'  when (rt.Owner is null or rt.Owner like '') then 'New' when isnull(deleted, 0) = 1 then 'deleted'  else 'Request' end as Stat,
               isnull(Cmp_number, 'N/A') as crm,
               ---[dbo].[greencrmn](Request_id) crm,
@@ -70,15 +90,20 @@ class Bookingdata extends AbstractModel
                 isnull(charge, 0)  as charge,
                 bc.survey_deadline,
                 req_col_instrct as instructions, 
-                request_col_date,
+                convert(varchar(100), request_col_date) request_col_date,
                 case when isnull(GDPRconf, 0) = 1 then 'Yes' else 'No' end as gdpr,
                 rt.postcode AS postcode, 
                 bc.emailsentdate
+              
               
               FROM
                request as rt with(nolock)
               LEFT join Booked_Collections as bc with(nolock) on
               (case when ISNUMERIC(bc.RequestID) = 1 then bc.RequestID else 0 end)  = rt.Request_id
+              join Req_Detail as rd on 
+              rd.req_id = Request_id
+              join productlist as p with(nolock) on 
+              p.product_ID = prod_id 
               
               WHERE
               Request_date_added  > dateadd(YY, DATEDIFF(YY, 0, getdate()), -30) 
@@ -118,32 +143,105 @@ class Bookingdata extends AbstractModel
                   $fu = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/collectdatesearch.txt","a+");
                   fwrite($fu,date("d-m-y",strtotime($_POST["collectdate"]))."\n");
                   fclose($fu);
-                  $sql .= "and rt.collection_date ='".date("d-m-y",strtotime($_POST["collectdate"]))."'"; 
+                  $sql .= "and isnull(cast(rt.collection_date as varchar(50)),'not set') ='".date("d-m-y",strtotime($_POST["collectdate"]))."'"; 
                 
                 }
                 
               
               
                 $sql .= "
+
+                group by 
+                Request_id,
+
+                prev_orders ,
+                [SurveyComplete],
+                ISNULL(RT.Owner, BC.Owner) ,
+                approved,
+                process,
+                rt.ord ,
+                case when been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and (confirmed = 0  or confirmed is null) 
+                and laststatus like 'booked' then 'booked' When  isnull(cast(collection_date as varchar(50)),'not set') is not null and confirmed = 1 then 'confirmed' when been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and (confirmed = 1  and laststatus like 'confirmed') then 'Confirmed' when laststatus like 'On-Hold' then 'Hold'
+                 when laststatus like 'cancelled' then  'cancelled'  when (rt.Owner is null or rt.Owner like '') then 'New' when isnull(deleted, 0) = 1 then 'deleted'  else 'Request' end,
+                isnull(Cmp_number, 'N/A') ,
+                ---[dbo].[greencrmn](Request_id) crm,
+                request_date_added,
+                isnull(cast(collection_date as varchar(50)),'not set') ,
+                  Customer_name, 
+                  customer_email ,
+                  customer_contact ,
+                  customer_phone ,
+                 rt.town ,
+                 ISNULL([TYPE], '') ,
+                 req_note  ,
+                  county,
+                  isnull(charge, 0),
+                  bc.survey_deadline,
+                  req_col_instrct , 
+                convert(varchar(100), request_col_date),
+                  case when isnull(GDPRconf, 0) = 1 then 'Yes' else 'No' end ,
+                  rt.postcode , 
+                  bc.emailsentdate
               ORDER BY
-                ".(isset($_POST["filter"]) && $_POST["filter"] != "" ? $_POST["filter"] : "collection_date")." ".(isset($_POST["filter2"]) && $_POST["filter2"] != "" ? $_POST["filter2"] : "  DESC")." 
+                ".(isset($_POST["filter"]) && $_POST["filter"] != "" ? $_POST["filter"] : " isnull(cast(collection_date as varchar(50)),'not set') ")." ".(isset($_POST["filter2"]) && $_POST["filter2"] != "" ? $_POST["filter2"] : "  DESC")." 
                 ";
               
-              
+              //var_dump($sql);
                 $stmt = $this->sdb->prepare($sql);
+                if (!$stmt) {
+                  echo "\nPDO::errorInfo():\n";
+                  print_r($this->sdb->errorInfo());
+              }
+
+
+
 
         try {
             $stmt->execute();
             $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-           echo $sql;
-            $this->response = $data;
+
+
+            $dataarray = array();
+            $dataarray = $data;
+
+            
+
+
+
+
+            
+
+
+         
+            $this->response = $dataarray;
             return $this->response;
         } catch (\Exception $e) {
-          var_dump($e);
+         var_dump($e);
         }
 
-        return [];
+       // return [];
      
+    }
+
+    public function qualifying($id){
+
+      $sql = "exec commisionable ".$id;
+      $stmt = $this->sdb->prepare($sql);
+
+      echo $id;
+      try{
+        $stmt->execute();
+
+
+      $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+      $this->response = $data;
+      return $this->response;
+      }catch (\Exception $e) {
+        var_dump($e->getmessage());
+       }
+
+      
+ 
     }
 
 
@@ -151,28 +249,23 @@ class Bookingdata extends AbstractModel
     public function getareas(){
   
         $areaquery = "select distinct area1 from Area";
-        $stmt = $this->sdb->prepare($areaquery);
-        $stmt->execute();
-        $datarea = $stmt->fetchall(PDO::FETCH_ASSOC);
+        $stmt3 = $this->sdb->prepare($areaquery);
 
 
-        foreach($datarea as $area){
-          echo "<option  value='".$area['area1']."'> ".$area['area1']." </option>";
-        }
-        
-        $dataArray2 = array();
-        foreach ($datarea as $val) {
-            $dataArray2[] = $val;
-        }
+
        
         try {
-            $this->response = json_encode($dataArray2);
+          $stmt3->execute();
+          $datarea = $stmt3->fetchall(\PDO::FETCH_ASSOC);
+
+          $dataArray2 = $datarea;
+            $this->response = $dataArray2;
             return $this->response;
         } catch (\JsonException $e) {
-          
+          var_dump($e->getmessage());
         }
 
-        return [];
+  
         
 
 

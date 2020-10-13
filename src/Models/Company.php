@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Database;
+use App\Helpers\Logger;
 
 /**
  * Class Company
@@ -202,18 +203,14 @@ class Company extends AbstractModel
                 $exists2 = $result2->fetchall(\PDO::FETCH_OBJ);
 
                 if (empty($exists2)) {
-                    $fh = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/shouldbeuploading.txt", "a+");
-                    fwrite($fh, $webUser->compname . "\n");
-                    fclose($fh);
+                    Logger::getInstance("shouldbeuploading.log")->info($webUser->compname);
 
                     $sql3 = "INSERT into companies(CompanyName, Location, cmp, dateadded, Department, owner )
 					VALUES (:name,:loc,:cmp, GETDATE(), 'new', 'new')";
                     $result2 = $this->sdb->prepare($sql3);
                     $result2->execute(array(':name' => $webUser->compname, ':loc' => $webUser->postcode, ':cmp' => $webUser->ccmp));
-                    //$data = $result->fetch(\PDO::FETCH_OBJ);
-                    $fh3 = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/updatescomoanygreen.txt", "a+");
-                    fwrite($fh3, print_r($exists2, true) . "\n");
-                    fclose($fh3);
+
+                    Logger::getInstance("updatescomoanygreen.log")->info('exist2', [$exists2]);
                 }
 
                 /**
@@ -228,19 +225,14 @@ class Company extends AbstractModel
                 }
 
                 if (empty($exists)) {
-                    $fh = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/doesntmatchweb.txt", "a+");
-                    fwrite($fh, print_r($exists, true) . "yes" . "\n");
-                    fclose($fh);
+                    Logger::getInstance("doesntmatchweb.log")->info('yes', [$exists]);
                     //get all the company data we need to set them up
                     $sql = "SELECT CompanyName, PrimaryAddressLine1,PrimaryAddressLine2,PrimaryAddressLine3,PrimaryAddressLine4 ,PrimaryAddressTown, PrimaryAddressPostCode, Telephone, Email, SiteCode, SICCode, CRMNumber
 							FROM [dbo].[Company] WHERE [CompanyID] = :greenoak";
                     $result = $this->gdb->prepare($sql);
                     $result->execute(array(':greenoak' => $webUser->company_id));
                     $data = $result->fetch(\PDO::FETCH_OBJ);
-
-                    $fh = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/shouldinsertcmp.txt", "a+");
-                    fwrite($fh, print_r($data, true) . "\n");
-                    fclose($fh);
+                    Logger::getInstance("shouldinsertcmp.log")->info('cmp', [$data]);
 
                     if (isset($data)) {
                         //add first to company table, and then once we have the company ID add to the sync table.

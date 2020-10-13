@@ -9,6 +9,9 @@ use App\Models\RS\BdView;
 use App\Models\RS\GoodInData;
 use App\Models\RS\GoodSoutData;
 use App\Models\RS\Bookingdata;
+use App\Models\RS\Isdone;
+use App\Models\RS\Pdfmaker;
+use App\Models\RS\download;
 use App\Models\User;
 
 /**
@@ -85,13 +88,24 @@ class RSController extends AbstractController
     // Checked
     public function isPdf()
     {
-        $this->template->view('RECBooking/pdfMaker', $this->getCommonData());
+        $data = new User();
+        $ispdfmaker = new Pdfmaker();
+        $data->getRoles();
+        $roles = $data->roles;
+        $pdf = $ispdfmaker->printdoc();
+        //$this->template->view('RECBooking/pdfMaker', $this->getCommonData());
     }
 
     // Checked
     public function isDone()
     {
-        $this->template->view('RECBooking/isDone', $this->getCommonData());
+
+        $data = new User();
+        $isdonedata = new isDone();
+        $data->getRoles();
+        $roles = $data->roles;
+        $isdone = $isdonedata->tocollected();
+       
     }
 
     // Checked
@@ -185,7 +199,11 @@ class RSController extends AbstractController
 
     public function downloadCsv()
     {
-        $this->template->view('RECBooking/download', $this->getCommonData());
+        $data = new User();
+        $isdownload = new Download();
+        $data->getRoles();
+        $roles = $data->roles;
+        $file = $isdownload->getfile();
     }
 
     public function onHold()

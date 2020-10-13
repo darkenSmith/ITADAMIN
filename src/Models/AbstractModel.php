@@ -22,5 +22,6 @@ abstract class AbstractModel
     {
         $this->rdb = Database::getInstance('recycling');
         $this->sdb = Database::getInstance('sql01');
+        $this->gdb = Database::getInstance('greenoak');
     }
 }

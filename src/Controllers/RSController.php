@@ -14,6 +14,7 @@ use App\Models\RS\Pdfmaker;
 use App\Models\RS\download;
 use App\Models\RS\Rebate;
 use App\Models\RS\Charge;
+use App\Models\RS\Arcdata;
 use App\Models\User;
 
 /**
@@ -72,7 +73,16 @@ class RSController extends AbstractController
     // Checked
     public function arc()
     {
-        $this->template->view('RECBooking/pages/archive', $this->getCommonData());
+
+        $data = new User();
+        $arcdata = new Arcdata();
+        $data->getRoles();
+        $roles = $data->roles;
+
+        $arctable = $arcdata->getdata();
+        $areas = $arcdata->getareas();
+        
+        $this->template->view('RECBooking/pages/Archive', array_merge(['arctable' => $arctable, 'areas' => $areas],$this->getCommonData()));
     }
 
     // Checked

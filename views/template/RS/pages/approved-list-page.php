@@ -1,16 +1,12 @@
 <script>
-
     jQuery(document).ready(function ($) {
-
         $('#search').keyup(function () {
             search_table($(this).val());
         });
 
         function search_table(value) {
             $('#tab tbody tr').each(function () {
-                var found = 'false';
-
-
+                let found = 'false';
                 $(this).each(function () {
                     if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0) {
                         found = 'true';
@@ -21,50 +17,34 @@
                 } else {
                     $(this).hide();
                 }
-
-
             });
         }
 
-
         $('#tab tr .appbtn').click(function () {
-            var idnum = $(this).closest('tr').attr('id');
-
+            let idnum = $(this).closest('tr').attr('id');
             $.ajax({
                 type: "POST",
                 url: "/RS/approvedupdate/",
                 data: {idnum: idnum},
                 success: function (data) {
-                    // alert(data);
                     alert("Done");
-
                 }
-
             });
             location.reload();
         });
-
-
     });
-
 </script>
 
-
 <?php
-
 $new = json_decode($list);
 
 $table = "
-
 <div align='center'>  <label> Search         <a data-toggle='tooltip' class='tooltipLink' data-original-title='filter's data in visble table.'>
 <span class='glyphicon glyphicon-info-sign'></span>
 </a></label> <input type='text' name='search' id='search' class='form-control' />  
 </div>
 
 <h1> Approve List </h1>
-
-
-
 <table class='table applisttab' id='tab'>
 <thead>
     <tr>
@@ -98,5 +78,5 @@ foreach ($new as $l) {
 }
 $table .= "    </tbody>
     </table>";
-echo $table;
 
+echo $table;

@@ -35,7 +35,7 @@ class ApprovData extends AbstractModel
         }
 
         try {
-            $this->response = json_encode($dataArray, JSON_THROW_ON_ERROR);
+            $this->response = json_encode($dataArray);
             return $this->response;
         } catch (\JsonException $e) {
         }
@@ -53,8 +53,15 @@ class ApprovData extends AbstractModel
           active =  (case when active = 1 then 0 ELSE 1 END)
           Where id = :id";
 
-            $result = $this->rdb->prepare($sql);
-            $result->execute(array(':id' => $id));
+            try {
+                $result = $this->rdb->prepare($sql);
+                $result->execute(array(':id' => $id));
+            } catch (\PDOException $e) {
+                return false;
+            }
+
+            return true;
         }
+        return false;
     }
 }

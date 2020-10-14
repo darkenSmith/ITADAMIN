@@ -1,72 +1,60 @@
 <script>
 
-jQuery(document).ready(function($) {
+    jQuery(document).ready(function ($) {
 
-    $('#search').keyup(function(){  
-                search_table($(this).val());  
-           });  
-           function search_table(value){  
-                $('#tab tbody tr').each(function(){  
-                     var found = 'false';  
+        $('#search').keyup(function () {
+            search_table($(this).val());
+        });
 
-                         
-
-    
-                     $(this).each(function(){  
-                          if($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0)  
-                          {  
-                               found = 'true';  
-                          }  
-                     });  
-                     if(found == 'true')  
-                     {  
-                          $(this).show();  
-                     }  
-                     else  
-                     {  
-                          $(this).hide();  
-                     }  
+        function search_table(value) {
+            $('#tab tbody tr').each(function () {
+                var found = 'false';
 
 
+                $(this).each(function () {
+                    if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0) {
+                        found = 'true';
+                    }
+                });
+                if (found == 'true') {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
 
 
+            });
+        }
 
-                });  
-           } 
 
-
-       $('#tab tr .appbtn').click(function(){
+        $('#tab tr .appbtn').click(function () {
             var idnum = $(this).closest('tr').attr('id');
 
             $.ajax({
-          type: "POST",
-          url: "/RS/approvedupdate/",
-          data: {idnum : idnum},
-          success: function(data) {
-            // alert(data);
-            alert("Done");
-          
-          }
+                type: "POST",
+                url: "/RS/approvedupdate/",
+                data: {idnum: idnum},
+                success: function (data) {
+                    // alert(data);
+                    alert("Done");
 
+                }
+
+            });
+            location.reload();
         });
-        location.reload();
-       });
 
-    
 
-});
+    });
 
 </script>
 
 
 <?php
 
-
 $new = json_decode($list);
-//var_dump($new);
 
-
-$table =     "
+$table = "
 
 <div align='center'>  <label> Search         <a data-toggle='tooltip' class='tooltipLink' data-original-title='filter's data in visble table.'>
 <span class='glyphicon glyphicon-info-sign'></span>
@@ -89,10 +77,7 @@ $table =     "
     </tr>
     </thead> <tbody>";
 
-foreach($new as $l){
-
-
-
+foreach ($new as $l) {
     $userna = $l->username;
     $firstname = $l->firstname;
     $lastname = $l->lastname;
@@ -100,34 +85,18 @@ foreach($new as $l){
     $approved = $l->approved;
     $idd = $l->idnum;
 
-
-   
-
-    
-
-
-
-
-
-
-$table .= "
-
-  
-<tr id='".$idd."'>
-    <td><input type='submit' class='appbtn btn btn-success' id='test' value='toggle approved' </td>
-    <td>".$userna." </td>
-    <td>".$firstname." </td>
-    <td>".$lastname." </td>
-    <td>".$email." </td>
-    <td>".$approved." </td>
+    $table .= "
+<tr id='" . $idd . "'>
+    <td><input type='submit' class='appbtn btn " . (($approved != 'Y') ? "btn-warning" : "btn-success") . "' id='test' value='toggle approved' </td>
+    <td>" . $userna . " </td>
+    <td>" . $firstname . " </td>
+    <td>" . $lastname . " </td>
+    <td>" . $email . " </td>
+    <td>" . $approved . " </td>
     <tr>
     ";
-
-
-
-}  
-  $table .= "    </tbody>
+}
+$table .= "    </tbody>
     </table>";
+echo $table;
 
-    echo $table;
-?>

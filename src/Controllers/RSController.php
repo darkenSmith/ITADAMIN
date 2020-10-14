@@ -515,7 +515,7 @@ class RSController extends AbstractController
 
         $data->getCustomers();
         $customers = $data->customers;
-        $updateapp->updateapp();
+        echo $updateapp->updateapp();
     }
 
     public function changePasswordApp()

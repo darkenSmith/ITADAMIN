@@ -12,6 +12,7 @@ use App\Models\RS\Bookingdata;
 use App\Models\RS\Isdone;
 use App\Models\RS\Pdfmaker;
 use App\Models\RS\download;
+use App\Models\RS\Charge;
 use App\Models\User;
 
 /**
@@ -373,7 +374,11 @@ class RSController extends AbstractController
 
     public function toggleCharge()
     {
-        $this->template->view('RECBooking/pages/ischarge', $this->getCommonData());
+        $data = new User();
+        $toggl = new Charge();
+        $data->getRoles();
+        $roles = $data->roles;
+        $toggl->toggle();
     }
 
     public function bdmView()

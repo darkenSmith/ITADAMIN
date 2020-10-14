@@ -36,7 +36,7 @@ class RSController extends AbstractController
         $arealist = $bookdata->getareas();
         
        
-        $this->template->view('RECBooking/bookedcollection', array_merge(['bookList' => $booklist,
+        $this->template->view('RECBooking/pages/bookedcollection', array_merge(['bookList' => $booklist,
                                'arealist'=>$arealist], $this->getCommonData()));
         
     }
@@ -63,26 +63,26 @@ class RSController extends AbstractController
     // Checked
     public function detialdoc()
     {
-        $this->template->view('RECBooking/detaildoc', $this->getCommonData());
+        $this->template->view('RECBooking/pages/detaildoc', $this->getCommonData());
     }
 
 
     // Checked
     public function arc()
     {
-        $this->template->view('RECBooking/archive', $this->getCommonData());
+        $this->template->view('RECBooking/pages/archive', $this->getCommonData());
     }
 
     // Checked
     public function updatadata()
     {
-        $this->template->view('RECBooking/update', $this->getCommonData());
+        $this->template->view('RECBooking/pages/update', $this->getCommonData());
     }
 
     // Checked
     public function isEmail()
     {
-        $this->template->view('RECBooking/isEmail', $this->getCommonData());
+        $this->template->view('RECBooking/pages/isEmail', $this->getCommonData());
     }
 
     // Checked
@@ -93,7 +93,7 @@ class RSController extends AbstractController
         $data->getRoles();
         $roles = $data->roles;
         $pdf = $ispdfmaker->printdoc();
-        //$this->template->view('RECBooking/pdfMaker', $this->getCommonData());
+        //$this->template->view('RECBooking/pages/pdfMaker', $this->getCommonData());
     }
 
     // Checked
@@ -111,90 +111,90 @@ class RSController extends AbstractController
     // Checked
     public function ordCheck()
     {
-        $this->template->view('RECBooking/Ordernumcheck', $this->getCommonData());
+        $this->template->view('RECBooking/pages/Ordernumcheck', $this->getCommonData());
     }
 
     // Checked
     public function bookingLog()
     {
-        $this->template->view('RECBooking/bookcollection_log', $this->getCommonData());
+        $this->template->view('RECBooking/pages/bookcollection_log', $this->getCommonData());
     }
 
     // Checked
     public function updateAPS()
     {
-        $this->template->view('RECBooking/updateAPSnew', $this->getCommonData());
+        $this->template->view('RECBooking/pages/updateAPSnew', $this->getCommonData());
     }
 
     // Checked
     public function rgr()
     {
-        $this->template->view('RECBooking/partweights', $this->getCommonData());
+        $this->template->view('RECBooking/pages/partweights', $this->getCommonData());
     }
 
 
     public function updateCol()
     {
-        $this->template->view('RECBooking/updatewgt_col_log', $this->getCommonData());
+        $this->template->view('RECBooking/pages/updatewgt_col_log', $this->getCommonData());
     }
 
     public function delRequest()
     {
-        $this->template->view('RECBooking/delete', $this->getCommonData());
+        $this->template->view('RECBooking/pages/delete', $this->getCommonData());
     }
 
     public function delRequestMulti()
     {
-        $this->template->view('RECBooking/deletemutli', $this->getCommonData());
+        $this->template->view('RECBooking/pages/deletemutli', $this->getCommonData());
     }
 
     public function emailConf()
     {
-        $this->template->view('RECBooking/bookingConf', $this->getCommonData());
+        $this->template->view('RECBooking/pages/bookingConf', $this->getCommonData());
     }
 
     public function testArc()
     {
-        $this->template->view('RECBooking/arctest', $this->getCommonData());
+        $this->template->view('RECBooking/pages/arctest', $this->getCommonData());
     }
 
 
     public function testArcData()
     {
-        $this->template->view('RECBooking/arctestdata', $this->getCommonData());
+        $this->template->view('RECBooking/pages/arctestdata', $this->getCommonData());
     }
 
 
     public function companyNote()
     {
-        $this->template->view('RECBooking/companies', $this->getCommonData());
+        $this->template->view('RECBooking/pages/companies', $this->getCommonData());
     }
 
     public function companyData()
     {
-        $this->template->view('RECBooking/companiesdata', $this->getCommonData());
+        $this->template->view('RECBooking/pages/companiesdata', $this->getCommonData());
     }
 
 
     public function companyUpdate()
     {
-        $this->template->view('RECBooking/updatecomps', $this->getCommonData());
+        $this->template->view('RECBooking/pages/updatecomps', $this->getCommonData());
     }
 
     public function delLine()
     {
-        $this->template->view('RECBooking/delline', $this->getCommonData());
+        $this->template->view('RECBooking/pages/delline', $this->getCommonData());
     }
 
     public function addNewLine()
     {
-        $this->template->view('RECBooking/addnewline', $this->getCommonData());
+        $this->template->view('RECBooking/pages/addnewline', $this->getCommonData());
     }
 
 
     public function updateConf()
     {
-        $this->template->view('RECBooking/emailcustomerconf', $this->getCommonData());
+        $this->template->view('RECBooking/pages/emailcustomerconf', $this->getCommonData());
     }
 
     public function downloadCsv()
@@ -208,76 +208,76 @@ class RSController extends AbstractController
 
     public function onHold()
     {
-        $this->template->view('RECBooking/holdon', $this->getCommonData());
+        $this->template->view('RECBooking/pages/holdon', $this->getCommonData());
     }
 
 
     public function amrApdate()
     {
-        $this->template->view('RECBooking/AMRupdate', $this->getCommonData());
+        $this->template->view('RECBooking/pages/AMRupdate', $this->getCommonData());
     }
 
 
     public function bookStat()
     {
-        $this->template->view('RECBooking/bookstatupdate', $this->getCommonData());
+        $this->template->view('RECBooking/pages/bookstatupdate', $this->getCommonData());
     }
 
 
     public function newCompany()
     {
-        $this->template->view('RECBooking/addcomps', $this->getCommonData());
+        $this->template->view('RECBooking/pages/addcomps', $this->getCommonData());
     }
 
 
     public function newRebate()
     {
-        $this->template->view('RECBooking/rebatecreate', $this->getCommonData());
+        $this->template->view('RECBooking/pages/rebatecreate', $this->getCommonData());
     }
 
     public function rebatePage()
     {
-        $this->template->view('RECBooking/RebatePage', $this->getCommonData());
+        $this->template->view('RECBooking/pages/RebatePage', $this->getCommonData());
     }
 
     public function rebateData()
     {
-        $this->template->view('RECBooking/Rebate_data', $this->getCommonData());
+        $this->template->view('RECBooking/pages/Rebate_data', $this->getCommonData());
     }
 
     public function updateRebate()
     {
-        $this->template->view('RECBooking/rebateupdate', $this->getCommonData());
+        $this->template->view('RECBooking/pages/rebateupdate', $this->getCommonData());
     }
 
     public function createBER()
     {
-        $this->template->view('RECBooking/createBER', $this->getCommonData());
+        $this->template->view('RECBooking/pages/createBER', $this->getCommonData());
     }
 
     public function getdataBER()
     {
-        $this->template->view('RECBooking/BERdata', $this->getCommonData());
+        $this->template->view('RECBooking/pages/BERdata', $this->getCommonData());
     }
 
     public function berUpdate()
     {
-        $this->template->view('RECBooking/BERupdate', $this->getCommonData());
+        $this->template->view('RECBooking/pages/BERupdate', $this->getCommonData());
     }
 
     public function unDoneBtn()
     {
-        $this->template->view('RECBooking/Undonemulti', $this->getCommonData());
+        $this->template->view('RECBooking/pages/Undonemulti', $this->getCommonData());
     }
 
     public function amrs()
     {
-        $this->template->view('RECBooking/amrmessage', $this->getCommonData());
+        $this->template->view('RECBooking/pages/amrmessage', $this->getCommonData());
     }
 
     public function goodsiInMail()
     {
-        $this->template->view('RECBooking/goodsinemail', $this->getCommonData());
+        $this->template->view('RECBooking/pages/goodsinemail', $this->getCommonData());
     }
 
     public function goodsIn()
@@ -363,17 +363,17 @@ class RSController extends AbstractController
 
     public function goodsInAdd()
     {
-        $this->template->view('RECBooking/goodsinUpdate', $this->getCommonData());
+        $this->template->view('RECBooking/pages/goodsinUpdate', $this->getCommonData());
     }
 
     public function closeLoad()
     {
-        $this->template->view('RECBooking/loadclose', $this->getCommonData());
+        $this->template->view('RECBooking/pages/loadclose', $this->getCommonData());
     }
 
     public function toggleCharge()
     {
-        $this->template->view('RECBooking/ischarge', $this->getCommonData());
+        $this->template->view('RECBooking/pages/ischarge', $this->getCommonData());
     }
 
     public function bdmView()

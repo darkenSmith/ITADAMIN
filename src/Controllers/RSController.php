@@ -12,6 +12,7 @@ use App\Models\RS\Bookingdata;
 use App\Models\RS\Isdone;
 use App\Models\RS\Pdfmaker;
 use App\Models\RS\download;
+use App\Models\RS\Rebate;
 use App\Models\User;
 
 /**
@@ -232,22 +233,30 @@ class RSController extends AbstractController
 
     public function newRebate()
     {
-        $this->template->view('RECBooking/pages/rebatecreate', $this->getCommonData());
+        echo (new Rebate())->create();
     }
 
     public function rebatePage()
     {
-        $this->template->view('RECBooking/pages/RebatePage', $this->getCommonData());
+        $data = (new Rebate())->getData();
+        $this->template->view(
+            'RECBooking/pages/rebate-page',
+            array_merge(['rebateData' => $data], $this->getCommonData())
+        );
     }
 
     public function rebateData()
     {
-        $this->template->view('RECBooking/pages/Rebate_data', $this->getCommonData());
+        $data = (new Rebate())->getData();
+        $this->template->view(
+            'RECBooking/pages/rebate-page',
+            array_merge(['rebateData' => $data], $this->getCommonData())
+        );
     }
 
     public function updateRebate()
     {
-        $this->template->view('RECBooking/pages/rebateupdate', $this->getCommonData());
+        echo (new Rebate())->create();
     }
 
     public function createBER()

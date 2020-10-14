@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Database;
+use App\Helpers\Logger;
 
 /**
  * Class Order
@@ -32,11 +33,7 @@ class Order extends AbstractModel
         $result->execute(array(':id' => $id));
         $this->detail = $result->fetch(\PDO::FETCH_OBJ);
 
-        if (file_exists($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/datafromdet.txt")) {
-            $fh = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/datafromdet.txt", "a+");
-            fwrite($fh, print_r($this->detail, true) . "\n");
-            fclose($fh);
-        }
+        Logger::getInstance("datafromdet.log")->info('loadById', [$this->detail]);
 
         $files = array(
             'asset' => 'Asset-Management-Report.pdf',
@@ -63,11 +60,7 @@ class Order extends AbstractModel
         $result->execute(array(':id' => $id));
         $newFiles = $result->fetchAll(\PDO::FETCH_OBJ);
 
-        if (file_exists($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/custfilesdetial.txt")) {
-            $fh = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/custfilesdetial.txt", "a+");
-            fwrite($fh, print_r($newFiles, true) . "\n");
-            fclose($fh);
-        }
+        Logger::getInstance("custfilesdetial.log")->info('loadById', [$newFiles]);
 
         if ($newFiles) {
             $this->newFiles = $newFiles;

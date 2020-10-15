@@ -54,7 +54,11 @@ class Database
                 $database['user'],
                 $database['pass']
             );
+            self::$instance ->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            Logger::getInstance("Database.log")->info('connected', [$type]);
+
         } catch (\PDOException $e) {
+            Logger::getInstance("Database.log")->error($type, [$e->getMessage()]);
             echo "server connection issue please contact MIS";
             die;
         }

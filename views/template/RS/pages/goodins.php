@@ -14,22 +14,13 @@
 
     <script type="text/javascript">
         jQuery(document).ready(function($) {
-
             var test = 0;
             var sum = 0;
             var val= 0;
             var arr = [];
             var arr2 = [];
 
-
             $('#intake tr').each(function() {
-                // var cust = $('#custname').html();
-                // var req = $('#rcnum').html();
-                // var ord = $('#ordernum').html();
-                // var drivers = $('#drivername').html();
-                // var drivers2 = $('#drivername2').html();
-                // var prod = $(this).find('#prod').text();
-                // var request = $(this).find('.req').val();
                 var bli = $(this).find('.bl').val();
                 var beri = $(this).find('.ber').val();
                 var wgti = $(this).find('.wgt').val();
@@ -45,22 +36,9 @@
                 if(wgti == ''){
                     $(this).find('.wgt').val(0);
                 }
-
-
             });
 
-
-
-
-
-
-
-
-
-            // var v= 0;
             $('#emailbtn').on('click', function(){
-
-                //  console.log('hello');
                 arr = [];
                 arr2 = [];
                 var scrap = $('#intake td #scrapwgt').val();
@@ -77,103 +55,40 @@
                 var comments = com1+"# "+com2+"# "+com3;
                 var veri = $('#intake td #veri option:selected').text();
                 var cust = $('#custname').text();
-                var id = <?php echo $rid ? $rid : "";  ?>;
+                var id = <?php echo isset($rid) ? $rid : "null";  ?>;
 
                 var ord = $('#ordernum').text();
 
-
-
-
-
-
-
                 $('#intake tr').each(function() {
-                    // var cust = $('#custname').html();
-                    // var req = $('#rcnum').html();
-                    // var ord = $('#ordernum').html();
-                    // var drivers = $('#drivername').html();
-                    // var drivers2 = $('#drivername2').html();
                     var prod = $(this).find('#prod').text();
                     var request = $(this).find('.req').val();
                     var bli = $(this).find('.bl').val();
                     var beri = $(this).find('.ber').val();
                     var wgti = $(this).find('.wgt').val();
 
-
-
-                    // console.log(scrp);
-
-                    // var dis = $(this).find('.dis').val();
-                    // console.log(request);
-
-
-
                     if(dis == null){
                         dis = 'none';
-
-
-                    }else{
-
-
-
                     }
+
                     if(wgti == null){
                         wgti = 'none';
-
-
-                    }else{
-
-
-
                     }
-
 
                     if(beri == null){
                         beri = 'none';
-
-
-                    }else{
-
-
-
                     }
+
                     if(bli == null){
                         bli = 'none';
-
-
-                    }else{
-
-
-
                     }
-
 
                     if(request == null){
-
                         request - 'none';
-
-                    }else{
-
-
-
                     }
 
-
-                    if(prod == ""){
-
-
-
-                    }else{
+                    if(prod != ""){
                         arr.push({name: prod, request : request, bli : bli, beri : beri, wgti : wgti, dis : dis});
-
-
                     }
-
-
-
-
-
-
                 });
 
                 arr2.push({ord : ord,
@@ -190,115 +105,38 @@
                     veri : veri,
                     comments : comments});
 
-
-
                 var array1 = JSON.stringify(arr);
                 var array2 = JSON.stringify(arr2);
                 console.log(arr);
                 console.log(arr2);
 
+                console.log("mail")
                 $.ajax({
-                    url: "/RS/goodsinmail/", // Url to which the request is send
-                    type: "POST",             // Type of request to be send, called as method
+                    url: "/RS/goodsinmail/",
+                    type: "POST",
                     data: {
                         array1 : array1,
                         array2 : array2
                         // notworkingqty : notworkingqty,
 
-                    }, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-                    // To send DOMDocument or non processed data file it is set to false
-
+                    },
                     success: function(data){   // A function to be called if request succeeds
-
-                        // alert('success');
-                        //console.log(data);
-
-                        location.reload("http://recwebtest.stonegroup.co.uk/RS/Goodsin/");
-                        // $("#image_preview").html(data);
+                        location.reload("/RS/Goodsin/");
                     }
                 });
-
-
-
-
-
             });
-
-
-
-            //  console.log(arr2);
-
-
-//         $('#emailbtn').on('click', function(){
-
-// var content = $('#tablezone').html();
-// console.log(content);
-// var rid = $('#intake #rcnum').val();
-// alert(rid);
-
-
-// $.ajax({
-//               url: "/RS/goodsinmail/", // Url to which the request is send
-//               type: "POST",             // Type of request to be send, called as method
-//               data: {
-//                 content : content,
-//                 rid : rid
-//                // notworkingqty : notworkingqty,
-
-//               }, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-//                     // To send DOMDocument or non processed data file it is set to false
-
-//               success: function(data){   // A function to be called if request succeeds
-
-//              alert('success');
-//              console.log(data);
-//              //location.reload(true);
-//                 // $("#image_preview").html(data);
-//               }
-//             });
-
-
-
-
-
-// });
-
-
-
-
-
-
-
-
 
             $('#print').on('click',function(){
                 printData();
             });
 
-
             refreshnum();
 
-
-
             $('#intake').on('input ', function(){
-
-
-
                 refreshnum();
-
-
-
-
             });
 
-
-
-
-
-
-
             function refreshnum(){
-
                 v = 0;
                 blber = 0;
                 wgttot = 0;
@@ -308,178 +146,88 @@
                 totalyelwgt = 0;
 
                 $('#intake .red').each(function() {
-
                     $(this).find('.wgt').each(function() {
-
                         redwgt = Number($(this).val());
                         console.log(redwgt);
                         if (!isNaN(redwgt) && redwgt.length !== 0) {
                             totalredwgt += parseFloat(redwgt);
-
                         }
                     });
-
-
                 });
 
                 $('#intake .yellow').each(function() {
-
-
                     $(this).find('.wgt').each(function() {
-
-
                         yelwgt = Number($(this).val());
-
                         console.log(yelwgt);
                         if (!isNaN(yelwgt) && yelwgt.length !== 0) {
                             totalyelwgt += parseFloat(yelwgt);
-
                         }
-
                     });
-
-
                 });
 
-
-
-
-
-
                 $('#intake tr').each(function() {
-
                     val = 0;
                     bl = 0;
                     wgt = 0;
                     ber = 0;
                     totalcol = 0;
                     dis = 0;
-
                     req = $(this).find('.req').val();
 
-
-
                     $(this).find('.bl').each(function() {
-
-
                         bl = Number($(this).val());
-
                         if (!isNaN(bl) && bl.length !== 0) {
                             blber += parseFloat(bl);
-
                         }
-
                     });
 
                     $(this).find('.wgt').each(function() {
-
-
                         wgt = Number($(this).val());
-
                         if (!isNaN(wgt) && wgt.length !== 0) {
                             wgttot += parseFloat(wgt);
-
                         }
-
                     });
-
-
-
 
                     $(this).find('.ber').each(function() {
-
-
                         ber = Number($(this).val());
-
                         if (!isNaN(ber) && ber.length !== 0) {
                             blber += parseFloat(ber);
-
                         }
-
-
-
                     });
-
 
                     $(this).find('.req').each(function() {
-
                         val = Number($(this).val());
-
                         if (!isNaN(val) && val.length !== 0) {
                             v += parseFloat(val);
-
                         }
                     });
 
-
-
-
-
-
-// $(this).find('.req').each(function() {
-
-
-// val = Number($(this).val());
-
-
-
-
-
-
-
-// });
-
-
-
                     totalcol += bl + ber;
-
                     dis =  totalcol - val;
 
-
                     $(this).find('.dis').each(function() {
-
-
                         $(this).val(dis);
-
-
                     });
+
                     $('#yeltotal').val(totalyelwgt);
                     $('#redtotal').val(totalredwgt);
                     $('#totunits').val(blber);
                     $('#totalreq').val(v);
                     $('#totalwgt').val(wgttot);
                 });
-
             }
 
-
             function printData() {
-                // var divToPrint=document.getElementById("intake");
-                // newWin= window.open("");
-                // newWin.document.write(divToPrint.outerHTML);
-                // newWin.print();
-                // newWin.close();
                 $('#tablezone').printThis({
                     importCSS: true,
                     importStyle: true
                 });
             }
-
-
-
-
-
         });
     </script>
-
-
-
 </head>
 <style type="text/css">
-
-
     body{
-
         -webkit-print-color-adjust: exact !important;
     }
 
@@ -490,29 +238,14 @@
 
     #container{
         -webkit-print-color-adjust: exact !important;
-
         padding-left:10% !important;
-
         padding-top:10% !important;
-
     }
-    /* #tablezone{
-     padding-left:20%;
-     padding-right:30%;
-
-    } */
-
-
-
 
     .xdebug-var-dump{
-
         padding-top:10% !important;
         -webkit-print-color-adjust: exact !important;
-
     }
-
-
 
     #intake .ewc{
         background-color:white !important;
@@ -529,8 +262,6 @@
         background-color:#ffb2b2 !important;
     }
 
-
-
     #intake .yellow{
         background-color:#f4f499 !important;
     }
@@ -539,7 +270,6 @@
         background-color:#f4f499 !important;
     }
 
-
     #intake .green{
         background-color:#b2d8b2 !important;
     }
@@ -547,11 +277,6 @@
     #intake .block{
         background-color:grey !important;
     }
-
-    /* #intake {
-      margin:0;
-
-    } */
 
     #intake{
         max-width: 2480px !important;
@@ -563,13 +288,9 @@
         word-wrap: break-word !important;
     }
 
-
-
 </style>
 
 <body>
-
-
 <div id='container'>
 
     <ul class="nav nav-tabs">
@@ -589,9 +310,6 @@
 
     <br> <br>
 
-
-
-
     <form method='POST' action='/RS/Goodsin/'>
         <input type='text' name='rid' id='reqid'/>
         <input type='submit'/>
@@ -600,334 +318,159 @@
     <?php
 
     $pc = 0;
-
-    if(isset($res) && $check['cn'] !== 0){
-
-
-
+    if (isset($res) && $check['cn'] !== 0) {
         $cust = '';
-
-        foreach($name as $n){
-
+        foreach ($name as $n) {
             $cust = $n['Customer_name'];
-
         }
 
-
         $ord ='';
-
-//echo print_r($driver, true);
-
-
-
-
-
-
-
-
-
-
-//echo print_r($subinfo, true);
-
-
-        foreach($subinfo as $info){
-
-
-            //if($info['PRODUCT'] == 'TFT Monitors') {
-
-            if($info['PRODUCT']== ' TFT Monitors '){
-
-
-
-
-                $det = implode(",",$info);
+        foreach ($subinfo as $info) {
+            if ($info['PRODUCT']== ' TFT Monitors ') {
+                $det = implode(",", $info);
                 $blarr = array_slice($info, 0, 1);
-                $tftmonbl= implode(",",$blarr);
+                $tftmonbl= implode(",", $blarr);
                 $berarr = array_slice($info, 1, 1);
                 $tftmonber = implode(",", $berarr);
                 $weightarr = array_slice($info, 2, 1);
                 $tftmonwight = implode(",", $weightarr);
-
-
-
-            }
-
-
-            else if($info['PRODUCT'] == ' TFT TV Monitors ') {
-
+            } elseif ($info['PRODUCT'] == ' TFT TV Monitors ') {
                 $tfttvnbl = $info['BL'];
                 $tfttvber = $info['ber'];
                 $tfttvwight = $info['weight'];
-
-            }
-            else if($info['PRODUCT'] == ' PC - DT/TOWER Generic ') {
-
+            } elseif ($info['PRODUCT'] == ' PC - DT/TOWER Generic ') {
                 $pcbl = $info['BL'];
                 $pcber = $info['ber'];
                 $pcwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' PC - Apple ') {
-
+            } elseif ($info['PRODUCT'] == ' PC - Apple ') {
                 $pcappmonbl = $info['BL'];
                 $pcappber = $info['ber'];
                 $pcappwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' All in One - Generic ') {
-
+            } elseif ($info['PRODUCT'] == ' All in One - Generic ') {
                 $aiobl = $info['BL'];
                 $aiober = $info['ber'];
                 $aiowight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' All in One - Apple Imac ') {
-
+            } elseif ($info['PRODUCT'] == ' All in One - Apple Imac ') {
                 $aioappimacbl = $info['BL'];
                 $aioappimacber = $info['ber'];
                 $aioappimacwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' All in One - Apple Emac ') {
-
+            } elseif ($info['PRODUCT'] == ' All in One - Apple Emac ') {
                 $aioemacbl = $info['BL'];
                 $aioemacber = $info['ber'];
                 $aioemacwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Laptops ') {
-
+            } elseif ($info['PRODUCT'] == ' Laptops ') {
                 $Laptopbl = $info['BL'];
                 $Laptopber = $info['ber'];
                 $Laptopwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Laptop - Apple Macbook ') {
-
+            } elseif ($info['PRODUCT'] == ' Laptop - Apple Macbook ') {
                 $applapbl = $info['BL'];
                 $applapber = $info['ber'];
                 $applapwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Servers ' ) {
-
+            } elseif ($info['PRODUCT'] == ' Servers ') {
                 $srvbl = $info['BL'];
                 $srvber = $info['ber'];
                 $srvwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Tablets - Generic ') {
-
+            } elseif ($info['PRODUCT'] == ' Tablets - Generic ') {
                 $tabbl = $info['BL'];
                 $tabber = $info['ber'];
                 $tabwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Tablets - Apple ') {
-
+            } elseif ($info['PRODUCT'] == ' Tablets - Apple ') {
                 $apptabbl = $info['BL'];
                 $apptabber = $info['ber'];
                 $apptabwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Smart Phone ') {
-
+            } elseif ($info['PRODUCT'] == ' Smart Phone ') {
                 $spbl = $info['BL'];
                 $spber = $info['ber'];
                 $spwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Apple Phone ') {
-
+            } elseif ($info['PRODUCT'] == ' Apple Phone ') {
                 $apbl = $info['BL'];
                 $apber = $info['ber'];
                 $apwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Non Smart Phone ') {
-
+            } elseif ($info['PRODUCT'] == ' Non Smart Phone ') {
                 $nonsmartbl = $info['BL'];
                 $nonsmartber = $info['ber'];
                 $nonsmartwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Printers ') {
-
+            } elseif ($info['PRODUCT'] == ' Printers ') {
                 $printbl = $info['BL'];
                 $printber = $info['ber'];
                 $printwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' MFD Printers ') {
-
+            } elseif ($info['PRODUCT'] == ' MFD Printers ') {
                 $mfdmonbl = $info['BL'];
                 $mfdmonber = $info['ber'];
                 $mfdwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' CRT Monitors / TV') {
-
+            } elseif ($info['PRODUCT'] == ' CRT Monitors / TV') {
                 $crtbl = $info['BL'];
                 $crtber = $info['ber'];
                 $crtwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Scanners ') {
-
+            } elseif ($info['PRODUCT'] == ' Scanners ') {
                 $scanbl = $info['BL'];
                 $scanber = $info['ber'];
                 $scanwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Batteries - UPS ') {
-
+            } elseif ($info['PRODUCT'] == ' Batteries - UPS ') {
                 $batupsbl = $info['BL'];
                 $batupsber = $info['ber'];
                 $batupswight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Batteries - Lead Acid ') {
-
+            } elseif ($info['PRODUCT'] == ' Batteries - Lead Acid ') {
                 $acidbl = $info['BL'];
                 $acidber = $info['ber'];
                 $acidwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Batteries - Mecury, Nickel ') {
-
+            } elseif ($info['PRODUCT'] == ' Batteries - Mecury, Nickel ') {
                 $nicbl = $info['BL'];
                 $nicber = $info['ber'];
                 $nicwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Batteries - Non Haz ') {
-
+            } elseif ($info['PRODUCT'] == ' Batteries - Non Haz ') {
                 $nonhazbl = $info['BL'];
                 $nonhazber = $info['ber'];
                 $nonhazwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Projectors ') {
-
+            } elseif ($info['PRODUCT'] == ' Projectors ') {
                 $projbl = $info['BL'];
                 $projber = $info['ber'];
                 $projwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Thin Clients ') {
-
+            } elseif ($info['PRODUCT'] == ' Thin Clients ') {
                 $thinbl = $info['BL'];
                 $thinber = $info['ber'];
                 $thinwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Switches ') {
-
+            } elseif ($info['PRODUCT'] == ' Switches ') {
                 $swibl = $info['BL'];
                 $swiber = $info['ber'];
                 $swiwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Smartboards ') {
-
+            } elseif ($info['PRODUCT'] == ' Smartboards ') {
                 $smartbl = $info['BL'];
                 $smartber = $info['ber'];
                 $smartwight = $info['weight'];
-
-
-            }
-
-            else if($info['PRODUCT'] == ' PDAS ') {
-
+            } elseif ($info['PRODUCT'] == ' PDAS ') {
                 $pdabl = $info['BL'];
                 $pdaber = $info['ber'];
                 $pdawight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Sky Boxes ') {
-
+            } elseif ($info['PRODUCT'] == ' Sky Boxes ') {
                 $skybl = $info['BL'];
                 $skyber = $info['ber'];
                 $skywight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Game Consoles ') {
-
+            } elseif ($info['PRODUCT'] == ' Game Consoles ') {
                 $gamebl = $info['BL'];
                 $gameber = $info['ber'];
                 $gamewight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Data Tapes ') {
-
+            } elseif ($info['PRODUCT'] == ' Data Tapes ') {
                 $databl = $info['BL'];
                 $databer = $info['ber'];
                 $datawight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Loose Hard Drives ') {
-
+            } elseif ($info['PRODUCT'] == ' Loose Hard Drives ') {
                 $hhdbl = $info['BL'];
                 $hhdber = $info['ber'];
                 $hhdwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Back Up Devices') {
-
+            } elseif ($info['PRODUCT'] == ' Back Up Devices') {
                 $devbl = $info['BL'];
                 $devber = $info['ber'];
                 $devwight = $info['weight'];
-
-
-            }
-            else if($info['PRODUCT'] == ' Ext Hard Drive') {
-
+            } elseif ($info['PRODUCT'] == ' Ext Hard Drive') {
                 $extbl = $info['BL'];
                 $extber = $info['ber'];
                 $extwight = $info['weight'];
-
-
-            }
-
-            else if($info['PRODUCT'] == ' Other:') {
-
+            } elseif ($info['PRODUCT'] == ' Other:') {
                 $otherbl = $info['BL'];
                 $otherber = $info['ber'];
                 $otherwight = $info['weight'];
-
-
             }
-
-
         }
 
         $pc = 0;
@@ -955,114 +498,103 @@
         $o2 = 0;
         $o3 = 0;
 
-
-        foreach($res as $resdata){
-
-            if($resdata['Product'] == 'PC - iSeries' || $resdata['Product'] == 'PC - AMD' || $resdata['Product'] == 'PC - OTHER'){
+        foreach ($res as $resdata) {
+            if ($resdata['Product'] == 'PC - iSeries' || $resdata['Product'] == 'PC - AMD' || $resdata['Product'] == 'PC - OTHER') {
                 $pc += $resdata['qty'] ?? '0';
             }
-            if($resdata['Product'] == 'Allinone_PC - iSeries' || $resdata['Product'] == 'ALLINONE PC - OTHER' || $resdata['Product'] == 'ALLINONE PC - AMD'){
+
+            if ($resdata['Product'] == 'Allinone_PC - iSeries' || $resdata['Product'] == 'ALLINONE PC - OTHER' || $resdata['Product'] == 'ALLINONE PC - AMD') {
                 $aio += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'TFT'){
+            if ($resdata['Product'] == 'TFT') {
                 $tft += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'TV'){
+            if ($resdata['Product'] == 'TV') {
                 $tfttv += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Laptop - iSeries' || $resdata['Product'] == 'Laptop - iSeries'){
+            if ($resdata['Product'] == 'Laptop - iSeries' || $resdata['Product'] == 'Laptop - iSeries') {
                 $lap += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'ALLINONE PC - OTHER'){
+            if ($resdata['Product'] == 'ALLINONE PC - OTHER') {
                 $lapother += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'ALLINONE PC - AMD'){
+            if ($resdata['Product'] == 'ALLINONE PC - AMD') {
                 $lapamd += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Harddrive'){
+            if ($resdata['Product'] == 'Harddrive') {
                 $hrd += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Server'){
+            if ($resdata['Product'] == 'Server') {
                 $srv = $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Apple Tablet'){
+            if ($resdata['Product'] == 'Apple Tablet') {
                 $apptab += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Tablet'){
+            if ($resdata['Product'] == 'Tablet') {
                 $tab += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Smart Phone'){
+            if ($resdata['Product'] == 'Smart Phone') {
                 $sphne += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Apple Phone'){
+            if ($resdata['Product'] == 'Apple Phone') {
                 $apphne += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'DesktopPrinter'){
+            if ($resdata['Product'] == 'DesktopPrinter') {
                 $pri += $resdata['qty'] ?? '0';
             }
-            if($resdata['Product'] == 'Standalone_Printer'){
+            if ($resdata['Product'] == 'Standalone_Printer') {
                 $mfdpri += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'CRT'){
+            if ($resdata['Product'] == 'CRT') {
                 $crt += $resdata['qty'] ?? '0';
             }
 
-
-            if($resdata['Product'] == 'UPS_Small' || $resdata['Product'] == 'UPS_Large'){
+            if ($resdata['Product'] == 'UPS_Small' || $resdata['Product'] == 'UPS_Large') {
                 $batups += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Projector'){
+            if ($resdata['Product'] == 'Projector') {
                 $proj += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Switches'){
+            if ($resdata['Product'] == 'Switches') {
                 $swi += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'SmartBoard'){
+            if ($resdata['Product'] == 'SmartBoard') {
                 $smartb += $resdata['qty'] ?? '0';
             }
 
-            if($resdata['Product'] == 'Harddrive'){
+            if ($resdata['Product'] == 'Harddrive') {
                 $hdd += $resdata['qty'] ?? '0';
             }
 
-
-            if($resdata['Product'] == 'Other1'){
+            if ($resdata['Product'] == 'Other1') {
                 $o1 += $resdata['qty'] ?? '0';
             }
 
-
-            if($resdata['Product'] == 'Other2'){
+            if ($resdata['Product'] == 'Other2') {
                 $o2 += $resdata['qty'] ?? '0';
             }
 
-
-            if($resdata['Product'] == 'Other3'){
+            if ($resdata['Product'] == 'Other3') {
                 $o3 += $resdata['qty'] ?? '0';
             }
 
             $to = $o1 + $o2 + $o3;
-
-
-
-
-
-
         }
 
         $table =  "
@@ -1074,22 +606,21 @@
 <tr >
 <td colspan='9 align='center' style='background-color:#f5f5dc !important;'> <h3>Customer</h3> </td>
 </tr>
+
 <tr >
 <td colspan='8' id='custname'>".$cust."</td> 
 </tr>
+
 <tr style=' border: 1px solid black;'>
-
-
 <td colspan='2' style='background-color:#b7e1f3 !important;'> <strong>RC Number:</strong></td>
 <td colspan='2' id='rcnum'> RC-00".$rid." </td>
 <td colspan='4' align='center'  style='background-color:#b7e1f3 !important;'> <strong>Driver(s)</strong></td>
 </tr>
+
 <tr>
 <td colspan='2' style='background-color:#99cc99 !important;'> <strong>WTN:</strong></td>
 <td colspan='2' id='wtnnum'> ".$ordnum['wtn']." </td>
 <td align='center'  colspan='4' class='block'><input type='text' id='drivername'/> </td>
-
-
 </tr>
 
 <tr>
@@ -1103,9 +634,6 @@
 <td align='center'  colspan='9' class='block' rowspan='1'></td>
 </tr>
 
-
-
-
 <tr>
 <th>Product:</th>
 <th> TMP REQ:</th>
@@ -1117,7 +645,6 @@
 <th> Discrepancies</th>
 </tr>
 </thead>
-
 <tbody>
 
 <tr>
@@ -1580,38 +1107,18 @@
 <td colspan = '2' id='securout'><input type='text' id='securinout'></td>
 </tr>
 
-
-
 </tbody>
-
-
 </table>
 </div>
 <br> 
 <input type='button' id='print' class='btn btn-primary'  value='Print'>
 <input type='button' id='emailbtn' class='btn btn-success'  value='Email'>
-
-
-
-
 ";
 
-
         echo $table;
-
-
-
-
-
-    }else{
-
+    } else {
         echo "<p>No Data Found!</p>";
     }
-
-    $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/pagehitgoods.txt","a+");
-    fwrite($fh,'on goods in'."\n");
-    fclose($fh);
-
     ?>
 </div>
 </body>

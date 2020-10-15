@@ -7,6 +7,7 @@ use App\Models\RS\ApprovData;
 use App\Models\RS\BdmDetail;
 use App\Models\RS\BdView;
 use App\Models\RS\GoodInData;
+use App\Models\RS\GoodsInMail;
 use App\Models\RS\GoodSoutData;
 use App\Models\RS\Bookingdata;
 use App\Models\RS\Isdone;
@@ -286,7 +287,8 @@ class RSController extends AbstractController
 
     public function goodsiInMail()
     {
-        $this->template->view('RECBooking/pages/goodsinemail', $this->getCommonData());
+        $goodsInMail = new GoodsInMail();
+        echo $goodsInMail->process();
     }
 
     public function goodsIn()
@@ -294,7 +296,7 @@ class RSController extends AbstractController
         $data = new User();
         $data->getRoles();
         $roles = $data->roles;
-        $rid = '';
+        $rid = null;
 
         if (isset($_POST['rid'])) {
             $rid = $_POST['rid'];
@@ -461,14 +463,6 @@ class RSController extends AbstractController
         );
     }
 
-    public function addToRebate()
-    {
-        $data = new User();
-        $reb = new AddRebate();
-
-        $reb->insert();
-        echo $reb->response;
-    }
 
     public function invRebate()
     {
@@ -477,7 +471,6 @@ class RSController extends AbstractController
         $data->getRoles();
 
         $data->getCustomers();
-
 
         $rebinv->invoicerebate();
         echo $rebinv->response;

@@ -12,9 +12,9 @@ use App\Models\RS\Bookingdata;
 use App\Models\RS\Isdone;
 use App\Models\RS\Pdfmaker;
 use App\Models\RS\download;
-use App\Models\RS\Rebate;
 use App\Models\RS\Charge;
 use App\Models\RS\Arcdata;
+use App\Models\RS\Rgrdata;
 use App\Models\User;
 
 /**
@@ -30,10 +30,9 @@ class RSController extends AbstractController
 
     public function booking()
     {
-        $data = new User();
+  
         $bookdata = new Bookingdata();
-        $data->getRoles();
-        $roles = $data->roles;
+
 
         $booklist = $bookdata->getdata();
         $arealist = $bookdata->getareas();
@@ -74,10 +73,9 @@ class RSController extends AbstractController
     public function arc()
     {
 
-        $data = new User();
+
         $arcdata = new Arcdata();
-        $data->getRoles();
-        $roles = $data->roles;
+  
 
         $arctable = $arcdata->getdata();
         $areas = $arcdata->getareas();
@@ -100,11 +98,9 @@ class RSController extends AbstractController
     // Checked
     public function isPdf()
     {
-        $data = new User();
+       $data = new User();
         $ispdfmaker = new Pdfmaker();
-        $data->getRoles();
-        $roles = $data->roles;
-        $pdf = $ispdfmaker->printdoc();
+        $ispdfmaker->printdoc();
         //$this->template->view('RECBooking/pages/pdfMaker', $this->getCommonData());
     }
 
@@ -112,11 +108,9 @@ class RSController extends AbstractController
     public function isDone()
     {
 
-        $data = new User();
+   
         $isdonedata = new isDone();
-        $data->getRoles();
-        $roles = $data->roles;
-        $isdone = $isdonedata->tocollected();
+         $isdonedata->tocollected();
        
     }
 
@@ -141,7 +135,10 @@ class RSController extends AbstractController
     // Checked
     public function rgr()
     {
-        $this->template->view('RECBooking/pages/partweights', $this->getCommonData());
+
+        $getrgr = new Rgrdata();
+        $data =$getrgr->getdata();
+        $this->template->view('RECBooking/pages/partweights', array_merge(['table' => $data],$this->getCommonData()));
     }
 
 
@@ -244,30 +241,22 @@ class RSController extends AbstractController
 
     public function newRebate()
     {
-        echo (new Rebate())->create();
+        $this->template->view('RECBooking/pages/rebatecreate', $this->getCommonData());
     }
 
     public function rebatePage()
     {
-        $data = (new Rebate())->getData();
-        $this->template->view(
-            'RECBooking/pages/rebate-page',
-            array_merge(['rebateData' => $data], $this->getCommonData())
-        );
+        $this->template->view('RECBooking/pages/RebatePage', $this->getCommonData());
     }
 
     public function rebateData()
     {
-        $data = (new Rebate())->getData();
-        $this->template->view(
-            'RECBooking/pages/rebate-page',
-            array_merge(['rebateData' => $data], $this->getCommonData())
-        );
+        $this->template->view('RECBooking/pages/Rebate_data', $this->getCommonData());
     }
 
     public function updateRebate()
     {
-        echo (new Rebate())->create();
+        $this->template->view('RECBooking/pages/rebateupdate', $this->getCommonData());
     }
 
     public function createBER()
@@ -525,7 +514,7 @@ class RSController extends AbstractController
 
         $data->getCustomers();
         $customers = $data->customers;
-        echo $updateapp->updateapp();
+        $updateapp->updateapp();
     }
 
     public function changePasswordApp()

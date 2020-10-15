@@ -481,7 +481,7 @@ class User extends AbstractModel
             $response = $sendgrid->send($email);
 
             if ($response->statusCode() !== 202) {
-                throw new \Exception($response->body());
+                throw new \RuntimeException($response->body());
             }
 
             Logger::getInstance("Mail_send_success.log")->info(

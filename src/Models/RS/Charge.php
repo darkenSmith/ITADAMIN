@@ -7,7 +7,7 @@ use App\Models\AbstractModel;
 use Exception;
 
 /**
- * Class Togglecharge
+ * Class Charge
  * @package App\Models
  */
 class Charge extends AbstractModel
@@ -20,7 +20,8 @@ class Charge extends AbstractModel
      */
     public function __construct()
     {
-        $this->rdb =  Database::getInstance('sql01');
+      $this->sdb = Database::getInstance('sql01');
+      $this->gdb = Database::getInstance('greenoak');
         parent::__construct();
     }
 
@@ -40,30 +41,31 @@ $who =  str_replace( '@stonegroup.co.uk', '', $_SESSION['user']['username']);
 
     foreach ($stuff as $value) {
         
-    $sqlc = "select isnull(charge, 0) as charge, case when  isnull(charge, 0) = 1 then 0 else 1 end as op    from request where Request_id =".$value;
-    $stmtcha = $this->rdb->prepare($sqlc);
-    try{
-      $stmtcha->execute();
-    $data = $stmtcha->fetch(\PDO::FETCH_ASSOC);
+      $sqlc = "SELECT ISNULL(charge, 0) AS charge, CASE WHEN ISNULL(charge, 0) = 1 THEN 0 ELSE 1 END AS op FROM Request WHERE Request_id ='" . $value ."'";
+    $stmtcha = $this->sdb->prepare($sqlc);
+   // $stmtcha->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        $stmtcha->execute();
+        $data = $stmtcha->fetch(\PDO::FETCH_ASSOC);
 
     $chstat = $data['op'];
       $colupdate ="
-      
-
+      set nocount on
       update request  
-      set charge =".$chstat.",
+      set charge = $chstat,
       modifedby = '".$who."',
       modifydate = getdate()
       where Request_ID =".$value; 
-      
-      $stmtu = $this->rdb->prepare($colupdate);
-      $stmtu->execute(); 
-      }catch(Exception $e){
-        var_dump($e);
-      }
-    
-      
-      }
+
+      $test = fopen($_SERVER["DOCUMENT_ROOT"]."/sqlc33.txt","a");
+      fwrite($test,$colupdate."\n");
+      fclose($test);
+  
+  
+      }  
+      $stmtu = $this->sdb->prepare($colupdate);
+      $stmtu->execute();
+      //return true;
     }
 
 

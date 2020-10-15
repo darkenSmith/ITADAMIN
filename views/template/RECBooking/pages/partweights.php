@@ -594,10 +594,11 @@ location.reload('http://recwebtest.stonegroup.co.uk/RS/RGR/?ye=');
 
   <?php
 
-if(isset($_SESSION['customer'])){
+if(isset($_GET['ye'])){
   $ord = $_GET['ye'];
    $name = $_SESSION['customer'];
 }else{
+  $_SESSION['customer'] = "";
   $ord = "";
   $name = "";
 }

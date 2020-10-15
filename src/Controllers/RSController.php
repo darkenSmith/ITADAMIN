@@ -17,6 +17,7 @@ use App\Models\RS\IsDone;
 use App\Models\RS\Pdfmaker;
 use App\Models\RS\Rebate;
 use App\Models\RS\Rgrdata;
+use App\Models\RS\UpdateCollog;
 use App\Models\User;
 
 /**
@@ -142,10 +143,10 @@ class RSController extends AbstractController
         );
     }
 
-
     public function updateCol()
     {
-        $this->template->view('RECBooking/pages/updatewgt_col_log', $this->getCommonData());
+        $updatecol = new UpdateCollog();
+        $updatecol->update();
     }
 
     public function delRequest()

@@ -9,7 +9,7 @@ use App\Models\AbstractModel;
  * Class ApprovData
  * @package App\Models\RS
  */
-class Isdone extends AbstractModel
+class IsDone extends AbstractModel
 {
     public $response;
     public $id;

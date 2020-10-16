@@ -19,6 +19,8 @@ use App\Models\RS\Rebate;
 use App\Models\RS\Rgrdata;
 use App\Models\RS\UpdateCollog;
 use App\Models\RS\Companynotes;
+use App\Models\RS\CompanyUpdate;
+use App\Models\RS\NewCompany;
 use App\Models\User;
 
 /**
@@ -195,15 +197,11 @@ class RSController extends AbstractController
         );
     }
 
-    public function companyData()
-    {
-        $this->template->view('RECBooking/pages/companiesdata', $this->getCommonData());
-    }
-
 
     public function companyUpdate()
     {
-        $this->template->view('RECBooking/pages/updatecomps', $this->getCommonData());
+       $update = new CompanyUpdate();
+       $update->update();
     }
 
     public function delLine()
@@ -251,7 +249,8 @@ class RSController extends AbstractController
 
     public function newCompany()
     {
-        $this->template->view('RECBooking/pages/addcomps', $this->getCommonData());
+        $addcomp = new NewCompany();
+        $addcomp->add();
     }
 
 

@@ -18,6 +18,7 @@ use App\Models\RS\Pdfmaker;
 use App\Models\RS\Rebate;
 use App\Models\RS\Rgrdata;
 use App\Models\RS\UpdateCollog;
+use App\Models\RS\Companynotes;
 use App\Models\User;
 
 /**
@@ -178,7 +179,20 @@ class RSController extends AbstractController
 
     public function companyNote()
     {
-        $this->template->view('RECBooking/pages/companies', $this->getCommonData());
+        $companydata = new Companynotes();
+        $table = $companydata->getdata();
+        $areas = $companydata->getareas();
+        $depts = $companydata->getdept();
+        $owners = $companydata->getowners();
+        $this->template->view(
+            'RECBooking/pages/companies',array_merge(
+                ['table' => $table,
+                 'areas' => $areas,
+                 'depts' => $depts,
+                 'owners' => $owners
+                ], 
+                $this->getCommonData())
+        );
     }
 
     public function companyData()

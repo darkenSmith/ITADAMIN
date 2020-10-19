@@ -12,7 +12,7 @@ use App\Models\RS\Charge;
 use App\Models\RS\download;
 use App\Models\RS\GoodInData;
 use App\Models\RS\GoodsInMail;
-use App\Models\RS\GoodSoutData;
+use App\Models\RS\GoodsOutData;
 use App\Models\RS\IsDone;
 use App\Models\RS\Pdfmaker;
 use App\Models\RS\Rebate;
@@ -232,7 +232,7 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/delline', $this->getCommonData());
     }
 
-    public function Addnewline()
+    public function AddNewline()
     {
         $addnew = new AddLineitem();
         $addnew->addline();
@@ -402,7 +402,7 @@ class RSController extends AbstractController
     public function goodsOut()
     {
         $data = new User();
-        $palletinfo = new GoodSoutData();
+        $palletinfo = new GoodsOutData();
         $palletlist = $palletinfo->getpallets();
         $loadlist = $palletinfo->getloads();
         $totalloads = $palletinfo->getloadtotals();
@@ -429,12 +429,14 @@ class RSController extends AbstractController
 
     public function goodsInAdd()
     {
-        $this->template->view('RECBooking/pages/goodsinUpdate', $this->getCommonData());
+        $goodsOutData = new GoodsOutData();
+        echo $goodsOutData->goodsInAdd();
     }
 
     public function closeLoad()
     {
-        $this->template->view('RECBooking/pages/loadclose', $this->getCommonData());
+        $goodsOutData = new GoodsOutData();
+        echo $goodsOutData->closeLoad();
     }
 
     public function toggleCharge()

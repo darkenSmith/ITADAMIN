@@ -278,6 +278,11 @@ class RSController extends AbstractController
         $addcomp->add();
     }
 
+    public function addToRebate()
+    {
+        echo (new Rebate())->add();
+    }
+
 
     public function newRebate()
     {
@@ -312,10 +317,6 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/createBER', $this->getCommonData());
     }
 
-
-
-
-    
     public function getdataBER()
     {
         $this->template->view('RECBooking/pages/BERdata', $this->getCommonData());
@@ -334,10 +335,8 @@ class RSController extends AbstractController
 
     public function amrs()
     {
-
         $amrsup = new ARCUpdates();
         $amrsup->update();
-       
     }
 
     public function goodsiInMail()
@@ -520,17 +519,9 @@ class RSController extends AbstractController
         );
     }
 
-
     public function invRebate()
     {
-        $data = new User();
-        $rebinv = new AddRebate();
-        $data->getRoles();
-
-        $data->getCustomers();
-
-        $rebinv->invoicerebate();
-        echo $rebinv->response;
+        echo (new Rebate())->invoice();
     }
 
     public function approvedList()

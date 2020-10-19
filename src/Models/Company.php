@@ -25,10 +25,10 @@ class Company extends AbstractModel
         if (isset($_SESSION['user']['id'])) {
             $this->userId = $_SESSION['user']['id'];
             $this->userRole = $_SESSION['user']['role_id'];
-        } else {
-            $this->userId = 61;
-            $this->userRole = 1;
         }
+
+        $this->sdb = Database::getInstance('sql01');
+        $this->gdb = Database::getInstance('greenoak');
 
         parent::__construct();
     }
@@ -122,7 +122,7 @@ class Company extends AbstractModel
             );
             //loop through, add to collection
             foreach ($files as $dir => $file) {
-                $path = '/var/www/recycling2/uploads/' . $dir . '/';
+                $path = PROJECT_DIR . 'uploads/' . $dir . '/';
                 $filename = $collection->sales_order_number . '-' . $file;
                 $altFilename = $collection->sales_order_number . '-' . str_replace('-', ' ', $file);
                 if (file_exists($path . $filename)) {
@@ -164,13 +164,15 @@ class Company extends AbstractModel
 
     public function getUnallocated()
     {
-        $sql = 'SELECT * from recyc_company_list cl
+        $sql = "SELECT * from recyc_company_list cl
 				left join recyc_bdm_to_company bc on cl.id = bc.company_id
-				where (user_id = "" OR user_id IS NULL) 
-				and portal_requirement = 1';
+				where (user_id = '' OR user_id IS NULL) 
+				and portal_requirement = 1";
         $result = $this->rdb->prepare($sql);
         $result->execute(array(':user' => $this->userId));
         $this->unallocated = $result->fetchAll(\PDO::FETCH_OBJ);
+
+        Logger::getInstance("Company.log")->info('getUnallocated', [$this->unallocated]);
     }
 
     public function claim()
@@ -203,14 +205,20 @@ class Company extends AbstractModel
                 $exists2 = $result2->fetchall(\PDO::FETCH_OBJ);
 
                 if (empty($exists2)) {
-                    Logger::getInstance("shouldbeuploading.log")->info($webUser->compname);
+                    Logger::getInstance("shouldbeuploading.log")->info(
+                        $webUser->compname
+                    );
 
                     $sql3 = "INSERT into companies(CompanyName, Location, cmp, dateadded, Department, owner )
 					VALUES (:name,:loc,:cmp, GETDATE(), 'new', 'new')";
                     $result2 = $this->sdb->prepare($sql3);
                     $result2->execute(array(':name' => $webUser->compname, ':loc' => $webUser->postcode, ':cmp' => $webUser->ccmp));
+                    Logger::getInstance("Company.log")->info('getUnallocated', [$this->unallocated]);
 
-                    Logger::getInstance("updatescomoanygreen.log")->info('exist2', [$exists2]);
+                    Logger::getInstance("updatescomoanygreen.log")->info(
+                        'updatescomoanygreen',
+                        [$exists2]
+                    );
                 }
 
                 /**

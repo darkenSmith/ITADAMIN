@@ -10,7 +10,10 @@ use Monolog\Handler\StreamHandler;
  */
 class Logger
 {
-    private static $instance = null;
+    /**
+     * @var \Monolog\Logger
+     */
+    private static $instance;
     public const DEFAULT_LOG_PATH = PROJECT_DIR . 'logs/';
     public const DEFAULT_LOG_FILE = 'log.log';
 
@@ -24,20 +27,6 @@ class Logger
      */
     final private function __construct()
     {
-        $this->logger = new \Monolog\Logger('ITAD-Admin');
-    }
-
-    /**
-     * @param $name
-     * @param $args
-     * @return mixed
-     */
-    public static function __callStatic($name, $args)
-    {
-        $logger = self::getInstance()->getLogger();
-        if (method_exists($logger, $name)) {
-            return $logger->{$name}(...$args);
-        }
     }
 
     /**
@@ -47,22 +36,13 @@ class Logger
     {
         $logFile = !empty($logFile) ? $logFile : self::DEFAULT_LOG_FILE;
 
-        if (null !== static::$instance) {
-            static::$instance->pushHandler(
-                new StreamHandler(
-                    self::DEFAULT_LOG_PATH . $logFile,
-                    \Monolog\Logger::DEBUG
-                )
-            );
-
-            return static::$instance;
-        }
         static::$instance = new \Monolog\Logger('ITAD-Admin');
 
         static::$instance->pushHandler(
             new StreamHandler(
                 self::DEFAULT_LOG_PATH . $logFile,
-                \Monolog\Logger::DEBUG
+                \Monolog\Logger::DEBUG,
+                true
             )
         );
 

@@ -12,7 +12,7 @@ use App\Models\RS\Charge;
 use App\Models\RS\download;
 use App\Models\RS\GoodInData;
 use App\Models\RS\GoodsInMail;
-use App\Models\RS\GoodsOutData;
+use App\Models\RS\GoodSoutData;
 use App\Models\RS\IsDone;
 use App\Models\RS\Pdfmaker;
 use App\Models\RS\Rebate;
@@ -21,6 +21,15 @@ use App\Models\RS\UpdateCollog;
 use App\Models\RS\Companynotes;
 use App\Models\RS\CompanyUpdate;
 use App\Models\RS\NewCompany;
+use App\Models\RS\OnHold;
+use App\Models\RS\DeleteReq;
+use App\Models\RS\UpdateDataDoc;
+use App\Models\RS\UpdateAps;
+use App\Models\RS\AddLineitem;
+use App\Models\RS\ItadEmails;
+use App\Models\RS\UploadImage;
+use App\Models\RS\UnDone;
+use App\Models\RS\ARCUpdates;
 use App\Models\User;
 
 /**
@@ -93,7 +102,9 @@ class RSController extends AbstractController
     // Checked
     public function updatadata()
     {
-        $this->template->view('RECBooking/pages/update', $this->getCommonData());
+        $update = new UpdateDataDoc();
+        $update->update();
+        //$this->template->view('RECBooking/pages/update', $this->getCommonData());
     }
 
     // Checked
@@ -132,7 +143,9 @@ class RSController extends AbstractController
     // Checked
     public function updateAPS()
     {
-        $this->template->view('RECBooking/pages/updateAPSnew', $this->getCommonData());
+        $apsupdate = new UpdateAps();
+        $apsupdate->update();
+        
     }
 
     // Checked
@@ -152,19 +165,23 @@ class RSController extends AbstractController
         $updatecol->update();
     }
 
-    public function delRequest()
-    {
-        $this->template->view('RECBooking/pages/delete', $this->getCommonData());
-    }
 
     public function delRequestMulti()
     {
-        $this->template->view('RECBooking/pages/deletemutli', $this->getCommonData());
+        $del = new DeleteReq();
+        $del->deletelist();
     }
+
+/////// deletes products from request
+    // public function delRequest()
+    // {
+    //     $this->template->view('RECBooking/pages/delete', $this->getCommonData());
+    // }
 
     public function emailConf()
     {
-        $this->template->view('RECBooking/pages/bookingConf', $this->getCommonData());
+        $emaildoc = new ItadEmails();
+        $emaildoc->email();
     }
 
     public function testArc()
@@ -176,6 +193,12 @@ class RSController extends AbstractController
     public function testArcData()
     {
         $this->template->view('RECBooking/pages/arctestdata', $this->getCommonData());
+    }
+
+    public function imageupload()
+    {
+       $uploadimg = new UploadImage();
+       $uploadimg->upload();
     }
 
 
@@ -209,9 +232,10 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/delline', $this->getCommonData());
     }
 
-    public function addNewLine()
+    public function Addnewline()
     {
-        $this->template->view('RECBooking/pages/addnewline', $this->getCommonData());
+        $addnew = new AddLineitem();
+        $addnew->addline();
     }
 
 
@@ -231,7 +255,8 @@ class RSController extends AbstractController
 
     public function onHold()
     {
-        $this->template->view('RECBooking/pages/holdon', $this->getCommonData());
+        $hold = new OnHold();
+        $hold->onholdlist();
     }
 
 
@@ -287,6 +312,10 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/createBER', $this->getCommonData());
     }
 
+
+
+
+    
     public function getdataBER()
     {
         $this->template->view('RECBooking/pages/BERdata', $this->getCommonData());
@@ -299,12 +328,16 @@ class RSController extends AbstractController
 
     public function unDoneBtn()
     {
-        $this->template->view('RECBooking/pages/Undonemulti', $this->getCommonData());
+        $undonereq = new unDone();
+        $undonereq->undo();
     }
 
     public function amrs()
     {
-        $this->template->view('RECBooking/pages/amrmessage', $this->getCommonData());
+
+        $amrsup = new ARCUpdates();
+        $amrsup->update();
+       
     }
 
     public function goodsiInMail()
@@ -369,7 +402,7 @@ class RSController extends AbstractController
     public function goodsOut()
     {
         $data = new User();
-        $palletinfo = new GoodsOutData();
+        $palletinfo = new GoodSoutData();
         $palletlist = $palletinfo->getpallets();
         $loadlist = $palletinfo->getloads();
         $totalloads = $palletinfo->getloadtotals();
@@ -396,14 +429,12 @@ class RSController extends AbstractController
 
     public function goodsInAdd()
     {
-        $goodsOutData = new GoodsOutData();
-        echo $goodsOutData->goodsInAdd();
+        $this->template->view('RECBooking/pages/goodsinUpdate', $this->getCommonData());
     }
 
     public function closeLoad()
     {
-        $goodsOutData = new GoodsOutData();
-        echo $goodsOutData->closeLoad();
+        $this->template->view('RECBooking/pages/loadclose', $this->getCommonData());
     }
 
     public function toggleCharge()

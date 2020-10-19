@@ -1,16 +1,8 @@
-<?php
-set_time_limit(0);
-
-?>
-
-<head>
 
 <br> <br><br>
 <br> 
 
   <style>
-   
-
    #opt {
       padding:20px;
       border-style: solid;
@@ -18,7 +10,6 @@ set_time_limit(0);
       border-color:#d8d8d8;
       }
 
-  
     #tbldata  th {
     background-color: #eee;
     border-top: 1px solid #fff;
@@ -552,8 +543,72 @@ location.reload(true);
 
 
   <br>
-  <?php var_dump($arctable);  ?>
- 
+
+<div align='center'>
+    <table id='tbldata' class='sortable table  table-striped'>
+        <thead>
+        <tr>
+            <TH> </TH>
+            <th>OrderNum</th>
+            <th>RequestID</th>
+            <th>CRM Number</th>
+            <th hidden>Requestdate</th>
+            <th>Collection Date</th>
+            <th> Name</th>
+            <th hidden> Tel</th>
+            <th hidden> Town</th>
+            <th hidden> Stat notes </th>
+            <th hidden> IS REBATE</th>
+            <th> Rebate </th>
+            <th hidden> County </th>
+            <th hidden> Postcode </th>
+            <th> TFT </th>
+            <th> TFT TV </th>
+            <th> PC </th>
+            <th> PC APPLE </th>
+            <th> AIO </th>
+            <th> AIO APPLE </th>
+            <th> LAPTOP </th>
+            <th> LAPTOP APPLE </th>
+            <th> SERVER </th>
+            <th> TABLET </th>
+            <th> TABLET APPLE </th>
+            <th> SMART PHONE </th>
+            <th> PHONE APPLE </th>
+            <th> Non Smart </th>
+            <th> PRINTERS </th>
+            <th> MFD PRINTERS </th>
+            <th hidden> CRT TFT </th>
+            <th>CRT</th>
+            <th> Scanners </th>
+            <th> Batt - Haz </th>
+            <th> Batt - Non Haz </th>
+            <th> PROJECTOR </th>
+            <th> Thin Client </th>
+            <th> Switch </th>
+            <th> Smartboard </th>
+            <th> HDD </th>
+            <th hidden> Status </th>
+            <th> Totalunits </th>
+            <th> Weight </th>
+            <th> Qualifying </th>
+            <th> Non-Qualifying </th>
+            <th> COD </th>
+            <th> AMR </th>
+            <th> invoice Number</th>
+            <th> invoice Date</th>
+            <th>RGR Date </th>
+            <th> Owner </th>
+            <th> RPT </th>
+            <th> Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php echo $arctable; ?>
+        </tbody>
+    </table>
+</div>
+
 
  
 

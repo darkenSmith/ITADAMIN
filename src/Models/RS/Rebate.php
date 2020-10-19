@@ -9,7 +9,8 @@ class Rebate extends AbstractModel
 {
     public function __construct()
     {
-        $this->sdb =  Database::getInstance('sql01');
+        $this->sdb = Database::getInstance('sql01');
+        $this->gdb = Database::getInstance('greenoak');
 
         parent::__construct();
     }
@@ -21,7 +22,7 @@ class Rebate extends AbstractModel
             $ord = $this->cclean($_POST["orde"]);
         }
 
-        $sql="
+        $sql = "
 
 
 SELECT
@@ -40,15 +41,75 @@ rebateid as rid
       ,[RebateID] as rid
       ,[CMP_Num] as cmp
       ,[ExpireDate] as expdate
-  FROM [Rebate] where /*[CMP_Num] like '%".(isset($cmp) ? $cmp : '%')."%'
-  and*/ [ORD] like '%".(isset($ord) ? $ord : '%')."%' and status not like ' Deleted '
+  FROM [Rebate] where /*[CMP_Num] like '%" . (isset($cmp) ? $cmp : '%') . "%'
+  and*/ [ORD] like '%" . (isset($ord) ? $ord : '%') . "%' and status not like ' Deleted '
   order by 
-  ".(isset($_POST["filter"]) ? $_POST["filter"] : "date")." desc
+  " . (isset($_POST["filter"]) ? $_POST["filter"] : "date") . " desc
 ";
 
         $stmt = $this->sdb->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function clean($string)
+    {
+        $string = str_replace(' ', '-', $string);
+        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string));
+    }
+
+    public function add()
+    {
+        $user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
+        $ord = $_POST['arr2'];
+        $inv = $_POST['message'];
+
+        foreach ($ord as $o) {
+            $ordernum = str_replace('ORD-', '', $o);
+
+            $ordernum = str_replace('ORD-', '', $ordernum);
+            $ordernum = str_replace('ORD ', '', $ordernum);
+            $sql = "UPDATE Collections_Log
+                SET rebate = '" . $inv . "'
+                where replace(OrderNum, 'ORD-', '') = '" . $ordernum . "' ";
+            $update = $this->rdb->prepare($sql);
+            $update->execute();
+
+            $sqlcheck = "select ord as c from rebate where ord like '" . $ordernum . "' ";
+            $check = $this->rdb->prepare($sqlcheck);
+            $check->execute();
+            $c = $check->fetch(\PDO::FETCH_ASSOC);
+
+            $boolrebate = $c;
+
+            if (empty($boolrebate)) {
+                $sql2 = "
+        select replace(so.SalesOrderNumber, 'ORD-', '') as ordernum, CompanyName, CRMNumber, cl.rebate from Company as c with(nolock) 
+        join SalesOrders as so with(nolock) on
+        so.CompanyID = c.CompanyID
+        join [sql01].ITADsys.[dbo].request as rt on
+        REPLACE(rt.ord, 'ORD-', '') collate SQL_Latin1_General_CP1_CI_AS =  replace(so.SalesOrderNumber, 'ORD-', '')
+        join [sql01].ITADsys.[dbo].Collections_Log as cl on
+        cl.ordernum = REPLACE(rt.ord, 'ORD-', '')
+        where REPLACE(rt.ord, 'ORD-', '')  = REPLACE('" . $ordernum . "', 'ORD-', '') 
+        ";
+                $dataof = $this->gdb->prepare($sql2);
+                $dataof->execute();
+
+                $greendata = $dataof->fetch(\PDO::FETCH_ASSOC);
+
+                $sqlin = "INSERT INTO rebate(ord, [Month], [DateSent], RaisedBy, [CustomerName], ValueExclVAT, InvValueExclVAT, DiffExclVAT, [CommentsINVNumber], Status, CMP_Num, updateby)
+            values('" . $greendata['ordernum'] . "', substring(DATENAME(mm, GETDATE()), 0, 4), getdate(), '" . $user . "', '" . $greendata['CompanyName'] . "', '" . $greendata['rebate'] . "', 0, '" . $greendata['rebate'] . "', ' ', 'awaiting', '" . $greendata['CRMNumber'] . "', '" . $user . "' );";
+
+                $insreb = $this->rdb->prepare($sqlin);
+                $insreb->execute();
+            } else {
+                return 'all ready in rebate table -' . $o;
+            }
+            return 'done';
+        }
+
+        return 'fail';
     }
 
     public function create()
@@ -77,77 +138,15 @@ rebateid as rid
         $safeaddcin = $this->cleanData($addcin, "text");
         $safeaddstat = $this->cleanData($addstat, "text");
 
-        $timin =  date("Y-m-d H:i:s", strtotime($invdate));
-        $timin2 =  date("Y-m-d H:i:s", strtotime($date));
+        $timin = date("Y-m-d H:i:s", strtotime($invdate));
+        $timin2 = date("Y-m-d H:i:s", strtotime($date));
 
         $sql = "
 insert into rebate(ord, [month], [DateSent], RaisedBy, [CustomerName], [ValueExclVAT], [InvValueExclVAT], DiffExclVAT, [DateINVReceived], [CommentsINVNumber], [Status], CMP_Num)
-values('".$safeord."','".$safemon."','".$timin2."','".$safeaddby."','".$safeaddname."','".$safeaddval1."', '".$safeaddval2."', '".$safeaddval3."', '".$timin."', '".$safeaddcin."','".$safeaddstat ."', '".$safecmp."')
+values('" . $safeord . "','" . $safemon . "','" . $timin2 . "','" . $safeaddby . "','" . $safeaddname . "','" . $safeaddval1 . "', '" . $safeaddval2 . "', '" . $safeaddval3 . "', '" . $timin . "', '" . $safeaddcin . "','" . $safeaddstat . "', '" . $safecmp . "')
 ";
         try {
             $this->sdb->prepare($sql)->execute();
-        } catch (\PDOException $e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function update()
-    {
-        $id = $_POST['id'];
-        $ord = $_POST['ord'];
-        $mon = $_POST['mon'];
-        $datee = $_POST['datee'];
-        $name = $_POST['name'];
-        $val1 = $_POST['val1'];
-        $val2 = $_POST['val2'];
-        $val3 = $_POST['val3'];
-        $invdate = $_POST['invdate'];
-        $cinn = $_POST['cinn'];
-        $status = $_POST['status'];
-
-        $safeord = $this->cleanData($ord ,"text");
-        $safemon= $this->cleanData($mon ,"text");
-        $safename = $this->cleanData($name ,"text");
-        $safeval1 = $this->cleanData($val1  ,"number");
-        $safeval2 = $this->cleanData($val2  ,"number");
-        $safeval3 = $this->cleanData($val3  ,"number");
-        $safecinn = $this->cleanData($cinn ,"text");
-        $safestatus = $this->cleanData($status ,"text");
-
-        if($datee == ''){
-            $timin = 'NULL';
-        }
-
-        if($invdate == ''){
-            $invdate = 'NULL';
-        } else {
-            $timin = date("d-m-Y", strtotime($datee));
-            $timin2 = date("d-m-Y", strtotime($invdate));
-        }
-
-        $sql = "
-set language british;
-update rebate
-set [Month] = '".$safemon."',
-[DateSent] = '".$timin."',
-[CustomerName] = '".$safename."',
-ValueExclVAT = ".$safeval1.",
-InvValueExclVAT = ".$safeval2.",
-DiffExclVAT = ".$safeval3.",
-DateInvReceived = '".$timin2."',
-CommentsInvNumber = '".$cinn."',
-Status = '".$status."'
-where RebateID = '".$id."'";
-
-        $sqlcheck = "update Rebate
-set Status = 'Claimed'
-where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
-
-        try {
-            $this->sdb->prepare($sql)->execute();
-            $this->sdb->prepare($sqlcheck)->execute();
         } catch (\PDOException $e) {
             return false;
         }
@@ -181,9 +180,100 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
         return $value;
     }
 
-    public function clean($string)
+    public function update()
     {
-        $string = str_replace(' ', '-', $string);
-        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string));
+        $id = $_POST['id'];
+        $ord = $_POST['ord'];
+        $mon = $_POST['mon'];
+        $datee = $_POST['datee'];
+        $name = $_POST['name'];
+        $val1 = $_POST['val1'];
+        $val2 = $_POST['val2'];
+        $val3 = $_POST['val3'];
+        $invdate = $_POST['invdate'];
+        $cinn = $_POST['cinn'];
+        $status = $_POST['status'];
+
+        $safeord = $this->cleanData($ord, "text");
+        $safemon = $this->cleanData($mon, "text");
+        $safename = $this->cleanData($name, "text");
+        $safeval1 = $this->cleanData($val1, "number");
+        $safeval2 = $this->cleanData($val2, "number");
+        $safeval3 = $this->cleanData($val3, "number");
+        $safecinn = $this->cleanData($cinn, "text");
+        $safestatus = $this->cleanData($status, "text");
+
+        if ($datee == '') {
+            $timin = 'NULL';
+        }
+
+        if ($invdate == '') {
+            $invdate = 'NULL';
+        } else {
+            $timin = date("d-m-Y", strtotime($datee));
+            $timin2 = date("d-m-Y", strtotime($invdate));
+        }
+
+        $sql = "
+set language british;
+update rebate
+set [Month] = '" . $safemon . "',
+[DateSent] = '" . $timin . "',
+[CustomerName] = '" . $safename . "',
+ValueExclVAT = " . $safeval1 . ",
+InvValueExclVAT = " . $safeval2 . ",
+DiffExclVAT = " . $safeval3 . ",
+DateInvReceived = '" . $timin2 . "',
+CommentsInvNumber = '" . $cinn . "',
+Status = '" . $status . "'
+where RebateID = '" . $id . "'";
+
+        $sqlcheck = "update Rebate
+set Status = 'Claimed'
+where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
+
+        try {
+            $this->sdb->prepare($sql)->execute();
+            $this->sdb->prepare($sqlcheck)->execute();
+        } catch (\PDOException $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function invoice()
+    {
+        $user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
+        $ord = $_POST['arr2'];
+        $inv = $_POST['message'];
+
+        foreach ($ord as $o) {
+            $ordernum = STR_replace('ORD-', '', $o);
+
+            $sqlup = "
+        UPDATE rebate 
+         set 
+         InvValueExclVAT = ValueExclVAT,
+         updateby = '" . $user . "',
+         DiffExclVAT = 0,
+         DateInvReceived = GETDATE(),
+         [CommentsINVNumber] = '" . $inv . "'
+         WHERE ORD = replace('" . $ordernum . "','ORD-', '') ";
+            $dataof = $this->rdb->prepare($sqlup);
+            $dataof->execute();
+
+            $sqp = "update Collections_Log
+        SET  invoiceAmt = ValueExclVAT
+		FROM REBATE as r with(nolock)
+		join collections_log as cl with(nolock) on
+		cl.OrderNum = r.ord
+        where  replace(ORD, '-ORD', '') = replace('" . $ordernum . "','ORD-', '')
+                  ";
+            $dataof2 = $this->rdb->prepare($sqp);
+            $dataof2->execute();
+        }
+
+        return "invoice updated";
     }
 }

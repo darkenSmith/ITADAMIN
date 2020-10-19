@@ -3,12 +3,13 @@
 namespace App\Models\RS;
 
 use App\Helpers\Database;
+use App\Helpers\Logger;
 use App\Models\AbstractModel;
 
 /**
  * Class Booking
  * @package App\Models\RS
- * * alex 
+ * * alex
  */
 class Arcdata extends AbstractModel
 {
@@ -20,68 +21,19 @@ class Arcdata extends AbstractModel
      */
     public function __construct()
     {
-      $this->sdb =  Database::getInstance('sql01');
+        $this->sdb = Database::getInstance('sql01');
         parent::__construct();
-
-       
     }
-    
-
-
-    
 
     public function getdata()
-    { 
-    
+    {
+        if (isset($_POST["postcode"])) {
+            $postcode = $this->clean($_POST["postcode"]);
+            $id = $this->clean($_POST["id"]);
+            $ord = $this->clean($_POST["ent"]);
+        }
 
-$ordernumber = '';
-function clean($string) {
-  $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
-   
-  return str_replace("-"," ",preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
-}
-
-
-
-if(isset($_POST["postcode"]))
-{
-    $postcode = clean($_POST["postcode"]);
-    $id= clean($_POST["id"]);
-    $ord = clean($_POST["ent"]);
-
-
-
-
-
-
-
-
-
-
-}
-
-
-// $sql2 = "SELECT
-//   COUNT(*) AS outstanding
-// FROM
-//   [dbo].[Request] AS r WITH(nolock)
-// -- join @t as t on t.rid = r.Request_ID
-// WHERE
-//   Request_date_added BETWEEN DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) AND DATEADD(yy, DATEDIFF(yy, 0, GETDATE()) + 1, -1)
-//   AND r.Request_ID  LIKE '%'
-//   AND r.Request_deleted <> 1
-//   AND r.Request_collection_date IS NOT NULL
-//   AND r.Request_is_done = 0
-//   AND r.Request_is_collection = 1
-// ";
-//
-// $stmt2 = $this->sdb->prepare($sql2);
-// $stmt2->execute();
-//
-// $count = $stmt2->fetch(PDO::FETCH_ASSOC);
-
-// Get records
-$sql = "
+        $sql = "
 SET LANGUAGE British;
 select distinct
 Request_id as id,
@@ -139,9 +91,7 @@ request_date_added as requestdate,
   cl.[TotalUnit] as coltotalunits,
   cl.invoiceAmt,
   cast(modifed_date as varchar(50)) as modifed_date,
-
   (CASE WHEN  ISNULL( collection_date, '1 JAN 1991') IS NOT NULL THEN 'BOOKED' ELSE 'Not Booked' END)  AS Status
-
 FROM
 Collections_Log as cl  WITH(nolock)
  join request as rt with(nolock)  on
@@ -151,125 +101,36 @@ Collections_Log as cl  WITH(nolock)
 
 WHERE
 Request_date_added >= '1 jan 2019' 
-  AND Request_ID  LIKE '".(isset($id) && $id != "" ? $id :"%")."'
+  AND Request_ID  LIKE '" . (isset($id) && $id != "" ? $id : "%") . "'
   ";
-  
-  if (isset($_POST["collectdate"]) &&  $_POST["collectdate"] != "") {
 
+        if (isset($_POST["collectdate"]) && $_POST["collectdate"] != "") {
+            $sql .= "and collection_date ='" . date("d-m-y", strtotime($_POST["collectdate"])) . "'";
+        }
 
-    
+        if (isset($ord) && $ord != "") {
+            $sql .= "AND ORD LIKE '%" . $_POST["ent"] . "' ";
+        } else {
+            $sql .= "AND (ORD LIKE '%%' OR ORD IS NULL) ";
+        }
 
-    $sql .= "and collection_date ='".date("d-m-y",strtotime($_POST["collectdate"]))."'"; 
-  
-  }
-  if (isset($ord) &&  $ord != "") {
-    $sql .= "AND ORD LIKE '%".$_POST["ent"]."' ";
-  } else {
-    $sql .= "AND (ORD LIKE '%%' OR ORD IS NULL) ";
-  }
-
-
-
-$sql .= "
+        $sql .= "
 AND ISNULL(deleted, 0) <> 1 
   AND collection_date IS not NULL
   AND done = 1 AND been_collected = 1
-  AND rt.postcode LIKE '%".(isset($postcode) && $postcode != "" ? '%'.$postcode.'%' : '%')."%'
-  And area1 like '%".(isset($_POST["areafilter"]) && $_POST["areafilter"] != "" ? $_POST["areafilter"] : '%')."%' 
+  AND rt.postcode LIKE '%" . (isset($postcode) && $postcode != "" ? '%' . $postcode . '%' : '%') . "%'
+  And area1 like '%" . (isset($_POST["areafilter"]) && $_POST["areafilter"] != "" ? $_POST["areafilter"] : '%') . "%' 
 ORDER BY
-  ".(isset($_POST["filter"]) && $_POST["filter"] != "" ? $_POST["filter"] : "isnull(collection_date,'01/01/1900')  ")." ".(isset($_POST["filter2"]) && $_POST["filter2"] != "" ? $_POST["filter2"] : "  DESC")."
-
-  
+  " . (isset($_POST["filter"]) && $_POST["filter"] != "" ? $_POST["filter"] : "isnull(collection_date,'01/01/1900')  ") . " " . (isset($_POST["filter2"]) && $_POST["filter2"] != "" ? $_POST["filter2"] : "  DESC") . "
   ";
 
+        $stmt = $this->sdb->prepare($sql);
+        $stmt->execute();
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-  //var_dump($_POST);
-  //var_dump($sql);
-  
-
-
-$stmt = $this->sdb->prepare($sql);
-if (!$stmt) {
-    echo "\nPDO::errorInfo():\n";
-    print_r($this->sdb->errorInfo());
-    die();
-}
-$stmt->execute();
-$data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-
-
-
-
-
-
-
-
-
-$table = "
-<div align='center'>
-<table id='tbldata' class='sortable table  table-striped'>
-<thead>
-<tr>
-  <TH> </TH>
-  <th>OrderNum</th>
-  <th>RequestID</th>
-  <th>CRM Number</th>
-  <th hidden>Requestdate</th>
-  <th>Collection Date</th>
-  <th> Name</th>
-  <th hidden> Tel</th>
-  <th hidden> Town</th>
-  <th hidden> Stat notes </th>
-  <th hidden> IS REBATE</th>
-  <th> Rebate </th>
-  <th hidden> County </th>
-  <th hidden> Postcode </th>
-  <th> TFT </th>
-  <th> TFT TV </th>
-  <th> PC </th>
-  <th> PC APPLE </th>
-  <th> AIO </th>
-  <th> AIO APPLE </th>
-  <th> LAPTOP </th>
-  <th> LAPTOP APPLE </th>
-  <th> SERVER </th>
-  <th> TABLET </th>
-  <th> TABLET APPLE </th>
-  <th> SMART PHONE </th>
-  <th> PHONE APPLE </th>
-  <th> Non Smart </th>
-  <th> PRINTERS </th>
-  <th> MFD PRINTERS </th>
-  <th hidden> CRT TFT </th>
-  <th>CRT</th>
-  <th> Scanners </th>
-  <th> Batt - Haz </th>
-  <th> Batt - Non Haz </th>
-  <th> PROJECTOR </th>
-  <th> Thin Client </th>
-  <th> Switch </th>
-  <th> Smartboard </th>
-  <th> HDD </th>
-  <th hidden> Status </th>
-  <th> Totalunits </th>
-  <th> Weight </th>
-  <th> Qualifying </th>
-  <th> Non-Qualifying </th>
-  <th> COD </th>
-  <th> AMR </th>
-  <th> invoice Number</th> 
-  <th> invoice Date</th>
-  <th>RGR Date </th>
-  <th> Owner </th>
-  <th> RPT </th>
-  <th> Email</th>
-</tr>
-</thead>
-<tbody>";
-foreach($data as $row) {
-
-  $totalswu = "
+        $table = "";
+        foreach ($data as $row) {
+            $totalswu = "
   select
 SUM(qty) as totalunits,
 sum(qty * convert(DECIMAL(9 , 2),typicalweight)) as totalweight,
@@ -279,126 +140,91 @@ SUM(qty) * max(commisionable) as commisionable
 join productlist as p on 
 p.product_ID = prod_id 
 
-where req_id =".$row["id"]."
-group by req_id"
+where req_id =" . $row["id"] . "
+group by req_id";
 
+            $stmtotal = $this->sdb->prepare($totalswu);
+            $stmtotal->execute();
+            $datatotal = $stmtotal->fetchAll(\PDO::FETCH_ASSOC);
 
-  
+            foreach ($datatotal as $rt) {
+                $modtime = date("d/m/Y", strtotime($row['modifed_date']));
+                $commissql = "set nocount on exec commisionable " . $row["id"] . "";
+                $commisstmt = $this->sdb->prepare($commissql);
+                $commisstmt->execute();
+                $commis = $commisstmt->fetch(\PDO::FETCH_ASSOC);
 
-  ;
-  
-  
-  $stmtotal = $this->sdb->prepare($totalswu);
-  if (!$stmt) {
-      echo "\nPDO::errorInfo():\n";
-      print_r($this->sdb->errorInfo());
-      die();
-  }
-  $stmtotal->execute();
-  $datatotal = $stmtotal->fetchAll(\PDO::FETCH_ASSOC);
-
-  foreach($datatotal as $rt) {
-
-    $modtime = date("d/m/Y",strtotime($row['modifed_date']));
-
-    // if($modtime == '01/01/1970'){
-
-    //   $modtime = '-';
-
-    // }
-
-    
-  $commissql = "
-  set nocount on
-    
-  exec commisionable ".$row["id"]."
-  ";
-   $commisstmt = $this->sdb->prepare($commissql);
-   $commisstmt->execute();
-   $commis = $commisstmt->fetch(\PDO::FETCH_ASSOC);
-
-
-  
-
-
-  $table .=  "
+                $table .= "
   <tr>
-  <td ><input type='checkbox' class='checkboxes' value='".$row["id"] ."' ></td>
-    <td   class='ord'>". $row["ordern"] . "</td>
-    <td   class='req'><a target='_blank' href='/RS/detialdoc?rowid=".$row["id"]." '>".$row["id"] ."</a></td>
-    <td  >".$row["crm"]."</td>
-    <td HIDDEN   >".date("d/m/Y",strtotime($row['requestdate'])). "</td>
-    <td   >".date("d/m/Y",strtotime($row['coldate']))."</td>
-    <td  >".$row["name"]."</td>
-    <td hidden  >".$row["tel"]."</td>
-    <td hidden  >".$row["town"]."</td>
-    <td hidden >".$row["upnotes"]."</td>
-    <td hidden  >".$row["is_Rebate"]."</td>
-    <td  >".$row["Rebate"]."</td>
-    <td hidden  >".$row["county"]."</td>
-    <td hidden >".$row["postcod"]."</td>
-    <td  >".$row["tft"]."</td>
-    <td  >".$row["tfttv"]."</td>
-    <td  >".$row["pc"]."</td>
-    <td  >".$row["pcapp"]."</td>
-    <td  >".$row["aio"]."</td>
-    <td  >".$row["aioapp"]."</td>
-    <td  >".$row["lap"]."</td>
-    <td  >".$row["lapapp"]."</td>
-    <td  >".$row["serv"]."</td>
-    <td  >".$row["tab"]."</td>
-    <td  >".$row["apptab"]."</td>
-    <td  >".$row["sphone"]."</td>
-    <td  >".$row["appphone"]."</td>
-    <td  >".$row["nonsmart"]."</td>
-    <td  >".$row["Printers"]."</td>
-    <td  >".$row["mfdp"]."</td>
-    <td hidden  >".$row["crtmon"]."</td>
-    <td  >".$row["crttv"]."</td>
-    <td  >".$row["scanner"]."</td>
-    <td  >".$row["bathaz"]."</td>
-    <td  >".$row["nonbathaz"]."</td>
-    <td  >".$row["proj"]."</td>
-    <td  >".$row["thin"]."</td>
-    <td  >".$row["switch"]."</td>
-    <td  >".$row["Smartboard"]."</td>
-    <td  >".$row["HDD"]."</td>
-    <td  hidden >".$row["Status"]."</td>
-    <td  >".$row["coltotalunits"]."</td>
-    <td >".$row["coltotalwgt"]."</td>
-    <td > ".$row["commis"]."</td>
-    <td > ".$row["noncommis"]."</td>
-    <td  >".$row["cod"]."</td>
-    <td> ".$row["AMR_Comp"].".</td>
-    <td >".$row['invoiceAmt']."</td>
-    <td >".$row['invoicedate']."</td>
-    <td   >".$modtime."</td>
-    <td>".$row["owner"]."</td>
-    <td>".$row["rpt"]."</td>
-    <td>".$row["email"]."</td>
-    
+  <td><input type='checkbox' class='checkboxes' value='" . $row["id"] . "'></td>
+    <td class='ord'>" . $row["ordern"] . "</td>
+    <td class='req'><a target='_blank' href='/RS/detialdoc?rowid=" . $row["id"] . " '>" . $row["id"] . "</a></td>
+    <td>" . $row["crm"] . "</td>
+    <td hidden>" . date("d/m/Y", strtotime($row['requestdate'])) . "</td>
+    <td>" . date("d/m/Y", strtotime($row['coldate'])) . "</td>
+    <td>" . $row["name"] . "</td>
+    <td hidden>" . $row["tel"] . "</td>
+    <td hidden>" . $row["town"] . "</td>
+    <td hidden>" . $row["upnotes"] . "</td>
+    <td hidden>" . $row["is_Rebate"] . "</td>
+    <td>" . $row["Rebate"] . "</td>
+    <td hidden>" . $row["county"] . "</td>
+    <td hidden>" . $row["postcod"] . "</td>
+    <td>" . $row["tft"] . "</td>
+    <td>" . $row["tfttv"] . "</td>
+    <td>" . $row["pc"] . "</td>
+    <td>" . $row["pcapp"] . "</td>
+    <td>" . $row["aio"] . "</td>
+    <td>" . $row["aioapp"] . "</td>
+    <td>" . $row["lap"] . "</td>
+    <td>" . $row["lapapp"] . "</td>
+    <td>" . $row["serv"] . "</td>
+    <td>" . $row["tab"] . "</td>
+    <td>" . $row["apptab"] . "</td>
+    <td>" . $row["sphone"] . "</td>
+    <td>" . $row["appphone"] . "</td>
+    <td>" . $row["nonsmart"] . "</td>
+    <td>" . $row["Printers"] . "</td>
+    <td>" . $row["mfdp"] . "</td>
+    <td hidden>" . $row["crtmon"] . "</td>
+    <td>" . $row["crttv"] . "</td>
+    <td>" . $row["scanner"] . "</td>
+    <td>" . $row["bathaz"] . "</td>
+    <td>" . $row["nonbathaz"] . "</td>
+    <td>" . $row["proj"] . "</td>
+    <td>" . $row["thin"] . "</td>
+    <td>" . $row["switch"] . "</td>
+    <td>" . $row["Smartboard"] . "</td>
+    <td>" . $row["HDD"] . "</td>
+    <td hidden>" . $row["Status"] . "</td>
+    <td>" . $row["coltotalunits"] . "</td>
+    <td>" . $row["coltotalwgt"] . "</td>
+    <td>" . $row["commis"] . "</td>
+    <td>" . $row["noncommis"] . "</td>
+    <td>" . $row["cod"] . "</td>
+    <td>" . $row["AMR_Comp"] . ".</td>
+    <td>" . $row['invoiceAmt'] . "</td>
+    <td>" . $row['invoicedate'] . "</td>
+    <td>" . $modtime . "</td>
+    <td>" . $row["owner"] . "</td>
+    <td>" . $row["rpt"] . "</td>
+    <td>" . $row["email"] . "</td>
   </tr>
-  
   ";
-  }
-}
-$table .= "</tbody>
-</table>
-</div>";
+            }
+        }
 
-$this->response = $table;
-
-return $this->response;
-
-     
+        return $table;
     }
 
-  
+    public function clean($string)
+    {
+        $string = str_replace(' ', '-', $string);
+        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
+    }
 
-
-    
-    public function getareas(){
-  
+    public function getareas()
+    {
         $areaquery = "      select distinct area1 as name, area1 as val from request
         WHERE
         Request_date_added BETWEEN DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) AND DATEADD(yy, DATEDIFF(yy, 0, GETDATE()) + 1, -1)
@@ -409,33 +235,19 @@ return $this->response;
         AND done = 1 AND been_collected = 1";
         $stmt3 = $this->sdb->prepare($areaquery);
 
-
-
-       
         try {
-          $stmt3->execute();
-          $datarea = $stmt3->fetchall(\PDO::FETCH_ASSOC);
+            $stmt3->execute();
+            $datarea = $stmt3->fetchall(\PDO::FETCH_ASSOC);
 
-          $dataArray2 = $datarea;
+            $dataArray2 = $datarea;
             $this->response = $dataArray2;
             return $this->response;
-        } catch (\JsonException $e) {
-          var_dump($e->getmessage());
+        } catch (\Exception $e) {
+            Logger::getInstance("ArcData.log")->warning(
+                "getareas",
+                [$e->getMessage()]
+            );
         }
-
-  
-        
-
-
+        return [];
     }
-
-
-    public function clean($string) {
-      $string = str_replace('-', ' ', $string); // Replaces all spaces with hyphens.
-       
-      return str_replace("-"," ",preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
-    }
-
-
 }
-

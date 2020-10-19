@@ -12,7 +12,7 @@ use App\Models\RS\Charge;
 use App\Models\RS\download;
 use App\Models\RS\GoodInData;
 use App\Models\RS\GoodsInMail;
-use App\Models\RS\GoodSoutData;
+use App\Models\RS\GoodsOutData;
 use App\Models\RS\IsDone;
 use App\Models\RS\Pdfmaker;
 use App\Models\RS\Rebate;
@@ -232,7 +232,7 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/delline', $this->getCommonData());
     }
 
-    public function Addnewline()
+    public function AddNewline()
     {
         $addnew = new AddLineitem();
         $addnew->addline();
@@ -278,6 +278,11 @@ class RSController extends AbstractController
         $addcomp->add();
     }
 
+    public function addToRebate()
+    {
+        echo (new Rebate())->add();
+    }
+
 
     public function newRebate()
     {
@@ -312,10 +317,6 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/createBER', $this->getCommonData());
     }
 
-
-
-
-    
     public function getdataBER()
     {
         $this->template->view('RECBooking/pages/BERdata', $this->getCommonData());
@@ -334,10 +335,8 @@ class RSController extends AbstractController
 
     public function amrs()
     {
-
         $amrsup = new ARCUpdates();
         $amrsup->update();
-       
     }
 
     public function goodsiInMail()
@@ -402,7 +401,7 @@ class RSController extends AbstractController
     public function goodsOut()
     {
         $data = new User();
-        $palletinfo = new GoodSoutData();
+        $palletinfo = new GoodsOutData();
         $palletlist = $palletinfo->getpallets();
         $loadlist = $palletinfo->getloads();
         $totalloads = $palletinfo->getloadtotals();
@@ -429,12 +428,14 @@ class RSController extends AbstractController
 
     public function goodsInAdd()
     {
-        $this->template->view('RECBooking/pages/goodsinUpdate', $this->getCommonData());
+        $goodsOutData = new GoodsOutData();
+        echo $goodsOutData->goodsInAdd();
     }
 
     public function closeLoad()
     {
-        $this->template->view('RECBooking/pages/loadclose', $this->getCommonData());
+        $goodsOutData = new GoodsOutData();
+        echo $goodsOutData->closeLoad();
     }
 
     public function toggleCharge()
@@ -518,17 +519,9 @@ class RSController extends AbstractController
         );
     }
 
-
     public function invRebate()
     {
-        $data = new User();
-        $rebinv = new AddRebate();
-        $data->getRoles();
-
-        $data->getCustomers();
-
-        $rebinv->invoicerebate();
-        echo $rebinv->response;
+        echo (new Rebate())->invoice();
     }
 
     public function approvedList()

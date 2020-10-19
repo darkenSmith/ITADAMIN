@@ -39,9 +39,13 @@
         <div class="form-group">
             <label for="company">Company Name</label>
             <select class="form-control" name="company">
-                <?php foreach ($info->unallocated as $unallocated) {
-                    echo '<option value="' . $unallocated->id . '">' . $unallocated->company_name . '</option>';
-                } ?>
+                <?php
+                if (!empty($info->unallocated)) {
+                    foreach ($info->unallocated as $unallocated) {
+                        echo '<option value="' . $unallocated->id . '">' . $unallocated->company_name . '</option>';
+                    }
+                }
+                ?>
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Claim Customer</button>

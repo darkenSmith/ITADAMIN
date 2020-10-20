@@ -4,6 +4,7 @@ namespace App\Models\RS;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
+use App\Models\RS\CurlStatuschange;
 use Exception;
 
 
@@ -26,10 +27,13 @@ class OnHold extends AbstractModel
         parent::__construct();
     }
 
-    public function onholdlist()
-    { 
+    public function onholdlist(){ 
+
+        $apicall = new CurlStatuschange();
+
         $ord = $_POST['stuff'];
         $who =  str_replace( '@stonegroup.co.uk', '', $_SESSION['user']['username']);
+        
 
         foreach ($ord as $value) {
         $colupdate ="
@@ -42,6 +46,9 @@ class OnHold extends AbstractModel
 
         $stmtu = $this->sdb->prepare($colupdate);
         $stmtu->execute();
+
+        // out for now cant connect while vpn
+ // $apicall->updateAPI($value, 'Done');
 
         }
     }

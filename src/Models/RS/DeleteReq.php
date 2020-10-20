@@ -4,6 +4,7 @@ namespace App\Models\RS;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
+use App\Models\RS\CurlStatuschange;
 
 
 
@@ -15,6 +16,8 @@ class DeleteReq extends AbstractModel
 {
     public $response;
     public $id;
+    public $status;
+    private $apicall;
 
     /**
      * DeleteReq constructor.
@@ -29,6 +32,8 @@ class DeleteReq extends AbstractModel
     public function deletelist()
     { 
       
+        $apicall = new CurlStatuschange();
+
         $stuff = $_POST['stuff']; 
         $dell = 1;
         
@@ -40,18 +45,19 @@ class DeleteReq extends AbstractModel
         
          $colupdate ="
         
-          update request  
-          set deleted =".$dell.",
-          deletedBy = '".$who."'
-          where Request_ID =".$value."
+            update request  
+            set deleted =".$dell.",
+            laststatus = 'cancelled',
+            deletedBy = '".$who."'
+            where Request_ID =".$value."
           
-        update Booked_Collections 
-        set is_canceled = 1
-        where  RequestID like '".$value."'";
-        
-        
-        $stmtu = $this->sdb->prepare($colupdate);
-        $stmtu->execute();
+            update Booked_Collections 
+            set is_canceled = 1
+            where  RequestID like '".$value."'";
+            $stmtu = $this->sdb->prepare($colupdate);
+            $stmtu->execute();
+
+            $apicall->updateAPI($value, 'cancelled');
         
         
         

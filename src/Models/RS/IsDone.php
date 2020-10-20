@@ -4,6 +4,7 @@ namespace App\Models\RS;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
+use App\Models\RS\CurlStatuschange;
 
 /**
  * Class ApprovData
@@ -82,19 +83,25 @@ foreach ($stuff as $value) {
 
   $pos = $ro['postcode'];
 
-
+  $apicall = new CurlStatuschange();
 
   $who =  str_replace( '@stonegroup.co.uk', '', $_SESSION['user']['username']);
 
   $update_req = "
   update request 
   set done = 1,
+  laststatus = 'Done',
   modifedby = '".$who."',
   modifydate = getdate()
   where request_id = '".$value."' 
   ";
   $stmtreq = $this->sdb->prepare($update_req);
   $stmtreq->execute();
+// out for now cant connect while vpn
+ // $apicall->updateAPI($value, 'Done');
+
+
+  
 
 $newsql = " 
 

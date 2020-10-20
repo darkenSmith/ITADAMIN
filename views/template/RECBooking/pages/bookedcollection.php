@@ -1,7 +1,7 @@
 <?php
 
 
-$filter_txt = (isset($_POST) && !empty($_POST) ? " matching your filter" : "");
+$filter_txt = (isset($_POST) && !empty($_POST) ? " matching your filter: " : "Requests: ");
 
 $cust = "\"Request_id\"";
 
@@ -513,7 +513,7 @@ $cust = "\"Request_id\"";
 </div>
 
 </div>
-<h2><?php echo count($bookList) . " " . $filter_txt ?></h2>
+<h2><?php echo $filter_txt.count($bookList) ?></h2>
 <table id='tbldata' width='100%' class='sortable table table-striped'>
     <thead>
     <tr>
@@ -649,3 +649,4 @@ $cust = "\"Request_id\"";
     </div>
 
 
+    

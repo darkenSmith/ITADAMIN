@@ -585,7 +585,7 @@
         <tbody>
         <?php
 
-        foreach ($arcData as $row) {
+        foreach ($arctable as $row) {
             $modtime = date("d/m/Y", strtotime($row['modifed_date']));
 
             echo "

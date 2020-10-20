@@ -4,6 +4,7 @@ namespace App\Models\RS;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
+use App\Models\RS\CurlStatuschange;
 use Exception;
 
 
@@ -28,8 +29,7 @@ class UnDone extends AbstractModel
 
     public function undo()
     { 
-        
-        include_once("db.php");
+        $apicall = new CurlStatuschange();
         if(isset($_POST['arr'])){
         $arr = $_POST['arr'];
         }
@@ -81,6 +81,8 @@ class UnDone extends AbstractModel
           $stmtu = $this->sdb->prepare($colupdate);
           $stmtu->execute();
         
+          // out for now cant connect while vpn
+ // $apicall->updateAPI($value, 'Done');
         
           $fw = fopen($_SERVER["DOCUMENT_ROOT"]."//undone_query_data.txt","a+");
           fwrite($fw,"---------------------------------\n".$colupdate."\n\n");

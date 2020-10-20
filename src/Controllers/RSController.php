@@ -43,6 +43,8 @@ class RSController extends AbstractController
         $this->booking();
     }
 
+
+
     public function booking()
     {
         $bookdata = new Bookingdata();
@@ -317,6 +319,10 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/createBER', $this->getCommonData());
     }
 
+
+
+
+    
     public function getdataBER()
     {
         $this->template->view('RECBooking/pages/BERdata', $this->getCommonData());
@@ -335,8 +341,10 @@ class RSController extends AbstractController
 
     public function amrs()
     {
+
         $amrsup = new ARCUpdates();
         $amrsup->update();
+       
     }
 
     public function goodsiInMail()

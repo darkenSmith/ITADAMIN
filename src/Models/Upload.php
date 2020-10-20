@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Helpers\FileHelper;
+
 /**
  * Class upload
  * @package App\Models
@@ -32,7 +34,9 @@ class Upload extends AbstractModel
 
         $filename = base64_encode($user . '+' . $date . '+' . $order . '+' . $type);
 
-        $filepath = '/var/www/uploads/' . $filename . '.pdf';
+        $uploadDir = FileHelper::getInstance()->getRealPath(PROJECT_DIR . 'uploads');
+        $filepath =  $uploadDir . '/pdf/'. $filename . '.pdf';
+
         rename($file, $filepath);
 
         $this->values = array(

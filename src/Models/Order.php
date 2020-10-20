@@ -43,7 +43,7 @@ class Order extends AbstractModel
         //loop through, add to collection
         foreach ($files as $dir => $file) {
             // $_SERVER["DOCUMENT_ROOT"]."/RS_Files/
-            $path = '/uploads/' . $dir . '/';
+            $path = PROJECT_DIR . 'uploads/pdf/' . $dir . '/';
 
             $filename = $this->detail->sales_order_number . '-' . $file;
             $altFilename = $this->detail->sales_order_number . '-' . str_replace('-', ' ', $file);

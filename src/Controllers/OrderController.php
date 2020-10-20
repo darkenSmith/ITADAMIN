@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Helpers\App;
+use App\Helpers\FileHelper;
 use App\Models\Company;
 use App\Models\OrderSync;
 use App\Models\Upload;
@@ -44,8 +45,9 @@ class OrderController extends AbstractController
             $filename = base64_decode($_GET['file']);
             $userFile = explode('/', $filename);
             $userFile = $userFile[1];
+            $uploadDir = FileHelper::getInstance()->getRealPath(PROJECT_DIR . 'uploads');
 
-            $filepath = '/uploads/' . $filename;
+            $filepath = '/uploads/pdf/' . $filename;
 
             if (file_exists($filepath)) {
                 $data = file_get_contents($filepath);
@@ -96,7 +98,7 @@ class OrderController extends AbstractController
 
             // Change tag: serverPath
 
-            $filepath = '/uploads/' . $filename_original . '.pdf';
+            $filepath = '/uploads/pdf/' . $filename_original . '.pdf';
 
             if (file_exists($filepath)) {
                 $data = file_get_contents($filepath);
@@ -135,7 +137,8 @@ class OrderController extends AbstractController
     {
         if (isset($_GET['file'])) {
             $filename = base64_decode($_GET['file']);
-            $filepath = '/uploads/' . $filename;
+            $uploadDir = FileHelper::getInstance()->getRealPath(PROJECT_DIR . 'uploads');
+            $filepath = $uploadDir . '/pdf/' . $filename;
             unlink($filepath);
         }
 
@@ -145,7 +148,9 @@ class OrderController extends AbstractController
             $filename = base64_decode($filename);
             $userFile = explode('+', $filename);
             $userFile = str_replace(' ', '-', $userFile[3]) . '.pdf';
-            $filepath = '/uploads/' . $_GET['newfile'] . '.pdf';
+            $uploadDir = FileHelper::getInstance()->getRealPath(PROJECT_DIR . 'uploads');
+
+            $filepath = $uploadDir . '/pdf/' . $_GET['newfile'] . '.pdf';
             unlink($filepath);
 
             $upload = new Upload();

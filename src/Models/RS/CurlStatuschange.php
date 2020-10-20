@@ -26,7 +26,6 @@ class CurlStatuschange extends AbstractModel
         $this->stoneApi = Config::getInstance()->get('stone_api');
 
         $this->sdb =  Database::getInstance('sql01');
-        $this->gdb = Database::getInstance('greenoak');
         parent::__construct();
     }
 

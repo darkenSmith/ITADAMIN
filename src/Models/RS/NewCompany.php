@@ -21,7 +21,6 @@ class NewCompany extends AbstractModel
     public function __construct()
     {
         $this->sdb = Database::getInstance('sql01');
-        $this->gdb = Database::getInstance('greenoak');
         parent::__construct();
     }
 

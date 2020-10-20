@@ -25,7 +25,6 @@ class ItadEmails extends AbstractModel
     public function __construct()
     {
         $this->sdb = Database::getInstance('sql01');
-        $this->gdb = Database::getInstance('greenoak');
         $this->emailConfig = Config::getInstance()->get('email');
         parent::__construct();
     }

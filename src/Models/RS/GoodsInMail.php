@@ -17,7 +17,6 @@ class GoodsInMail extends AbstractModel
      */
     public function __construct()
     {
-        $this->gdb = Database::getInstance('greenoak');
         $this->sdb = Database::getInstance('sql01');
         $this->emailConfig = Config::getInstance()->get('email');
 

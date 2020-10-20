@@ -47,7 +47,9 @@ class UnBook extends AbstractModel
         where RequestID ='" . $value . "' and ([SurveyComplete] like  ''  or [SurveyComplete]  is null)";
 
             $stmtu = $this->sdb->prepare($colupdate);
-            return $stmtu->execute();
+            $stmtu->execute();
         }
+
+        return true;
     }
 }

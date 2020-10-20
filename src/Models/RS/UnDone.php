@@ -7,7 +7,6 @@ use App\Models\AbstractModel;
 use App\Models\RS\CurlStatuschange;
 use Exception;
 
-
 /**
  * Class UnDone
  * @package App\Models\RS
@@ -28,38 +27,33 @@ class UnDone extends AbstractModel
     }
 
     public function undo()
-    { 
+    {
         $apicall = new CurlStatuschange();
-        if(isset($_POST['arr'])){
-        $arr = $_POST['arr'];
+        if (isset($_POST['arr'])) {
+            $arr = $_POST['arr'];
         }
         
         $dell = 0;
         
-          if(isset($arr)){
-        
-        
-        
-        foreach ($arr  as $value) {
-        
-        
-        $getord = "
+        if (isset($arr)) {
+            foreach ($arr as $value) {
+                $getord = "
         select replace(ord, 'ORD-', '')as ord , Customer_name, postcode  from request where request_id = '".$value."'
         
         ";
         
-        $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1_query_data.txt","a+");
-        fwrite($Ffw,"---------------------------------\n".$getord."\n\n");
-        fclose($Ffw);
+                $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1_query_data.txt", "a+");
+                fwrite($Ffw, "---------------------------------\n".$getord."\n\n");
+                fclose($Ffw);
         
         
-        $ordstmt = $this->sdb->prepare($getord);
-        $ordstmt->execute();
-        $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
-        $who =  str_replace( '@stonegroup.co.uk', '', $_SESSION['user']['username']);
+                $ordstmt = $this->sdb->prepare($getord);
+                $ordstmt->execute();
+                $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
+                $who =  str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
         
         
-          $colupdate ="
+                $colupdate ="
         
         
          delete from Collections_Log where OrderNum = '".$ordde['ord']."'
@@ -78,31 +72,27 @@ class UnDone extends AbstractModel
         where RequestID ='".$value."'
         ";
         
-          $stmtu = $this->sdb->prepare($colupdate);
-          $stmtu->execute();
+                $stmtu = $this->sdb->prepare($colupdate);
+                $stmtu->execute();
         
-          // out for now cant connect while vpn
- // $apicall->updateAPI($value, 'Done');
+              // out for now cant connect while vpn
+     // $apicall->updateAPI($value, 'Done');
         
-          $fw = fopen($_SERVER["DOCUMENT_ROOT"]."//undone_query_data.txt","a+");
-          fwrite($fw,"---------------------------------\n".$colupdate."\n\n");
-          fclose($fw);
-        
-              }
-          }
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."//undone_query_data.txt", "a+");
+                fwrite($fw, "---------------------------------\n".$colupdate."\n\n");
+                fclose($fw);
+            }
+        }
         
         
         // echo $sqlii;
-        
-        
     }
 
 
-    public function clean($string) {
+    public function clean($string)
+    {
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
          
-        return str_replace("-"," ",preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
-      }
-
+        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
+    }
 }
-

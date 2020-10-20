@@ -58,31 +58,30 @@ class Companynotes extends AbstractModel
         ".(isset($_POST["filter"]) ? $_POST["filter"] : "[CompanyName]")." asc";
 
 
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/companysql.txt","a+");
-        fwrite($fh,$sql."\n");
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/companysql.txt", "a+");
+        fwrite($fh, $sql."\n");
         fclose($fh);
 
 
         $stmt = $this->sdb->prepare($sql);
         if (!$stmt) {
-        echo "\nPDO::errorInfo():\n";
-        print_r($this->sdb->errorInfo());
-        die();
+            echo "\nPDO::errorInfo():\n";
+            print_r($this->sdb->errorInfo());
+            die();
         }
         $stmt->execute();
 
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
 
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/companysql.txt","a+");
-        fwrite($fh,$sql."\n");
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/companysql.txt", "a+");
+        fwrite($fh, $sql."\n");
         fclose($fh);
 
         $i = 0;
 
         $table = "<tbody>";
-        foreach($data as $row){
-
+        foreach ($data as $row) {
             $i++;
             $table .= " 
             <tr class='trstuff'>
@@ -107,16 +106,13 @@ class Companynotes extends AbstractModel
 
             </tr>
         ";
-
         }
         $table .= "  </tbody>
         </table>
         ";
 
-        $this->response = $table; 
+        $this->response = $table;
         return $this->response;
-
-
     }
 
     public function getareas()
@@ -125,16 +121,15 @@ class Companynotes extends AbstractModel
             $sqlstuff2 = "select distinct case when [owner] = 'Recycling' then 'ITAD' else [owner] end as own from Companies with(nolock)";
 
             $stmt3 = $this->sdb->prepare($sqlstuff2);
-            if (!$stmt3) {
+        if (!$stmt3) {
             echo "\nPDO::errorInfo():\n";
             print_r($this->sdb->errorInfo());
             die();
-            }
+        }
             $stmt3->execute();
             $datastuff2 = $stmt3->fetchAll(\PDO::FETCH_ASSOC);
             $this->response = $datastuff2;
             return $this->response;
-
     }
 
     public function getdept()
@@ -144,9 +139,8 @@ class Companynotes extends AbstractModel
         
         $stmt2 = $this->sdb->prepare($sqlstuff);
         if (!$stmt2) {
-        echo "\nPDO::errorInfo():\n";
-        print_r($this->sdb->errorInfo());
-
+            echo "\nPDO::errorInfo():\n";
+            print_r($this->sdb->errorInfo());
         }
         $stmt2->execute();
         
@@ -154,7 +148,6 @@ class Companynotes extends AbstractModel
 
         $this->response = $datastuff;
         return $this->response;
-
     }
 
     public function getowners()
@@ -166,14 +159,14 @@ class Companynotes extends AbstractModel
 
         $this->response = $owndata;
         return $this->response;
-
     }
 
 
 
-    public function clean($string) {
+    public function clean($string)
+    {
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
         
-        return str_replace("-"," ",preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
+        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
     }
 }

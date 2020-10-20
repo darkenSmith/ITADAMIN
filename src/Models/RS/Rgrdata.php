@@ -9,7 +9,7 @@ use Office365\Runtime\Http\Response;
 /**
  * Class Rgrdata
  * @package App\Models\RS
- * * alex 
+ * * alex
  */
 class Rgrdata extends AbstractModel
 {
@@ -21,10 +21,8 @@ class Rgrdata extends AbstractModel
      */
     public function __construct()
     {
-      $this->sdb =  Database::getInstance('sql01');
+        $this->sdb =  Database::getInstance('sql01');
         parent::__construct();
-
-       
     }
     
 
@@ -32,29 +30,28 @@ class Rgrdata extends AbstractModel
     
 
     public function getdata()
-    { 
+    {
 
-        if (isset($_GET['ye'])){
-
+        if (isset($_GET['ye'])) {
               strip_tags($_GET['ye']);
           
           
-                   $ord = filter_var ($_GET['ye'], FILTER_SANITIZE_STRING); 
+                   $ord = filter_var($_GET['ye'], FILTER_SANITIZE_STRING);
         
-        $sqlcust = "select Customer from Collections_Log as c where OrderNum =".$ord;
-        $stmtc = $this->sdb->prepare($sqlcust);
-        if (!$stmtc) {
-          //echo "\nPDO::errorInfo():\n";
-          //print_r($conn->errorInfo());
-          die();
-        }
-        $stmtc->execute();
-        $data2 = $stmtc->fetch(\PDO::FETCH_ASSOC);
-        $_SESSION['customer'] = $data2['Customer'];
+            $sqlcust = "select Customer from Collections_Log as c where OrderNum =".$ord;
+            $stmtc = $this->sdb->prepare($sqlcust);
+            if (!$stmtc) {
+              //echo "\nPDO::errorInfo():\n";
+              //print_r($conn->errorInfo());
+                die();
+            }
+            $stmtc->execute();
+            $data2 = $stmtc->fetch(\PDO::FETCH_ASSOC);
+            $_SESSION['customer'] = $data2['Customer'];
 
-        $t = $ord;
+            $t = $ord;
 
-        $sqls = "SELECT
+            $sqls = "SELECT
 [Printers] as pri,
 MFD_Printer as mfd,
 [TV_CRT_Monitor] as tvcrt,
@@ -147,14 +144,14 @@ Total_Kg as totalkg
 
 
 
-$stmt = $this->sdb->prepare($sqls);
-$stmt->execute();
-$data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $stmt = $this->sdb->prepare($sqls);
+            $stmt->execute();
+            $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
 
 
 
-$compquery = "
+            $compquery = "
 
 set language british; 
 
@@ -180,14 +177,14 @@ COD_pwork_Checked as cod,
  --and c.[Date Added] <> '' 
  ";
 ////this needs to be set to use CMP numbers
-$collstmt = $this->sdb->prepare($compquery);
-$collstmt->execute();
-$coldata = $collstmt->fetch(\PDO::FETCH_ASSOC);
+            $collstmt = $this->sdb->prepare($compquery);
+            $collstmt->execute();
+            $coldata = $collstmt->fetch(\PDO::FETCH_ASSOC);
 
 
 /*
 
-select 
+select
 isnull([TFT], 0) as tftber
 ,isnull([TFT TV], 0) as tfttvber
 ,isnull([PC], 0) as berpc
@@ -221,7 +218,7 @@ isnull([TFT], 0) as tftber
 ,isnull([Loose Hard Drives], 0) as berloose
 ,isnull([Back Up Devices], 0) as berbackup
 ,isnull([Ext Hard Drives], 0) as berexhard
-,isnull([Total], 0) as [Total] 
+,isnull([Total], 0) as [Total]
 ,isnull([AIO_APP], 0) as AIOappber
 ,isnull(pc_app, 0) as pc_app
 ,isnull(lap_app, 0) as lapappber
@@ -229,7 +226,7 @@ isnull([TFT], 0) as tftber
 */
 
 
-$berquery = "
+            $berquery = "
 
 select 
 [TFT] as tftber
@@ -273,22 +270,18 @@ select
 
  from berresults AS b where ordernum =".$t;
 
-$berst = $this->sdb->prepare($berquery);
-$berst->execute();
-$berda = $berst->fetch(\PDO::FETCH_ASSOC);
+            $berst = $this->sdb->prepare($berquery);
+            $berst->execute();
+            $berda = $berst->fetch(\PDO::FETCH_ASSOC);
 
 
 
 
 
-$table = "";
+            $table = "";
 
-foreach($data as $row) {
-
-
-
-
-  $table .=  "
+            foreach ($data as $row) {
+                $table .=  "
    <table id='tb' class='table table-striped'>
     <thead>
    <tr>
@@ -660,7 +653,7 @@ foreach($data as $row) {
 
 
 <label hidden>Date Collected </label>
-<input hidden id='datec' class='form-control' type='hidden' value = '".date("d-m-y",strtotime($coldata['coldate']))."'>
+<input hidden id='datec' class='form-control' type='hidden' value = '".date("d-m-y", strtotime($coldata['coldate']))."'>
 <label hidden>Consignment Note </label>
 <input hidden id='conignnum' class='form-control' type='hidden' placeholder='Consignment Note' value = '".$coldata['ConsignmentNoteCode']."'>
 
@@ -684,43 +677,37 @@ foreach($data as $row) {
   </form>
   </div>
   <button id='updatewgt'  class='btn btn-warning'>Update</button>";
+            }
 
-
-}
-
-$this->response = $table;
-return $this->response;
-
-        
-     }
+            $this->response = $table;
+            return $this->response;
+        }
        // return [];
-     
     }
 
-    public function qualifying($id){
+    public function qualifying($id)
+    {
 
-      $sql = "exec commisionable ".$id;
-      $stmt = $this->sdb->prepare($sql);
+        $sql = "exec commisionable ".$id;
+        $stmt = $this->sdb->prepare($sql);
 
-      echo $id;
-      try{
-        $stmt->execute();
+        echo $id;
+        try {
+            $stmt->execute();
 
 
-      $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-      $this->response = $data;
-      return $this->response;
-      }catch (\Exception $e) {
-        var_dump($e->getmessage());
-       }
-
-      
- 
+            $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $this->response = $data;
+            return $this->response;
+        } catch (\Exception $e) {
+            var_dump($e->getmessage());
+        }
     }
 
 
     
-    public function getareas(){
+    public function getareas()
+    {
   
         $areaquery = "select distinct area1 from Area";
         $stmt3 = $this->sdb->prepare($areaquery);
@@ -729,29 +716,22 @@ return $this->response;
 
        
         try {
-          $stmt3->execute();
-          $datarea = $stmt3->fetchall(\PDO::FETCH_ASSOC);
+            $stmt3->execute();
+            $datarea = $stmt3->fetchall(\PDO::FETCH_ASSOC);
 
-          $dataArray2 = $datarea;
+            $dataArray2 = $datarea;
             $this->response = $dataArray2;
             return $this->response;
         } catch (\JsonException $e) {
-          var_dump($e->getmessage());
+            var_dump($e->getmessage());
         }
-
-  
-        
-
-
     }
 
 
-    public function clean($string) {
-      $string = str_replace('-', ' ', $string); // Replaces all spaces with hyphens.
+    public function clean($string)
+    {
+        $string = str_replace('-', ' ', $string); // Replaces all spaces with hyphens.
        
-      return str_replace("-"," ",preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
+        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
     }
-
-
 }
-

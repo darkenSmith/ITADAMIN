@@ -6,7 +6,6 @@ use App\Helpers\Database;
 use App\Models\AbstractModel;
 use Exception;
 
-
 /**
  * Class UpdateAps
  * @package App\Models\RS
@@ -27,7 +26,7 @@ class UpdateAps extends AbstractModel
     }
 
     public function update()
-    { 
+    {
         $a_status = $this->clean($_POST['a_status']);
         $p_status = $this->clean($_POST['p_status']);
         $notes_status = $this->clean($_POST['notes_status']);
@@ -60,15 +59,14 @@ class UpdateAps extends AbstractModel
         
         
         
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/manualupdate.txt","a+");
-        fwrite($fh,$deadline."\n");
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/manualupdate.txt", "a+");
+        fwrite($fh, $deadline."\n");
         fclose($fh);
         
-        if(!isset($_POST['lortype'])){
-        
-          $lorrytype = '';
-        }else{
-          $lorrytype = $this->clean($_POST['lortype']);
+        if (!isset($_POST['lortype'])) {
+            $lorrytype = '';
+        } else {
+            $lorrytype = $this->clean($_POST['lortype']);
         }
         
         
@@ -95,8 +93,8 @@ class UpdateAps extends AbstractModel
         $stmtup = $this->sdb->prepare($reqsql);
         $stmtup->execute();
         
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/requestsurvyup.txt","a+");
-        fwrite($fh,$reqsql."\n");
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/requestsurvyup.txt", "a+");
+        fwrite($fh, $reqsql."\n");
         fclose($fh);
         
         
@@ -138,16 +136,14 @@ class UpdateAps extends AbstractModel
         $stmtup->execute();
      
         
-        ECHO "COMPLETED";
-        
+        echo "COMPLETED";
     }
 
 
-    public function clean($string) {
+    public function clean($string)
+    {
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
          
-        return str_replace("-"," ",preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
-      }
-
+        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
+    }
 }
-

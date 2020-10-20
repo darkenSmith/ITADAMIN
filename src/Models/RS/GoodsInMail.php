@@ -2,7 +2,6 @@
 
 namespace App\Models\RS;
 
-
 use App\Helpers\Config;
 use App\Helpers\Database;
 use App\Models\AbstractModel;

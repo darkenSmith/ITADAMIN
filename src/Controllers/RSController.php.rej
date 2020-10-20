@@ -1,9 +1,0 @@
-diff a/src/Controllers/RSController.php b/src/Controllers/RSController.php	(rejected hunks)
-@@ -12,6 +12,7 @@
- use App\Models\RS\download;
- use App\Models\RS\GoodInData;
- use App\Models\RS\GoodsInMail;
-+use App\Models\RS\GoodSoutData;
- use App\Models\RS\IsDone;
- use App\Models\RS\Pdfmaker;
- use App\Models\RS\Rebate;

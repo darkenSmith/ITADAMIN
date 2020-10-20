@@ -5,7 +5,6 @@ namespace App\Models\RS;
 use App\Helpers\Database;
 use App\Models\AbstractModel;
 
-
 /**
  * Class UpdateCollog
  * @package App\Models\RS
@@ -26,12 +25,13 @@ class UpdateCollog extends AbstractModel
 
     public function update()
     {
-        function nanremove($value){
+        function nanremove($value)
+        {
 
-            if($value == 'NaN'){
+            if ($value == 'NaN') {
                 $value  = 0;
             }
-          return $value;
+            return $value;
         }
         
         $pcqty = nanremove($_POST['pcqty']) ?? 0;
@@ -209,8 +209,8 @@ class UpdateCollog extends AbstractModel
         
         
         
-        $commis = $pctotal + $pcothertotal + $laptotal +$lapothertotal + $sptotal + $appsptotal + $apptabtotal + 
-                    $tabtotal  +  $tfttotal + $srvtotal + $swber + $aiototal + $tfttvber + $aioapptotal + $aioothertotal; 
+        $commis = $pctotal + $pcothertotal + $laptotal +$lapothertotal + $sptotal + $appsptotal + $apptabtotal +
+                    $tabtotal  +  $tfttotal + $srvtotal + $swber + $aiototal + $tfttvber + $aioapptotal + $aioothertotal;
         
         $noncommis = $projber + $crtber + $nsptotal + $gameber + $smber + $priber + $mfdber + $batnonhazber + $bathazber
                       + $thinber + $scanber + $pdaber + $skyber + $databer + $looseber +$backupber +
@@ -218,8 +218,7 @@ class UpdateCollog extends AbstractModel
         
         
         
-        if($aiootherber == 'NaN'){
-        
+        if ($aiootherber == 'NaN') {
             $aiootherber = 0;
         }
         
@@ -230,20 +229,18 @@ class UpdateCollog extends AbstractModel
         $berexs = $this->sdb->prepare($bercheck);
         $berexs->execute();
         $exs = $berexs->fetch(\PDO::FETCH_ASSOC);
-        if(!$exs['c']){
-        
-        
-        $bersql = "
+        if (!$exs['c']) {
+            $bersql = "
         insert into berresults(ordernum)
         values(".$ord.")
         
         ";
-         $berstmt = $this->sdb->prepare($bersql);
-         $berstmt->execute();
-         $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/is_done_query_berlist.txt","a+");
-         fwrite($fw,"\n"."ber"."\n");
-         fclose($fw);
-          }
+            $berstmt = $this->sdb->prepare($bersql);
+            $berstmt->execute();
+            $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/is_done_query_berlist.txt", "a+");
+            fwrite($fw, "\n"."ber"."\n");
+            fclose($fw);
+        }
         
         $sqal = "
         
@@ -378,8 +375,8 @@ class UpdateCollog extends AbstractModel
         set NumOfDaysOld = datediff(day, DateCollected, getdate()) 
         where OrderNum =".$ord;
         
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/wgtoutput.txt","a+");
-        fwrite($fh,$sqal."\n");
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/wgtoutput.txt", "a+");
+        fwrite($fh, $sqal."\n");
         fclose($fh);
         
         
@@ -387,9 +384,8 @@ class UpdateCollog extends AbstractModel
         $stmtup->execute();
         
         
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/wgtoutput.txt","a+");
-        fwrite($fh,$sqal."\n");
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/wgtoutput.txt", "a+");
+        fwrite($fh, $sqal."\n");
         fclose($fh);
-        
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models\RS;
 
+use App\Helpers\Config;
 use App\Helpers\Database;
 use App\Helpers\Logger;
 use App\Models\AbstractModel;
@@ -13,12 +14,15 @@ use App\Models\AbstractModel;
 class AddRebate extends AbstractModel
 {
     public $response;
+    private $stoneApi;
 
     /**
      * AddRebate constructor.
      */
     public function __construct()
     {
+        $this->stoneApi = Config::getInstance()->get('stone_api');
+
         $this->gdb = Database::getInstance('greenoak');
         parent::__construct();
     }
@@ -28,7 +32,7 @@ class AddRebate extends AbstractModel
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://stoneapi.stonegroup.co.uk/stoneapp/rmApproval/" . $userid,
+            CURLOPT_URL => $this->stoneApi['url'] . "stoneapp/rmApproval/" . $userid,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,

@@ -7,7 +7,6 @@ use App\Models\AbstractModel;
 use App\Models\RS\CurlStatuschange;
 use Exception;
 
-
 /**
  * Class OnHold
  * @package App\Models\RS
@@ -27,16 +26,17 @@ class OnHold extends AbstractModel
         parent::__construct();
     }
 
-    public function onholdlist(){ 
+    public function onholdlist()
+    {
 
         $apicall = new CurlStatuschange();
 
         $ord = $_POST['stuff'];
-        $who =  str_replace( '@stonegroup.co.uk', '', $_SESSION['user']['username']);
+        $who =  str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
         
 
         foreach ($ord as $value) {
-        $colupdate ="
+            $colupdate ="
         update request
         set laststatus = 'On-Hold',
         confirmed = 0,
@@ -44,14 +44,11 @@ class OnHold extends AbstractModel
         modifydate = getdate()
         where Request_ID ='".$value."'";
 
-        $stmtu = $this->sdb->prepare($colupdate);
-        $stmtu->execute();
+            $stmtu = $this->sdb->prepare($colupdate);
+            $stmtu->execute();
 
         // out for now cant connect while vpn
  // $apicall->updateAPI($value, 'Done');
-
         }
     }
-
 }
-

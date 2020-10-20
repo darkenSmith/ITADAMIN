@@ -5,8 +5,6 @@ namespace App\Models\RS;
 use App\Helpers\Database;
 use App\Models\AbstractModel;
 
-
-
 /**
  * Class ARCUpdates
  * @package App\Models\RS
@@ -27,41 +25,34 @@ class ARCUpdates extends AbstractModel
     }
 
     public function update()
-    { 
+    {
 
         $arr = $_POST['arr'];
         $message = $_POST['message'];
         $type = $_POST['type'];
         $user =  $_SESSION['user']['firstname'][0].$_SESSION['user']['lastname'][0];
         
-        $Ffw2 = fopen($_SERVER["DOCUMENT_ROOT"]."/arrayAMR_query_data.txt","a+");
-        fwrite($Ffw2,"---------------------------------\n".print_r($arr, true)."\n\n");
+        $Ffw2 = fopen($_SERVER["DOCUMENT_ROOT"]."/arrayAMR_query_data.txt", "a+");
+        fwrite($Ffw2, "---------------------------------\n".print_r($arr, true)."\n\n");
         fclose($Ffw2);
         
-        foreach($arr  as $value) {
-        
-        
-            if($type == 'amr'){
-        
-        
-            
-        
-        
-        $getord = "
+        foreach ($arr as $value) {
+            if ($type == 'amr') {
+                $getord = "
         
         select replace(ord, 'ORD-', '') as ord from request where request_id = '".$value."'
               
         
         ";
         
-        $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1AMR_query_data.txt","a+");
-        fwrite($Ffw,"---------------------------------\n".$getord."\n\n");
-        fclose($Ffw);
+                $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1AMR_query_data.txt", "a+");
+                fwrite($Ffw, "---------------------------------\n".$getord."\n\n");
+                fclose($Ffw);
         
         
-        $ordstmt = $this->sdb->prepare($getord);
-        $ordstmt->execute();
-        $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
+                $ordstmt = $this->sdb->prepare($getord);
+                $ordstmt->execute();
+                $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
         
         
         // $Ffw2 = fopen($_SERVER["DOCUMENT_ROOT"]."/AMRcompdastage1.txt","a+");
@@ -79,16 +70,16 @@ class ARCUpdates extends AbstractModel
                 $cmpstmt->execute();
                 $cmp = $cmpstmt->fetch(\PDO::FETCH_ASSOC);
         
-                $Ffw2 = fopen($_SERVER["DOCUMENT_ROOT"]."/AMRcompda.txt","a+");
-                fwrite($Ffw2,"---------------------------------\n".print_r($cmp, true)."\n\n");
+                $Ffw2 = fopen($_SERVER["DOCUMENT_ROOT"]."/AMRcompda.txt", "a+");
+                fwrite($Ffw2, "---------------------------------\n".print_r($cmp, true)."\n\n");
                 fclose($Ffw2);
         
         
         
-          $cmpnumber = $cmp['CMP'] ?? 00000;
+                $cmpnumber = $cmp['CMP'] ?? 00000;
         
         
-          $colupdate ="
+                $colupdate ="
         
         
           update Collections_Log 
@@ -109,34 +100,31 @@ class ARCUpdates extends AbstractModel
         
         
         ";
-        $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/AMRUPDATE_COL_query_data.txt","a+");
-        fwrite($fw,"---------------------------------\n".$colupdate."\n\n");
-        fclose($fw);
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/AMRUPDATE_COL_query_data.txt", "a+");
+                fwrite($fw, "---------------------------------\n".$colupdate."\n\n");
+                fclose($fw);
         
-          $stmtu = $this->sdb->prepare($colupdate);
-          $stmtu->execute();
-        
-        
-          $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/AMRUPDATE_COL_query_data.txt","a+");
-          fwrite($fw,"---------------------------------\n".$colupdate."\n\n");
-          fclose($fw);
-        
-            }else if($type == 'cod'){
+                $stmtu = $this->sdb->prepare($colupdate);
+                $stmtu->execute();
         
         
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/AMRUPDATE_COL_query_data.txt", "a+");
+                fwrite($fw, "---------------------------------\n".$colupdate."\n\n");
+                fclose($fw);
+            } elseif ($type == 'cod') {
                 $getord = "
         select replace(ord, 'ORD-', '') as ord  from request where request_id = '".$value."'
         
         ";
         
-        $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1AMR_query_data.txt","a+");
-        fwrite($Ffw,"---------------------------------\n".$getord."\n\n");
-        fclose($Ffw);
+                $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1AMR_query_data.txt", "a+");
+                fwrite($Ffw, "---------------------------------\n".$getord."\n\n");
+                fclose($Ffw);
         
         
-        $ordstmt = $this->sdb->prepare($getord);
-        $ordstmt->execute();
-        $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
+                $ordstmt = $this->sdb->prepare($getord);
+                $ordstmt->execute();
+                $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
         
         
                 $cust = $ordde['Customer_name'];
@@ -147,7 +135,7 @@ class ARCUpdates extends AbstractModel
                 
         
         
-          $colupdate ="
+                $colupdate ="
           update Collections_Log 
           set COD_pwork_Checked = 'YES',
           changedate = getdate(),
@@ -155,37 +143,32 @@ class ARCUpdates extends AbstractModel
           where  ordernum = '".$ordrn."'
         ";
         
-        $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/CODUPDATE_COL_query_data.txt","a+");
-        fwrite($fw,"---------------------------------\n".$colupdate."\n\n");
-        fclose($fw);
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/CODUPDATE_COL_query_data.txt", "a+");
+                fwrite($fw, "---------------------------------\n".$colupdate."\n\n");
+                fclose($fw);
         
-          $stmtu = $this->sdb->prepare($colupdate);
-          $stmtu->execute();
-        
-        
-          $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/CODUPDATE_COL_query_data.txt","a+");
-          fwrite($fw,"---------------------------------\n".$colupdate."\n\n");
-          fclose($fw);
+                $stmtu = $this->sdb->prepare($colupdate);
+                $stmtu->execute();
         
         
-        
-            }else if($type == 'rebate'){
-        
-        
-              $getord = "
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/CODUPDATE_COL_query_data.txt", "a+");
+                fwrite($fw, "---------------------------------\n".$colupdate."\n\n");
+                fclose($fw);
+            } elseif ($type == 'rebate') {
+                $getord = "
               select replace(ord, 'ORD-', '') as ord from request where request_id = '".$value."'
               
               ";
               
         
-        $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1AMR_query_data.txt","a+");
-        fwrite($Ffw,"---------------------------------\n".$getord."\n\n");
-        fclose($Ffw);
+                $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1AMR_query_data.txt", "a+");
+                fwrite($Ffw, "---------------------------------\n".$getord."\n\n");
+                fclose($Ffw);
         
         
-        $ordstmt = $this->sdb->prepare($getord);
-        $ordstmt->execute();
-        $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
+                $ordstmt = $this->sdb->prepare($getord);
+                $ordstmt->execute();
+                $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
         
         
         
@@ -204,7 +187,7 @@ class ARCUpdates extends AbstractModel
         
         
         
-          $colupdate ="
+                $colupdate ="
         
         
         
@@ -226,35 +209,22 @@ class ARCUpdates extends AbstractModel
           is_AMR = 'yes'
           where  cmp = '".$cmp['cmp']."'
         ";
-        $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/no_COL_query_data.txt","a+");
-        fwrite($fw,"---------------------------------\n".$colupdate."\n\n");
-        fclose($fw);
-        
-          $stmtu = $this->sdb->prepare($colupdate);
-          $stmtu->execute();
-        
-        
-        
-        
-            } else{
-        
-                 
-                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/no_COL_query_data.txt","a+");
-                fwrite($fw,"---------------------------------\n".$colupdate."\n\n");
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/no_COL_query_data.txt", "a+");
+                fwrite($fw, "---------------------------------\n".$colupdate."\n\n");
                 fclose($fw);
-              
         
-        
+                $stmtu = $this->sdb->prepare($colupdate);
+                $stmtu->execute();
+            } else {
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/no_COL_query_data.txt", "a+");
+                fwrite($fw, "---------------------------------\n".$colupdate."\n\n");
+                fclose($fw);
             }
-        
         }
         
         
         //var_dump($arr);
         
-        // echo $sqlii; 
-            
+        // echo $sqlii;
     }
-
 }
-

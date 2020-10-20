@@ -8,7 +8,7 @@ use App\Models\AbstractModel;
 /**
  * Class Booking
  * @package App\Models\RS
- * * alex 
+ * * alex
  */
 class Bookingdata extends AbstractModel
 {
@@ -20,10 +20,8 @@ class Bookingdata extends AbstractModel
      */
     public function __construct()
     {
-      $this->sdb =  Database::getInstance('sql01');
+        $this->sdb =  Database::getInstance('sql01');
         parent::__construct();
-
-       
     }
     
 
@@ -31,20 +29,18 @@ class Bookingdata extends AbstractModel
     
 
     public function getdata()
-    { 
+    {
     
-              if(isset($_POST["postcode"]))
-              {
-                  $postcode = $this->clean($_POST["postcode"]);
-                  $id= $this->clean($_POST["id"]);
-                  $ord = $this->clean($_POST["ent"]);
-                  $notes = $this->clean($_POST["notesja"]);
-              }
+        if (isset($_POST["postcode"])) {
+            $postcode = $this->clean($_POST["postcode"]);
+            $id= $this->clean($_POST["id"]);
+            $ord = $this->clean($_POST["ent"]);
+            $notes = $this->clean($_POST["notesja"]);
+        }
               
-              if(isset($_SESSION['stat'])){
-
-                $_SESSION['stat'] = isset($_POST["filterstatus"]) ? $_SESSION['stat'] : "AND laststatus not like 'On-Hold'";
-             }
+        if (isset($_SESSION['stat'])) {
+            $_SESSION['stat'] = isset($_POST["filterstatus"]) ? $_SESSION['stat'] : "AND laststatus not like 'On-Hold'";
+        }
 
              
 
@@ -109,43 +105,39 @@ class Bookingdata extends AbstractModel
               Request_date_added  > dateadd(YY, DATEDIFF(YY, 0, getdate()), -30) 
                 AND Request_ID  LIKE '".(isset($id) && $id != "" ? $id :"%")."'
                 ";
-                if (isset($ord) &&  $ord != "") {
-                  $sql .= "AND rt.ORD LIKE '%".$_POST["ent"]."' ";
-                } else {
-                  $sql .= "AND (rt.ORD LIKE '%%' OR rt.ORD IS NULL) ";
-                }
+        if (isset($ord) &&  $ord != "") {
+            $sql .= "AND rt.ORD LIKE '%".$_POST["ent"]."' ";
+        } else {
+            $sql .= "AND (rt.ORD LIKE '%%' OR rt.ORD IS NULL) ";
+        }
               
-                if (isset($notes) &&  $notes != "") {
-                  $sql .= "AND  bc.[Job_notes] + bc.[Access_Notes] LIKE '%".$notes."%' ";
-                } else {
-                  $sql .= "AND (bc.[Job_notes] + bc.[Access_Notes] LIKE '%%' OR bc.[Job_notes] + bc.[Access_Notes] IS NULL) ";
-                }
+        if (isset($notes) &&  $notes != "") {
+            $sql .= "AND  bc.[Job_notes] + bc.[Access_Notes] LIKE '%".$notes."%' ";
+        } else {
+            $sql .= "AND (bc.[Job_notes] + bc.[Access_Notes] LIKE '%%' OR bc.[Job_notes] + bc.[Access_Notes] IS NULL) ";
+        }
                 
               
               
-                if (isset($_POST['filterstatus']) && $_POST['filterstatus'] == 'deleted') {
-              
-                  $sql .= "
+        if (isset($_POST['filterstatus']) && $_POST['filterstatus'] == 'deleted') {
+            $sql .= "
               AND isnull(deleted, 0) = 1  AND  isnull(DONE, 0) <> 1 
                 AND rt.postcode LIKE '%".(isset($postcode) && $postcode != "" ? '%'.$postcode.'%' : '%')."%'
                 And (rt.area1 like '".(isset($_POST["areafilter"]) && $_POST["areafilter"] != "" ? $_POST["areafilter"] : '%' )."' )";
-                }else{
-                  $sql .= "
+        } else {
+            $sql .= "
               AND isnull(deleted, 0) <> 1  AND  isnull(DONE, 0) <> 1 
                ".(isset($_POST["filterstatus"]) ? $_POST["filterstatus"] : "AND laststatus not like 'On-Hold' ")."
                 AND rt.postcode LIKE '%".(isset($postcode) && $postcode != "" ? '%'.$postcode.'%' : '%')."%'
                 And (rt.area1 like '".(isset($_POST["areafilter"]) && $_POST["areafilter"] != "" ? $_POST["areafilter"] : '%' )."' )";
+        }
               
-                }
-              
-                if (isset($_POST["collectdate"]) &&  $_POST["collectdate"] != "") {
-              
-                  $fu = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/collectdatesearch.txt","a+");
-                  fwrite($fu,date("d-m-y",strtotime($_POST["collectdate"]))."\n");
-                  fclose($fu);
-                  $sql .= "and isnull(cast(rt.collection_date as varchar(50)),'not set') ='".date("d-m-y",strtotime($_POST["collectdate"]))."'"; 
-                
-                }
+        if (isset($_POST["collectdate"]) &&  $_POST["collectdate"] != "") {
+            $fu = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/collectdatesearch.txt", "a+");
+            fwrite($fu, date("d-m-y", strtotime($_POST["collectdate"]))."\n");
+            fclose($fu);
+            $sql .= "and isnull(cast(rt.collection_date as varchar(50)),'not set') ='".date("d-m-y", strtotime($_POST["collectdate"]))."'";
+        }
                 
               
               
@@ -188,10 +180,10 @@ class Bookingdata extends AbstractModel
               
               //var_dump($sql);
                 $stmt = $this->sdb->prepare($sql);
-                if (!$stmt) {
-                  echo "\nPDO::errorInfo():\n";
-                  print_r($this->sdb->errorInfo());
-              }
+        if (!$stmt) {
+            echo "\nPDO::errorInfo():\n";
+            print_r($this->sdb->errorInfo());
+        }
 
 
 
@@ -216,37 +208,35 @@ class Bookingdata extends AbstractModel
             $this->response = $dataarray;
             return $this->response;
         } catch (\Exception $e) {
-         var_dump($e);
+            var_dump($e);
         }
 
        // return [];
-     
     }
 
-    public function qualifying($id){
+    public function qualifying($id)
+    {
 
-      $sql = "exec commisionable ".$id;
-      $stmt = $this->sdb->prepare($sql);
+        $sql = "exec commisionable ".$id;
+        $stmt = $this->sdb->prepare($sql);
 
-      echo $id;
-      try{
-        $stmt->execute();
+        echo $id;
+        try {
+            $stmt->execute();
 
 
-      $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-      $this->response = $data;
-      return $this->response;
-      }catch (\Exception $e) {
-        var_dump($e->getmessage());
-       }
-
-      
- 
+            $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $this->response = $data;
+            return $this->response;
+        } catch (\Exception $e) {
+            var_dump($e->getmessage());
+        }
     }
 
 
     
-    public function getareas(){
+    public function getareas()
+    {
   
         $areaquery = "select distinct area1 from Area";
         $stmt3 = $this->sdb->prepare($areaquery);
@@ -255,29 +245,22 @@ class Bookingdata extends AbstractModel
 
        
         try {
-          $stmt3->execute();
-          $datarea = $stmt3->fetchall(\PDO::FETCH_ASSOC);
+            $stmt3->execute();
+            $datarea = $stmt3->fetchall(\PDO::FETCH_ASSOC);
 
-          $dataArray2 = $datarea;
+            $dataArray2 = $datarea;
             $this->response = $dataArray2;
             return $this->response;
         } catch (\JsonException $e) {
-          var_dump($e->getmessage());
+            var_dump($e->getmessage());
         }
-
-  
-        
-
-
     }
 
 
-    public function clean($string) {
-      $string = str_replace('-', ' ', $string); // Replaces all spaces with hyphens.
+    public function clean($string)
+    {
+        $string = str_replace('-', ' ', $string); // Replaces all spaces with hyphens.
        
-      return str_replace("-"," ",preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
+        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
     }
-
-
 }
-

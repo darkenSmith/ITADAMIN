@@ -5,8 +5,6 @@ namespace App\Models\RS;
 use App\Helpers\Database;
 use App\Models\AbstractModel;
 
-
-
 /**
  * Class ApprovData
  * @package App\Models\RS
@@ -27,7 +25,7 @@ class Download extends AbstractModel
     }
 
     public function getfile()
-    { 
+    {
      
     
 
@@ -48,22 +46,17 @@ class Download extends AbstractModel
         
         
                 $stmtlog = $this->sdb->prepare($sqlog);
-                if (!$stmtlog) {
-                echo "\nPDO::errorInfo():\n";
-                print_r($this->sdb->errorInfo());
-                die();
-                }
+        if (!$stmtlog) {
+            echo "\nPDO::errorInfo():\n";
+            print_r($this->sdb->errorInfo());
+            die();
+        }
                 $stmtlog->execute();
         
                 $log = $stmtlog->fetch(\PDO::FETCH_ASSOC);
         
-                $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/rsatrack.txt","a+");
-                fwrite($fh,$sqlog."\n");
+                $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/rsatrack.txt", "a+");
+                fwrite($fh, $sqlog."\n");
                 fclose($fh);
-        
-     
- 
     }
-
 }
-

@@ -5,7 +5,6 @@ namespace App\Models\RS;
 use App\Helpers\Database;
 use App\Models\AbstractModel;
 
-
 /**
  * Class UpdateDataDoc
  * @package App\Models\RS
@@ -31,56 +30,41 @@ class UpdateDataDoc extends AbstractModel
           
           ///go
           
-          if(!isset($_POST['other1name'])){
-          
+        if (!isset($_POST['other1name'])) {
             $other1name  = ' ';
-          
-          }else{
+        } else {
             $other1name = $this->clean($_POST['other1name']);
-          }
+        }
           
           
-          if(!isset($_POST['other2name'])){
-          
+        if (!isset($_POST['other2name'])) {
             $other2name  = ' ';
-          
-          }else{
+        } else {
             $other2name = $this->clean($_POST['other2name']);
-          }
+        }
           
-          if(!isset($_POST['other3name'])){
-          
+        if (!isset($_POST['other3name'])) {
             $other3name  = ' ';
-          
-          }else{
+        } else {
             $other3name = $this->clean($_POST['other3name']);
-          
-          
-          }if(!isset($_POST['other4name'])){
-          
+        }if (!isset($_POST['other4name'])) {
             $other4name  = ' ';
-          
-          }else{
-          
+        } else {
             $other4name = $this->clean($_POST['other4name']);
-          }
-          if(!isset($_POST['other5name'])){
-          
+        }
+        if (!isset($_POST['other5name'])) {
             $other5name  = ' ';
-          
-          }else{
+        } else {
             $other5name = $this->clean($_POST['other5name']);
-          }
-          if(!isset($_POST['other6name'])){
-          
+        }
+        if (!isset($_POST['other6name'])) {
             $other6name  = ' ';
-          
-          }else{
+        } else {
             $other6name = $this->clean($_POST['other6name']);
-          }
+        }
 
           
-           $who =  str_replace( '@stonegroup.co.uk', '', $_SESSION['user']['username']);
+           $who =  str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
           
           $reqid = $this->clean($_POST['reqid']);
           $email = ltrim($_POST['email'], " ");
@@ -96,13 +80,13 @@ class UpdateDataDoc extends AbstractModel
           $gdprselect = $_POST['gdprselect'];
           $avoid =$this->clean($_POST['avoid']);
           
-          if(isset($_POST['deadline'])){
+        if (isset($_POST['deadline'])) {
             $deadline = $_POST['deadline'];
-          }else{
+        } else {
             $deadline = '';
-          }
+        }
           
-          $manordd = $_POST['manord']; 
+          $manordd = $_POST['manord'];
           
           
           $pos = $this->clean($_POST['pos']);
@@ -122,21 +106,17 @@ class UpdateDataDoc extends AbstractModel
           $emailsent = $_POST['emailsent'];
           
           
-          if(isset($_POST['emailsent'])){
-          
+        if (isset($_POST['emailsent'])) {
             $emailsent = $_POST['emailsent'];
-          
-          }else{
+        } else {
             $emailsent = '';
-          
-          }
+        }
           
         
           
-          if(empty($ordnum) || $ordnum == ' '){
-          
+        if (empty($ordnum) || $ordnum == ' ') {
             $ordnum = $manordd;
-          }
+        }
             
           
           
@@ -147,18 +127,17 @@ class UpdateDataDoc extends AbstractModel
           ";
           
           $stmtcheck = $this->sdb->prepare($sqlbookcheck);
-          if (!$stmtcheck) {
-              echo "\nPDO::errorInfo():\n";
-              print_r($this->sdb->errorInfo());
-              die();
-            }
+        if (!$stmtcheck) {
+            echo "\nPDO::errorInfo():\n";
+            print_r($this->sdb->errorInfo());
+            die();
+        }
             $stmtcheck->execute();
             $bookdata = $stmtcheck->fetch(\PDO::FETCH_ASSOC);
           
           
-            if(!$bookdata['cn'] == 0){
-          
-                $updead = "
+        if (!$bookdata['cn'] == 0) {
+            $updead = "
                  
                           set language BRITISH
                               declare @date datetime 
@@ -177,26 +156,23 @@ class UpdateDataDoc extends AbstractModel
           
                             update request
                             set survey_deadline = (select  format(@date, 'dd-MM-yyyy hh:mm:ss') ), 
-                            modifedby = '".str_replace("@stonegroup.co.uk","",$who)."',
+                            modifedby = '".str_replace("@stonegroup.co.uk", "", $who)."',
                             modifydate = getdate()
                             where Request_ID = '".$reqid."'
                             ";
           
-                            $bookc = fopen($_SERVER["DOCUMENT_ROOT"]."/bookcheck.txt","a+");
-                            fwrite($bookc,$updead."\n");
-                            fclose($bookc);
+                        $bookc = fopen($_SERVER["DOCUMENT_ROOT"]."/bookcheck.txt", "a+");
+                        fwrite($bookc, $updead."\n");
+                        fclose($bookc);
           
-                            $bookupdate = $this->sdb->prepare($updead);
-                            if (!$bookupdate) {
-                                echo "\nPDO::errorInfo():\n";
-                                print_r($this->sdb->errorInfo());
-                                die();
-                              }
-                            $bookupdate->execute();
-                     
-          
-          
+                        $bookupdate = $this->sdb->prepare($updead);
+            if (!$bookupdate) {
+                echo "\nPDO::errorInfo():\n";
+                print_r($this->sdb->errorInfo());
+                die();
             }
+                        $bookupdate->execute();
+        }
           
           
           
@@ -215,12 +191,12 @@ class UpdateDataDoc extends AbstractModel
           
           
           
-          $arr = json_decode(json_encode($_POST['reqlines']),true);
+          $arr = json_decode(json_encode($_POST['reqlines']), true);
           // $ItemArray = json_decode($_POST['json']);
           $arrfinal = json_decode($arr, true);
           
-          $requp = fopen($_SERVER["DOCUMENT_ROOT"]."/updatearraydet.txt","a+");
-          fwrite($requp,print_r($arrfinal, true)."\n");
+          $requp = fopen($_SERVER["DOCUMENT_ROOT"]."/updatearraydet.txt", "a+");
+          fwrite($requp, print_r($arrfinal, true)."\n");
           fclose($requp);
           
           
@@ -270,20 +246,20 @@ class UpdateDataDoc extends AbstractModel
           
           ";
           
-          $requp = fopen($_SERVER["DOCUMENT_ROOT"]."/requpdatesqloutput.txt","a+");
-          fwrite($requp,$sqlhead."\n");
+          $requp = fopen($_SERVER["DOCUMENT_ROOT"]."/requpdatesqloutput.txt", "a+");
+          fwrite($requp, $sqlhead."\n");
           fclose($requp);
           
           $restmt = $this->sdb->prepare($sqlhead);
-          if (!$restmt) {
-              echo "\nPDO::errorInfo():\n";
-              print_r($this->sdb->errorInfo());
-              die();
-            }
+        if (!$restmt) {
+            echo "\nPDO::errorInfo():\n";
+            print_r($this->sdb->errorInfo());
+            die();
+        }
             $restmt->execute();
           
-            $requp = fopen($_SERVER["DOCUMENT_ROOT"]."/requpdatesqloutput.txt","a+");
-          fwrite($requp,$sqlhead."\n");
+            $requp = fopen($_SERVER["DOCUMENT_ROOT"]."/requpdatesqloutput.txt", "a+");
+          fwrite($requp, $sqlhead."\n");
           fclose($requp);
           
           
@@ -293,19 +269,19 @@ class UpdateDataDoc extends AbstractModel
           
           
           ///Request_SERVER_ASSET_REQ =". $con7 . ",
-          foreach($arrfinal as $output) {
-              $det = implode(",",$output);
-              $id = array_slice($output, 0, 1);  
-              $Rid = implode(",",$id);
-              $w = array_slice($output, 1, 1);
-              $wkn = implode(",", $w);
-             // $asset = array_slice($output, 2, 1); 
-              $ass = 0;
-              //$wipe = array_slice($output, 3, 1); 
-              $wipest =  0;
+        foreach ($arrfinal as $output) {
+            $det = implode(",", $output);
+            $id = array_slice($output, 0, 1);
+            $Rid = implode(",", $id);
+            $w = array_slice($output, 1, 1);
+            $wkn = implode(",", $w);
+           // $asset = array_slice($output, 2, 1);
+            $ass = 0;
+            //$wipe = array_slice($output, 3, 1);
+            $wipest =  0;
           
           
-              $sqlii = " 
+            $sqlii = " 
           
               update Req_Detail";
           
@@ -314,11 +290,10 @@ class UpdateDataDoc extends AbstractModel
           
           
           //push to server using array same as testform
-          if($Rid == 19){
+            if ($Rid == 19) {
+                $is_other = 1;
           
-              $is_other = 1;
-          
-              $sqlii .= " 
+                $sqlii .= " 
           
           set qty =" .$wkn.",
           other1_name = '".$other1name."',
@@ -327,14 +302,10 @@ class UpdateDataDoc extends AbstractModel
           from req_detail
           where req_id =".$reqid." and 
           prod_id =".$Rid;
-              
-             
-              
-                  }
+            }
             
-            if($Rid == 21){
-            
-              $sqlii .= "
+            if ($Rid == 21) {
+                $sqlii .= "
           
               set qty =" .$wkn.",
               other2_name = '".$other2name."',
@@ -343,12 +314,10 @@ class UpdateDataDoc extends AbstractModel
               from req_detail
               where req_id =".$reqid." and 
               prod_id =".$Rid;
-              
-                }
+            }
             
-            if($Rid == 23){
-            
-              $sqlii .= "
+            if ($Rid == 23) {
+                $sqlii .= "
           
               set qty =" .$wkn.",
               other3_name = '".$other3name."',
@@ -357,10 +326,7 @@ class UpdateDataDoc extends AbstractModel
               from req_detail
               where req_id =".$reqid." and 
               prod_id =".$Rid;
-              
-              
-              }  if($Rid == 65){
-            
+            }  if ($Rid == 65) {
                 $sqlii .= "
             
                 set qty =" .$wkn.",
@@ -370,11 +336,8 @@ class UpdateDataDoc extends AbstractModel
                 from req_detail
                 where req_id =".$reqid." and 
                 prod_id =".$Rid;
-                
-                
-                }  if($Rid == 67){
-            
-                  $sqlii .= "
+            }  if ($Rid == 67) {
+                $sqlii .= "
               
                   set qty =" .$wkn.",
                   other5_name = '".$other5name."',
@@ -383,11 +346,8 @@ class UpdateDataDoc extends AbstractModel
                   from req_detail
                   where req_id =".$reqid." and 
                   prod_id =".$Rid;
-                  
-                  
-                  }  if($Rid == 69){
-            
-                    $sqlii .= "
+            }  if ($Rid == 69) {
+                $sqlii .= "
                 
                     set qty =" .$wkn.",
                     other6_name = '".$other6name."',
@@ -396,10 +356,8 @@ class UpdateDataDoc extends AbstractModel
                     from req_detail
                     where req_id =".$reqid." and 
                     prod_id =".$Rid;
-                    
-                    
-                    }if($Rid != 19 && $Rid != 21 && $Rid != 23 && $Rid != 65 && $Rid != 67 && $Rid != 69){
-              $sqlii .= " 
+            }if ($Rid != 19 && $Rid != 21 && $Rid != 23 && $Rid != 65 && $Rid != 67 && $Rid != 69) {
+                $sqlii .= " 
           
               set qty =" .$wkn.",
               Asset_req =".$ass.",
@@ -407,29 +365,27 @@ class UpdateDataDoc extends AbstractModel
               from req_detail
               where req_id =".$reqid." and 
               prod_id =".$Rid;
-          }
-          
-          $fun = fopen($_SERVER["DOCUMENT_ROOT"]."/newreqsqlout.txt","a+");
-          fwrite($fun,$sqlii."\n");
-          fclose($fun);
-             
-          $stmt = $this->sdb->prepare($sqlii);
-          if (!$stmt) {
-              echo "\nPDO::errorInfo():\n";
-              print_r($this->sdb->errorInfo());
-              die();
             }
-            $stmt->execute();
-          }
-
+          
+                $fun = fopen($_SERVER["DOCUMENT_ROOT"]."/newreqsqlout.txt", "a+");
+                fwrite($fun, $sqlii."\n");
+                fclose($fun);
+             
+                $stmt = $this->sdb->prepare($sqlii);
+            if (!$stmt) {
+                echo "\nPDO::errorInfo():\n";
+                print_r($this->sdb->errorInfo());
+                die();
+            }
+                $stmt->execute();
+        }
     }
 
-    function clean($string) {
-        $string = str_replace(array("'", "\"", "&quot;"), "", htmlspecialchars($string ) );
+    function clean($string)
+    {
+        $string = str_replace(array("'", "\"", "&quot;"), "", htmlspecialchars($string));
         $string = str_replace('-', ' ', $string); // Replaces all spaces with hyphens.
         $string = str_replace('&', 'and', $string);
-        return str_replace("-"," ",preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
-      }
-
-
+        return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
+    }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Models\RS;
 
+use App\Helpers\Database;
 use App\Helpers\Logger;
 use App\Models\AbstractModel;
-use App\Helpers\Database;
 use Exception;
 
 /**
@@ -28,7 +28,7 @@ class GoodsOutData extends AbstractModel
 
     public function getpallets()
     {
-        $sql= "select * from pallets ";
+        $sql = "select * from pallets ";
         $stmt = $this->sdb->prepare($sql);
         $stmt->execute();
         $this->pallets = $stmt->fetchall(\PDO::FETCH_ASSOC);
@@ -37,7 +37,7 @@ class GoodsOutData extends AbstractModel
 
     public function getloads()
     {
-        $sql2= "	select loadnum, sum(weight) totalwgt, l.company, l.staus, convert(varchar(20),l.despatch_date, 103) as despatch_date from palletloads as pl
+        $sql2 = "	select loadnum, sum(weight) totalwgt, l.company, l.staus, convert(varchar(20),l.despatch_date, 103) as despatch_date from palletloads as pl
         left join loads as l on
         l.loadnum_id = pl.loadnum and
         l.year = pl.year
@@ -53,7 +53,7 @@ class GoodsOutData extends AbstractModel
 
     public function getloadtotals()
     {
-        $sql3= "select loadnum, sum(weight) wgt,type, max(supplier) supplier , max(palletref) as pallets from palletloads
+        $sql3 = "select loadnum, sum(weight) wgt,type, max(supplier) supplier , max(palletref) as pallets from palletloads
 		group by loadnum, type
 		order by loadnum";
 
@@ -82,8 +82,8 @@ class GoodsOutData extends AbstractModel
         $Supplier = $_POST['Supplier'];
         $palletnum = $_POST['palletnum'];
 
-        $colupdate ="insert into palletloads(loadnum, weight, type, supplier, palletref)
-  values(".$loadnum.", ".$wgt.", '".$Type."', '".$Supplier."', ".$palletnum.")";
+        $colupdate = "insert into palletloads(loadnum, weight, type, supplier, palletref)
+  values(" . $loadnum . ", " . $wgt . ", '" . $Type . "', '" . $Supplier . "', " . $palletnum . ")";
 
         try {
             $stmtu = $this->sdb->prepare($colupdate);
@@ -94,8 +94,8 @@ class GoodsOutData extends AbstractModel
             Logger::getInstance("GoodsOutData.log")->warning(
                 "goodsInAdd failed",
                 [
-                            $e->getMessage()
-                        ]
+                    $e->getMessage()
+                ]
             );
         }
 
@@ -112,12 +112,12 @@ class GoodsOutData extends AbstractModel
         $newdate = date("Y-m-d", strtotime($date));
 
         $sql = "update palletloads
-set dispatchdate = '".$newdate."',
+set dispatchdate = '" . $newdate . "',
 [year] = year(getdate())
 where loadnum = $loadnum
 
 insert into loads (loadnum_id, company, despatch_date, createdate, staus, [year])
-values('".$loadnum."', '".$company."', '".$newdate."', GETDATE(), 'closed', year(getdate()))";
+values('" . $loadnum . "', '" . $company . "', '" . $newdate . "', GETDATE(), 'closed', year(getdate()))";
 
         try {
             $stmt = $this->sdb->prepare($sql);

@@ -87,7 +87,6 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/detaildoc', $this->getCommonData());
     }
 
-
     // Checked
     public function arc()
     {
@@ -147,7 +146,6 @@ class RSController extends AbstractController
     {
         $apsupdate = new UpdateAps();
         $apsupdate->update();
-        
     }
 
     // Checked
@@ -167,18 +165,11 @@ class RSController extends AbstractController
         $updatecol->update();
     }
 
-
     public function delRequestMulti()
     {
         $del = new DeleteReq();
         $del->deletelist();
     }
-
-/////// deletes products from request
-    // public function delRequest()
-    // {
-    //     $this->template->view('RECBooking/pages/delete', $this->getCommonData());
-    // }
 
     public function emailConf()
     {
@@ -191,7 +182,6 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/arctest', $this->getCommonData());
     }
 
-
     public function testArcData()
     {
         $this->template->view('RECBooking/pages/arctestdata', $this->getCommonData());
@@ -199,10 +189,9 @@ class RSController extends AbstractController
 
     public function imageupload()
     {
-       $uploadimg = new UploadImage();
-       $uploadimg->upload();
+        $uploadimg = new UploadImage();
+        $uploadimg->upload();
     }
-
 
     public function companyNote()
     {
@@ -212,21 +201,22 @@ class RSController extends AbstractController
         $depts = $companydata->getdept();
         $owners = $companydata->getowners();
         $this->template->view(
-            'RECBooking/pages/companies',array_merge(
+            'RECBooking/pages/companies',
+            array_merge(
                 ['table' => $table,
                  'areas' => $areas,
                  'depts' => $depts,
                  'owners' => $owners
-                ], 
-                $this->getCommonData())
+                ],
+                $this->getCommonData()
+            )
         );
     }
 
-
     public function companyUpdate()
     {
-       $update = new CompanyUpdate();
-       $update->update();
+        $update = new CompanyUpdate();
+        $update->update();
     }
 
     public function delLine()
@@ -234,12 +224,11 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/delline', $this->getCommonData());
     }
 
-    public function AddNewline()
+    public function addNewline()
     {
         $addnew = new AddLineitem();
         $addnew->addline();
     }
-
 
     public function updateConf()
     {
@@ -261,18 +250,15 @@ class RSController extends AbstractController
         $hold->onholdlist();
     }
 
-
     public function amrApdate()
     {
         $this->template->view('RECBooking/pages/AMRupdate', $this->getCommonData());
     }
 
-
     public function bookStat()
     {
         $this->template->view('RECBooking/pages/bookstatupdate', $this->getCommonData());
     }
-
 
     public function newCompany()
     {
@@ -319,10 +305,6 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/createBER', $this->getCommonData());
     }
 
-
-
-
-    
     public function getdataBER()
     {
         $this->template->view('RECBooking/pages/BERdata', $this->getCommonData());
@@ -344,7 +326,6 @@ class RSController extends AbstractController
 
         $amrsup = new ARCUpdates();
         $amrsup->update();
-       
     }
 
     public function goodsiInMail()

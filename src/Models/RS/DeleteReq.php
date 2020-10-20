@@ -6,8 +6,6 @@ use App\Helpers\Database;
 use App\Models\AbstractModel;
 use App\Models\RS\CurlStatuschange;
 
-
-
 /**
  * Class DeleteReq
  * @package App\Models\RS
@@ -30,20 +28,19 @@ class DeleteReq extends AbstractModel
     }
 
     public function deletelist()
-    { 
+    {
       
         $apicall = new CurlStatuschange();
 
-        $stuff = $_POST['stuff']; 
+        $stuff = $_POST['stuff'];
         $dell = 1;
         
         foreach ($stuff as $value) {
+            $user =  $_SESSION['user']['firstname'][0].$_SESSION['user']['lastname'][0];
         
-          $user =  $_SESSION['user']['firstname'][0].$_SESSION['user']['lastname'][0];
+            $who =  str_replace('@stonegroup.co.uk', '', $user);
         
-          $who =  str_replace( '@stonegroup.co.uk', '', $user);
-        
-         $colupdate ="
+            $colupdate ="
         
             update request  
             set deleted =".$dell.",
@@ -58,13 +55,6 @@ class DeleteReq extends AbstractModel
             $stmtu->execute();
 
             $apicall->updateAPI($value, 'cancelled');
-        
-        
-        
-        
-          }
-
+        }
     }
-
 }
-

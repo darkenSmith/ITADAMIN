@@ -4,8 +4,6 @@ namespace App\Models\Conf;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
-use Exception;
-
 
 /**
  * Class UnConf
@@ -27,16 +25,13 @@ class UnConf extends AbstractModel
     }
 
     public function unconfirmlist()
-    { 
-     
+    {
+        $stuff = $_POST['stuff'];
+        $dell = 0;
+        $who =  str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
 
 
-            $stuff = $_POST['stuff'];
-            $dell = 0;
-            $who =  str_replace( '@stonegroup.co.uk', '', $_SESSION['user']['username']);
-
-
-            foreach ($stuff as $value) {
+        foreach ($stuff as $value) {
             $colupdate ="
 
             update request
@@ -45,8 +40,6 @@ class UnConf extends AbstractModel
             modifydate = getdate(),
             updatedBy = '".$who."'
             where Request_ID =".$value."
-
-            
             update Booked_Collections
             set booking_status = 'Unconfimed'
             where RequestID ='".$value."'
@@ -54,12 +47,6 @@ class UnConf extends AbstractModel
 
             $stmtu = $this->sdb->prepare($colupdate);
             $stmtu->execute();
-
-
-
-            }
-
+        }
     }
-
 }
-

@@ -11,7 +11,6 @@ use App\Models\AbstractModel;
  */
 class UnBook extends AbstractModel
 {
-
     public $response;
 
     /**

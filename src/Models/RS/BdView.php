@@ -20,7 +20,7 @@ class BdView extends AbstractModel
     public function __construct()
     {
         $this->heading = 'datastuff';
-        $this->sdb =  Database::getInstance('sql01');
+        $this->sdb = Database::getInstance('sql01');
 
         parent::__construct();
     }
@@ -30,26 +30,25 @@ class BdView extends AbstractModel
 
         include('./RECbooking/db.php');
 
-        $sql= "select id, name, dept from owners";
+        $sql = "select id, name, dept from owners";
 
 
-
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/owners.txt", "a+");
-        fwrite($fh, $sql ."\n");
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/owners.txt", "a+");
+        fwrite($fh, $sql . "\n");
         fclose($fh);
 
-              $stmt = $this->sdb->prepare($sql);
-              $stmt->execute();
-              $this->datastuff = $stmt->fetchall(\PDO::FETCH_ASSOC);
-             return $this->datastuff;
+        $stmt = $this->sdb->prepare($sql);
+        $stmt->execute();
+        $this->datastuff = $stmt->fetchall(\PDO::FETCH_ASSOC);
+        return $this->datastuff;
     }
 
 
     public function getdata($own, $filter)
     {
 
-            include('./RECbooking/db.php');
-            $own = $_POST['own'] ?? '';
+        include('./RECbooking/db.php');
+        $own = $_POST['own'] ?? '';
         if (!isset($own)) {
             $own = '%';
         }
@@ -59,7 +58,7 @@ class BdView extends AbstractModel
         }
         $filter->$_POST['filterstatus'] ?? '';
 
-        $sql= "
+        $sql = "
 
         SET LANGUAGE British;
         
@@ -67,7 +66,7 @@ class BdView extends AbstractModel
         
         
         declare @owner varchar(200)
-        set @owner = '".$own."'
+        set @owner = '" . $own . "'
         
         select 
         convert(varchar(50), request_date_added, 103) as requestdate,
@@ -132,35 +131,33 @@ class BdView extends AbstractModel
           AND Request_ID  LIKE '%'
           AND (rt.ORD LIKE '%%' OR rt.ORD IS NULL) AND (bc.[Job_notes] + bc.[Access_Notes] LIKE '%%' OR bc.[Job_notes] + bc.[Access_Notes] IS NULL) 
         AND isnull(deleted, 0) <> 1  AND  isnull(DONE, 0) <> 1 "
-        .(isset($filter) ? $filter : "AND laststatus not like 'On-Hold' ")."
+            . (isset($filter) ? $filter : "AND laststatus not like 'On-Hold' ") . "
           AND rt.postcode LIKE '%%%' and rt.postcode <> '%test'
           And (rt.area1 like '%') and ISNULL(RT.Owner, BC.Owner) like '%'+@owner+'%' and Customer_name  not like 'test%'
         ORDER BY
         collection_date desc";
 
 
-
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/stage1bdm.txt", "a+");
-        fwrite($fh, $sql ."\n");
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/stage1bdm.txt", "a+");
+        fwrite($fh, $sql . "\n");
         fclose($fh);
 
-                $stmt = $this->sdb->prepare($sql);
-                $stmt->execute();
-                $data = $stmt->fetchall(\PDO::FETCH_ASSOC);
+        $stmt = $this->sdb->prepare($sql);
+        $stmt->execute();
+        $data = $stmt->fetchall(\PDO::FETCH_ASSOC);
 
-                $dataarry = array();
+        $dataarry = array();
 
         foreach ($data as $val) {
             array_push($dataarry, $val);
         }
 
-                $this->datacheck = $dataarry;
+        $this->datacheck = $dataarry;
 
 
-                $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/bdmreport.txt", "a+");
-                fwrite($fh, $sql ."\n");
-                fclose($fh);
-
+        $fh = fopen($_SERVER["DOCUMENT_ROOT"] . "/RS_Files/bdmreport.txt", "a+");
+        fwrite($fh, $sql . "\n");
+        fclose($fh);
 
 
         return $this->datacheck;

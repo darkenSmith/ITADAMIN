@@ -26,7 +26,7 @@ class IsDone extends AbstractModel
     }
 
     public function tocollected()
-    { 
+    {
      
 
         ini_set('display_errors', 1);
@@ -39,12 +39,9 @@ class IsDone extends AbstractModel
 
 
 
-foreach ($stuff as $value) {
-
-  if(!empty($value)){
-
-  
-  $colupdate = "SELECT
+        foreach ($stuff as $value) {
+            if (!empty($value)) {
+                $colupdate = "SELECT
   replace(OrD, 'ORD-', '') AS ORD,
     r.request_ID as id,
     r.Customer_name as customer,
@@ -69,25 +66,25 @@ foreach ($stuff as $value) {
   WHERE
     Request_ID = '".$value."'";
 
-// $fw = fopen($_SERVER["DOCUMENT_ROOT"]."step1is_done_query_data1.txt","a+");
-// fwrite($fw,$colupdate);
-// fclose($fw);
+    // $fw = fopen($_SERVER["DOCUMENT_ROOT"]."step1is_done_query_data1.txt","a+");
+    // fwrite($fw,$colupdate);
+    // fclose($fw);
 
-  $stmtu = $this->sdb->prepare($colupdate);
-  $stmtu->execute();
-  $ro = $stmtu->fetch(\PDO::FETCH_ASSOC);
+                $stmtu = $this->sdb->prepare($colupdate);
+                $stmtu->execute();
+                $ro = $stmtu->fetch(\PDO::FETCH_ASSOC);
 
-//   $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_data1.txt","a+");
-//   fwrite($fw,$colupdate);
-//   fclose($fw);
+    //   $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_data1.txt","a+");
+    //   fwrite($fw,$colupdate);
+    //   fclose($fw);
 
-  $pos = $ro['postcode'];
+                $pos = $ro['postcode'];
 
-  $apicall = new CurlStatuschange();
+                $apicall = new CurlStatuschange();
 
-  $who =  str_replace( '@stonegroup.co.uk', '', $_SESSION['user']['username']);
+                $who =  str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
 
-  $update_req = "
+                $update_req = "
   update request 
   set done = 1,
   laststatus = 'Done',
@@ -95,15 +92,15 @@ foreach ($stuff as $value) {
   modifydate = getdate()
   where request_id = '".$value."' 
   ";
-  $stmtreq = $this->sdb->prepare($update_req);
-  $stmtreq->execute();
-// out for now cant connect while vpn
- // $apicall->updateAPI($value, 'Done');
+                $stmtreq = $this->sdb->prepare($update_req);
+                $stmtreq->execute();
+    // out for now cant connect while vpn
+     // $apicall->updateAPI($value, 'Done');
 
 
   
 
-$newsql = " 
+                $newsql = " 
 
 
 
@@ -237,37 +234,37 @@ declare @t table(
 ";
 
 
-$stmtreqn = $this->sdb->prepare($newsql);
-$stmtreqn->execute();
-$rw = $stmtreqn->fetch(\PDO::FETCH_ASSOC);
+                $stmtreqn = $this->sdb->prepare($newsql);
+                $stmtreqn->execute();
+                $rw = $stmtreqn->fetch(\PDO::FETCH_ASSOC);
 
 
-$fy = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_new2.txt","a+");
-fwrite($fy,$newsql);
-fclose($fy);
+                $fy = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_new2.txt", "a+");
+                fwrite($fy, $newsql);
+                fclose($fy);
 
-  // PHP Date
-  $week   = date("W")-1;
-  $q = "Q".ceil(date('n', time())/3);
-  $date = date("Y");
-  $day = date("l");
-
-
-
-  //$week = $r['week'];
-  //$q = $r['Quarter'];
-
-  $timeconvert = $ro['ProposedDate'];
-  $finaltime = date("Y-m-d H:i:s",strtotime($timeconvert));
-
-
-  $f2 = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_part3","a+");
-fwrite($f2,"\n".$timeconvert."\n");
-fclose($f2);
+      // PHP Date
+                $week   = date("W")-1;
+                $q = "Q".ceil(date('n', time())/3);
+                $date = date("Y");
+                $day = date("l");
 
 
 
-  $totals_sql = "
+      //$week = $r['week'];
+      //$q = $r['Quarter'];
+
+                $timeconvert = $ro['ProposedDate'];
+                $finaltime = date("Y-m-d H:i:s", strtotime($timeconvert));
+
+
+                $f2 = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_part3", "a+");
+                fwrite($f2, "\n".$timeconvert."\n");
+                fclose($f2);
+
+
+
+                $totals_sql = "
 
   select
   isnull(rt.owner, '') as owner,
@@ -286,107 +283,102 @@ where rq.req_id =".$value."
 group by rq.req_id,   rt.owner";
 
 
-// $f = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_totals.txt","a+");
-// fwrite($f,"\n".print_r($totals_sql,true)."\n");
-// fclose($f);
+    // $f = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_totals.txt","a+");
+    // fwrite($f,"\n".print_r($totals_sql,true)."\n");
+    // fclose($f);
 
-$totalst = $this->sdb->prepare($totals_sql);
-$totalst->execute();
-$t = $totalst->fetch(\PDO::FETCH_ASSOC);
-
-
-
-$f = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_totals.txt","a+");
-fwrite($f,"\n".$totals_sql."\n");
-fclose($f);
+                $totalst = $this->sdb->prepare($totals_sql);
+                $totalst->execute();
+                $t = $totalst->fetch(\PDO::FETCH_ASSOC);
 
 
 
+                $f = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_totals.txt", "a+");
+                fwrite($f, "\n".$totals_sql."\n");
+                fclose($f);
 
 
-$commissql = "
+
+
+
+                $commissql = "
 set nocount on
 exec commisionable ".$value."
 ";
- $commisstmt = $this->sdb->prepare($commissql);
- $commisstmt->execute();
- $commis = $commisstmt->fetch(\PDO::FETCH_ASSOC);
+                $commisstmt = $this->sdb->prepare($commissql);
+                $commisstmt->execute();
+                $commis = $commisstmt->fetch(\PDO::FETCH_ASSOC);
 
 
-/// needs to be in sync with request_id - ORD
+    /// needs to be in sync with request_id - ORD
 
 
- $ordsql = "
+                $ordsql = "
  select replace(SalesOrderNumber, 'ord-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders where CustomerPONumber like '%".$value."'
 
 ";
- $ordstmt = $this->sdb->prepare($ordsql);
- $ordstmt->execute();
- $orddata = $ordstmt->fetch(\PDO::FETCH_ASSOC);
+                $ordstmt = $this->sdb->prepare($ordsql);
+                $ordstmt->execute();
+                $orddata = $ordstmt->fetch(\PDO::FETCH_ASSOC);
 
- $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_dataord.txt","a+");
- fwrite($fw,"\n".isset($orddata['ord'])."\n");
- fclose($fw);
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_dataord.txt", "a+");
+                fwrite($fw, "\n".isset($orddata['ord'])."\n");
+                fclose($fw);
 
 
- if(isset($orddata['ord'])){
- // var_dump($orddata['ord']);
-$trimord = $orddata['ord']; // returns "d"
-}else{
-
-$trimord = '00000';
-
-}
+                if (isset($orddata['ord'])) {
+                         // var_dump($orddata['ord']);
+                        $trimord = $orddata['ord']; // returns "d"
+                } else {
+                      $trimord = '00000';
+                }
 
 
 
-$colcheck = "
+                $colcheck = "
 select count(*) as c from Collections_Log where Customer like '".$rw['custname']."' and OrderNum ='".$trimord."'";
 
 
-$fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_check.txt","a+");
-fwrite($fw,"\n".$colcheck."\n");
-fclose($fw);
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_check.txt", "a+");
+                fwrite($fw, "\n".$colcheck."\n");
+                fclose($fw);
 
 
- $checkstmt = $this->sdb->prepare($colcheck);
- $checkstmt->execute();
- $checkdata = $checkstmt->fetch(\PDO::FETCH_ASSOC);
+                $checkstmt = $this->sdb->prepare($colcheck);
+                $checkstmt->execute();
+                $checkdata = $checkstmt->fetch(\PDO::FETCH_ASSOC);
 
- $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_check.txt","a+");
- fwrite($fw,"\n".$checkdata['c']."\n");
- fclose($fw);
-
-
+                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_check.txt", "a+");
+                fwrite($fw, "\n".$checkdata['c']."\n");
+                fclose($fw);
 
 
 
-$user = $_SESSION['user']['username'];
-
-if(!isset($trimord) == false){
-$bercheck = "select count(*) from berresults where ordernum =".$trimord;
-$berexs = $this->sdb->prepare($bercheck);
-$berexs->execute();
-$exs = $berexs->fetch(\PDO::FETCH_ASSOC);
-if(!isset($exs)){
 
 
-$bersql = "
+                $user = $_SESSION['user']['username'];
+
+                if (!isset($trimord) == false) {
+                              $bercheck = "select count(*) from berresults where ordernum =".$trimord;
+                              $berexs = $this->sdb->prepare($bercheck);
+                              $berexs->execute();
+                              $exs = $berexs->fetch(\PDO::FETCH_ASSOC);
+                    if (!isset($exs)) {
+                        $bersql = "
 insert into berresults(ordernum)
 values(".$trimord.")
 
 ";
- $berstmt = $this->sdb->prepare($bersql);
- $berstmt->execute();
- $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_berlist.txt","a+");
- fwrite($fw,"\n"."ber"."\n");
- fclose($fw);
-  }
+                        $berstmt = $this->sdb->prepare($bersql);
+                        $berstmt->execute();
+                        $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_berlist.txt", "a+");
+                        fwrite($fw, "\n"."ber"."\n");
+                        fclose($fw);
+                    }
+                }
 
-}
 
-
-$sqlgreen = "SELECT
+                $sqlgreen = "SELECT
 ConsignmentNumber AS consign,
 d.WasteTransferNumber as wtn,
 SICCode,
@@ -400,32 +392,31 @@ c.CompanyID = s.CompanyID
 WHERE
 REPLACE(SalesOrderNumber, 'ORD-', '') LIKE  '".$trimord."'";
 
-$stmtgreen = $this->gdb->prepare($sqlgreen);
+                $stmtgreen = $this->gdb->prepare($sqlgreen);
 
-$stmtgreen->execute();
-
-
-
-$rg = $stmtgreen->fetch(\PDO::FETCH_ASSOC);
+                $stmtgreen->execute();
 
 
-//$user = substr(ucwords($name[0]),0, 1).substr(ucwords($name[1]),0, 1);
-  /// convert time so its the correct format in sql
+
+                $rg = $stmtgreen->fetch(\PDO::FETCH_ASSOC);
 
 
-  $sqlcompany = " select distinct * from [dbo].[getCompanyinfo]('".$trimord."')";
-  $compdata = $this->gdb->prepare($sqlcompany);
-  $compdata->execute();
-  $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
+    //$user = substr(ucwords($name[0]),0, 1).substr(ucwords($name[1]),0, 1);
+      /// convert time so its the correct format in sql
 
-  $compowner =  $compstuff['Owner'];
-  $dept = $compstuff['dept'];
-  $rpt = $compstuff['rpt'];
-  $sharedwith = $compstuff['sharedWith'];
 
-  if($checkdata['c'] == 0){
+                $sqlcompany = " select distinct * from [dbo].[getCompanyinfo]('".$trimord."')";
+                $compdata = $this->gdb->prepare($sqlcompany);
+                $compdata->execute();
+                $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
 
-  $updatelog = "INSERT INTO
+                $compowner =  $compstuff['Owner'];
+                $dept = $compstuff['dept'];
+                $rpt = $compstuff['rpt'];
+                $sharedwith = $compstuff['sharedWith'];
+
+                if ($checkdata['c'] == 0) {
+                      $updatelog = "INSERT INTO
     Collections_Log (
     dept, 
     SharedWith,
@@ -521,29 +512,25 @@ $rg = $stmtgreen->fetch(\PDO::FETCH_ASSOC);
   )
   ";
 
-  $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_updatecol.txt","a+");
-  fwrite($fw,$updatelog);
-  fclose($fw);
+                      $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_updatecol.txt", "a+");
+                      fwrite($fw, $updatelog);
+                      fclose($fw);
 
 
-   $stmtupdatecol = $this->sdb->prepare($updatelog);
-  $stmtupdatecol->execute();
+                       $stmtupdatecol = $this->sdb->prepare($updatelog);
+                      $stmtupdatecol->execute();
 
 
-  $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_updatecol.txt","a+");
-  fwrite($fw,$updatelog);
-  fclose($fw);
+                      $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_updatecol.txt", "a+");
+                      fwrite($fw, $updatelog);
+                      fclose($fw);
 
 
-  $sqlii = "UPDATE request SET done = 1 WHERE request_id =".$value;
-  $stmt = $this->sdb->prepare($sqlii);
-  $stmt->execute();
-
+                      $sqlii = "UPDATE request SET done = 1 WHERE request_id =".$value;
+                      $stmt = $this->sdb->prepare($sqlii);
+                      $stmt->execute();
+                }
+            }
+        }
     }
-  }
-
-}
- 
-    }
-
 }

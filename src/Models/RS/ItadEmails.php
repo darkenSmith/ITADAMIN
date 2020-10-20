@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models\RS;
+
 use SendGrid;
 use SendGrid\Mail\Mail;
 
@@ -8,8 +9,6 @@ use App\Helpers\Database;
 use App\Models\AbstractModel;
 use App\Helpers\Config;
 use Exception;
-
-
 
 /**
  * Class ItadEmails
@@ -25,14 +24,15 @@ class ItadEmails extends AbstractModel
      */
     public function __construct()
     {
-      $this->sdb = Database::getInstance('sql01');
-      $this->gdb = Database::getInstance('greenoak');
-      $this->emailConfig = Config::getInstance()->get('email');
+        $this->sdb = Database::getInstance('sql01');
+        $this->gdb = Database::getInstance('greenoak');
+        $this->emailConfig = Config::getInstance()->get('email');
         parent::__construct();
     }
 
 
-    public function email(){
+    public function email()
+    {
         
         $emailadd = $_POST['emailaddress'];
         $lorrytype = $_POST['loorytype'];
@@ -61,63 +61,56 @@ class ItadEmails extends AbstractModel
         
         $name = str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
         
-        $timin =  date("y-m-d",$test);
+        $timin =  date("y-m-d", $test);
         
-        $emailtime = date("d-m-y",$test);
+        $emailtime = date("d-m-y", $test);
         
         
         $now = time();
         
-        $nowtime = date("Y-m-d h:m",$now);
+        $nowtime = date("Y-m-d h:m", $now);
         
          $email_1 = '';
          $string = '@stonegroup.co.uk';
         
-         if(isset($_POST['owner'])){
+        if (isset($_POST['owner'])) {
+            if ($_POST['owner'] != 'Sales'|| $_POST['owner'] != 'Recycling'  || $_POST['owner'] != null) {
+                $owner = $_POST['owner'];
         
-         
-        
-         if($_POST['owner'] != 'Sales'|| $_POST['owner'] != 'Recycling'  || $_POST['owner'] != NULL){
-           $owner = $_POST['owner'];
-        
-         $email_1 = rtrim($owner).$string;
-        
-         }else if($_POST['owner'] == 'ITAD'){
-        
-          $email_1 = 'StoneITAD'.$string;
-          }else{
-        
+                $email_1 = rtrim($owner).$string;
+            } elseif ($_POST['owner'] == 'ITAD') {
+                $email_1 = 'StoneITAD'.$string;
+            } else {
+                $email_1 = 'alex.smith'.$string;
+            }
+        } else {
+            $owner = '';
             $email_1 = 'alex.smith'.$string;
-          }
-         }else{
-          $owner = '';
-          $email_1 = 'alex.smith'.$string;
-         }
+        }
         
-         if($email_1 == 'Recycling@stonegroup.co.uk'){
-          $email_1 = 'alex.smith'.$string;
-         }else if($email_1 == 'recycling@stonegroup.co.uk'){
-          $email_1 = 'alex.smith'.$string;
-         }else if($email_1 == 'sales@stonegroup.co.uk'){
-          $email_1 = 'alex.smith'.$string;
-         }else if($email_1 == 'Sales@stonegroup.co.uk'){
-          $email_1 = 'alex.smith'.$string;
-         }
+        if ($email_1 == 'Recycling@stonegroup.co.uk') {
+            $email_1 = 'alex.smith'.$string;
+        } elseif ($email_1 == 'recycling@stonegroup.co.uk') {
+            $email_1 = 'alex.smith'.$string;
+        } elseif ($email_1 == 'sales@stonegroup.co.uk') {
+            $email_1 = 'alex.smith'.$string;
+        } elseif ($email_1 == 'Sales@stonegroup.co.uk') {
+            $email_1 = 'alex.smith'.$string;
+        }
         
 
         // if($lorrytype == 'b7van' || $lorrytype == 'b77lorry' || $lorrytype == 'b714lorry'|| $lorrytype == 'b7GB'){
         
         
         //   date_default_timezone_set('Europe/London');
-        //   $sTime = date("d-m-Y H:i:s"); 
+        //   $sTime = date("d-m-Y H:i:s");
         
         
         
         // }
         
-        if($email_1 == 'ITAD@stonegroup.co.uk'){
+        if ($email_1 == 'ITAD@stonegroup.co.uk') {
             $email_1 = 'StoneITAD@stonegroup.co.uk';
-        
         }
         
         
@@ -130,11 +123,9 @@ class ItadEmails extends AbstractModel
         
         
         
-        if($lorrytype == 'b7van' || $lorrytype == 'b72van'  || $lorrytype == 'b77lorry' || $lorrytype == 'b714lorry' || $lorrytype == 'b7GB'){
-        
-          if($manual == 0){
-        
-          $sqal2= " UPDATE Booked_Collections
+        if ($lorrytype == 'b7van' || $lorrytype == 'b72van'  || $lorrytype == 'b77lorry' || $lorrytype == 'b714lorry' || $lorrytype == 'b7GB') {
+            if ($manual == 0) {
+                $sqal2= " UPDATE Booked_Collections
           SET LorryType = '".$lorrytype."',
             Lorry = '".$yes."',
             [sentby] = '".$name."',
@@ -155,15 +146,8 @@ class ItadEmails extends AbstractModel
         
           WHERE
             RequestID ='".$rid."'";
-            
-        
-        
-          }else{
-        
-        
-        
-              
-            $sqal2= " UPDATE Booked_Collections
+            } else {
+                $sqal2= " UPDATE Booked_Collections
             SET LorryType = '".$lorrytype."',
               Lorry = '".$yes."',
               [sentby] = '".$name."',
@@ -175,29 +159,20 @@ class ItadEmails extends AbstractModel
               LorryFlag = 1
             WHERE
               RequestID ='".$rid."'";
-            
-        
-        
-          }
-          $stmtup2 = $this->sdb->prepare($sqal2);
-          $stmtup2->execute();
-        
-         }else{
-        
-          $sqlcheck = "
+            }
+            $stmtup2 = $this->sdb->prepare($sqal2);
+            $stmtup2->execute();
+        } else {
+            $sqlcheck = "
           select  (case when [SurveySent] like '%yes%' then 'yes' else 'no' end) ss from Booked_Collections as rt where 
           [SurveySent] like 'yes%' and requestid =  '".$rid."'";
         
-        $stmtchk = $this->sdb->prepare($sqlcheck);
-        $stmtchk->execute();
-        $datack = $stmtchk->fetch(\PDO::FETCH_ASSOC);
+            $stmtchk = $this->sdb->prepare($sqlcheck);
+            $stmtchk->execute();
+            $datack = $stmtchk->fetch(\PDO::FETCH_ASSOC);
         
           
-          if($datack['ss'] !== 'yes'){
-        
-        
-          
-        
+            if ($datack['ss'] !== 'yes') {
                 $sqal= " UPDATE Booked_Collections
               SET LorryType = '".$lorrytype."',
                 Lorry = '".$yes."',
@@ -216,14 +191,8 @@ class ItadEmails extends AbstractModel
           WHERE
             RequestID ='".$rid."'
                 ";
-        
-        
-        
-          }else{
-        
-        
-            
-            $sqal= " UPDATE Booked_Collections
+            } else {
+                $sqal= " UPDATE Booked_Collections
             SET LorryType = '".$lorrytype."',
               Lorry = '".$yes."',
               [SurveySent] = 'yes',
@@ -232,17 +201,14 @@ class ItadEmails extends AbstractModel
               LorryFlag = 1
             WHERE
               RequestID ='".$rid."'";
-          
-          }
+            }
         
-        $stmtup = $this->sdb->prepare($sqal);
-        $stmtup->execute();
-              // $em = fopen($_SERVER["DOCUMENT_ROOT"]."/emails.txt","a+");
-              // fwrite($em,$sqal."\n");
-              // fclose($em);
-        
-          
-         }
+            $stmtup = $this->sdb->prepare($sqal);
+            $stmtup->execute();
+             // $em = fopen($_SERVER["DOCUMENT_ROOT"]."/emails.txt","a+");
+             // fwrite($em,$sqal."\n");
+             // fclose($em);
+        }
         
         
         
@@ -261,20 +227,19 @@ class ItadEmails extends AbstractModel
         
         
         
-        if($manual == 1){
-        
-         $d = str_replace('-','/',$manualtime);
-         $newdeadtime = $d;
+        if ($manual == 1) {
+            $d = str_replace('-', '/', $manualtime);
+            $newdeadtime = $d;
         
          //$date = str_replace('/', '-', $manualtime );
-         $newDate = date("Y-m-d h:i:s", strtotime($manualtime));
+            $newDate = date("Y-m-d h:i:s", strtotime($manualtime));
          //echo $newDate;
          ///$sqlnewdeadtime = date("Y-m-d h:i:s",strtotime($d));
         
          
         
         
-         $upbooking = "
+            $upbooking = "
         
          SET LANGUAGE british
         
@@ -286,34 +251,32 @@ class ItadEmails extends AbstractModel
          set survey_deadline = (select format(@date, 'dd-MM-yyyy hh:mm:ss') )
          where RequestID = '".$rid."'
          ";
-         $e = fopen($_SERVER["DOCUMENT_ROOT"]."/emailbookup.txt","a+");
-         fwrite($e,  $upbooking."\n");
-         fclose($e);
+            $e = fopen($_SERVER["DOCUMENT_ROOT"]."/emailbookup.txt", "a+");
+            fwrite($e, $upbooking."\n");
+            fclose($e);
         
-         $stmtbook = $this->sdb->prepare($upbooking);
-         $stmtbook->execute();
-        
-        }else{
-        $datedead = $datatime['survey_deadline'];
-        $newdeadtime = date("d/m/y h:i:s",strtotime($datedead));
+            $stmtbook = $this->sdb->prepare($upbooking);
+            $stmtbook->execute();
+        } else {
+            $datedead = $datatime['survey_deadline'];
+            $newdeadtime = date("d/m/y h:i:s", strtotime($datedead));
         }
         
-        $e = fopen($_SERVER["DOCUMENT_ROOT"]."/dead.txt","a+");
-        fwrite($e,$newdeadtime."\n");
+        $e = fopen($_SERVER["DOCUMENT_ROOT"]."/dead.txt", "a+");
+        fwrite($e, $newdeadtime."\n");
         fclose($e);
         
         $newdeadtimetrim = substr($newdeadtime, 0, -3);
         
-        $emadd = fopen($_SERVER["DOCUMENT_ROOT"]."/emailaddress.txt","w");
-        fwrite($emadd,$emailadd."\n");
+        $emadd = fopen($_SERVER["DOCUMENT_ROOT"]."/emailaddress.txt", "w");
+        fwrite($emadd, $emailadd."\n");
         fclose($emadd);
 
         $start = 1;
         
-            if($start==1){
-              $sendgridConfig = $this->emailConfig['sendgrid'];
-              try{
-
+        if ($start==1) {
+            $sendgridConfig = $this->emailConfig['sendgrid'];
+            try {
                 $mail = new Mail();
                 // $email->setFrom($_SESSION['user']['username'], 'Stone Computers Recycling System');
                 // $email->setSubject("Collection intake Sheet  - Request-ID:" . $rid);
@@ -323,9 +286,8 @@ class ItadEmails extends AbstractModel
                 // $response = $sendgrid->send($email);
                 $mail->setFrom($_SESSION['user']['username'], 'Stone Computers ITAD System');
                 //$mail->addAddress($email_1);
-                foreach($arry as $val){
-        
-                  $mail->addTo(rtrim($val));
+                foreach ($arry as $val) {
+                    $mail->addTo(rtrim($val));
                 }
                 $mail->AddCC(rtrim($email_1));
                 $mail->AddCC($_SESSION['user']['username']);
@@ -336,25 +298,24 @@ class ItadEmails extends AbstractModel
                 $att1->setFilename("ITADCOVID19terms.pdf");
                 $att1->setDisposition("attachment");
                 $mail->addAttachment($att1);
-               // $mail ->AddCC($_SESSION['user']['username']);
+                 // $mail ->AddCC($_SESSION['user']['username']);
         
-              //   if (php_uname("n") == "STO-LAP-094") {
-              //     // Neil DEV machine
-              //     $mail->addAddress("neil.baker@stonegroup.co.uk");
-              //   } else {
-              //     // The rest of the world
-              //     $mail->addAddress("neil.baker@stonegroup.co.uk");
+                //   if (php_uname("n") == "STO-LAP-094") {
+                //     // Neil DEV machine
+                //     $mail->addAddress("neil.baker@stonegroup.co.uk");
+                //   } else {
+                //     // The rest of the world
+                //     $mail->addAddress("neil.baker@stonegroup.co.uk");
                   // $mail->addAddress("alex.smith@stonegroup.co.uk");
-              //     //$mail->addAddress($val);
-              //   }
+                //     //$mail->addAddress($val);
+                //   }
         
            
             
                 $emailtxt = "";
-               // $mail->isHTML(true);
+                 // $mail->isHTML(true);
                 $mail->setSubject("Booked collection confirmation - Request-ID:".$rid) ;
-                if($lorrytype == 'sbvan'){
-        
+                if ($lorrytype == 'sbvan') {
                     $emailtxt .= '
                      <head>
                        <meta name="viewport" content="width=device-width" />
@@ -683,15 +644,13 @@ class ItadEmails extends AbstractModel
                        </table>
                      </body>
                    </html>';
-                 
-                           }
+                }
         
                            
         
         
-                           if($lorrytype == 'sb2van'){
-        
-                            $emailtxt .= '
+                if ($lorrytype == 'sb2van') {
+                    $emailtxt .= '
                                <head>
                                  <meta name="viewport" content="width=device-width" />
                                  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -1019,13 +978,12 @@ class ItadEmails extends AbstractModel
                                  </table>
                                </body>
                              </html>';
-                           
-                                     }
+                }
           
           
           
-                           if($lorrytype == 'sblorry7'){
-                            $emailtxt .='
+                if ($lorrytype == 'sblorry7') {
+                    $emailtxt .='
                                <head>
                                  <meta name="viewport" content="width=device-width" />
                                  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -1352,13 +1310,11 @@ class ItadEmails extends AbstractModel
                                  </table>
                                </body>
                              </html>';
-                           
-                                     }
+                }
           
                                      
-                           if($lorrytype == 'sblorry14'){
-          
-                            $emailtxt .= '
+                if ($lorrytype == 'sblorry14') {
+                    $emailtxt .= '
                                <head>
                                  <meta name="viewport" content="width=device-width" />
                                  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -1686,12 +1642,11 @@ class ItadEmails extends AbstractModel
                                  </table>
                                </body>
                              </html>';
-                           
-                                     }
+                }
           
           
-                                     if($lorrytype == 'GB'){
-                                        $emailtxt .= '
+                if ($lorrytype == 'GB') {
+                    $emailtxt .= '
                                          <head>
                                            <meta name="viewport" content="width=device-width" />
                                            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -2052,12 +2007,11 @@ class ItadEmails extends AbstractModel
                                            </table>
                                          </body>
                                        </html>';
-                                     
-                                               }
+                }
         
                                                  
-                                               if($lorrytype == 'b7van'){
-                                                $emailtxt .= '
+                if ($lorrytype == 'b7van') {
+                    $emailtxt .= '
                                                    <head>
                                                      <meta name="viewport" content="width=device-width" />
                                                      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -2388,12 +2342,11 @@ class ItadEmails extends AbstractModel
                                                      </table>
                                                    </body>
                                                  </html>';
-                                               
-                                                         }
+                }
         
         
-                                                         if($lorrytype == 'CHSb7van'){
-                                                            $emailtxt .= '
+                if ($lorrytype == 'CHSb7van') {
+                    $emailtxt .= '
                                                          <head>
                                                            <meta name="viewport" content="width=device-width" />
                                                            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -2723,14 +2676,13 @@ class ItadEmails extends AbstractModel
                                                            </table>
                                                          </body>
                                                        </html>';
-                                                     
-                                                               }
+                }
         
         
         
         
-                                                               if($lorrytype == 'CHS75T'){
-                                                                $emailtxt .= '
+                if ($lorrytype == 'CHS75T') {
+                    $emailtxt .= '
                                                                <head>
                                                                  <meta name="viewport" content="width=device-width" />
                                                                  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -3060,13 +3012,12 @@ class ItadEmails extends AbstractModel
                                                                  </table>
                                                                </body>
                                                              </html>';
-                                                           
-                                                                     }
+                }
         
         
         
-                                                                     if($lorrytype == 'CHS14T'){
-                                                                        $emailtxt .= '
+                if ($lorrytype == 'CHS14T') {
+                    $emailtxt .= '
                                                                      <head>
                                                                        <meta name="viewport" content="width=device-width" />
                                                                        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -3396,15 +3347,14 @@ class ItadEmails extends AbstractModel
                                                                        </table>
                                                                      </body>
                                                                    </html>';
-                                                                 
-                                                                           }
+                }
                         
                 
                   
           
           
-                                               if($lorrytype == 'b7van'){
-                                                $emailtxt .='
+                if ($lorrytype == 'b7van') {
+                    $emailtxt .='
                                                    <head>
                                                      <meta name="viewport" content="width=device-width" />
                                                      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -3735,13 +3685,11 @@ class ItadEmails extends AbstractModel
                                                      </table>
                                                    </body>
                                                  </html>';
-                                               
-                                                         }
+                }
           
           
-                                                         if($lorrytype == 'b77lorry'){
-          
-                                                            $emailtxt .= '
+                if ($lorrytype == 'b77lorry') {
+                    $emailtxt .= '
                                                              <head>
                                                                <meta name="viewport" content="width=device-width" />
                                                                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -4069,12 +4017,11 @@ class ItadEmails extends AbstractModel
                                                                </table>
                                                              </body>
                                                            </html>';
-                                                         
-                                                                   }
+                }
         
                                                                      
-                                               if($lorrytype == 'b72van'){
-                                                $emailtxt .= '
+                if ($lorrytype == 'b72van') {
+                    $emailtxt .= '
                                                <head>
                                                  <meta name="viewport" content="width=device-width" />
                                                  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -4405,15 +4352,14 @@ class ItadEmails extends AbstractModel
                                                  </table>
                                                </body>
                                              </html>';
-                                           
-                                                     }
+                }
           
           
           
           
           
-                                                                   if($lorrytype == 'b714lorry'){
-                                                                    $emailtxt .= '
+                if ($lorrytype == 'b714lorry') {
+                    $emailtxt .= '
                                                                        <head>
                                                                          <meta name="viewport" content="width=device-width" />
                                                                          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -4742,14 +4688,12 @@ class ItadEmails extends AbstractModel
                                                                          </table>
                                                                        </body>
                                                                      </html>';
-                                                                   
-                                                                             }
+                }
           
           
           
-                                                                             if($lorrytype == 'b7GB'){
-          
-                                                                                $emailtxt .= '
+                if ($lorrytype == 'b7GB') {
+                    $emailtxt .= '
                                                                                  <head>
                                                                                    <meta name="viewport" content="width=device-width" />
                                                                                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -5120,70 +5064,61 @@ class ItadEmails extends AbstractModel
                                                                                    </table>
                                                                                  </body>
                                                                                </html>';
-                                                                             
-                                                                                       }
+                }
 
-             $mail->addContent("text/html", $emailtxt);
-             $sendgrid = new SendGrid($sendgridConfig['api']['key']);
-             $response = $sendgrid->send($mail);
-             $em = fopen($_SERVER["DOCUMENT_ROOT"]."/emailcontent.txt","a+");
-             fwrite($em,$emailtxt."\n");
-             fclose($em);
+                 $mail->addContent("text/html", $emailtxt);
+                 $sendgrid = new SendGrid($sendgridConfig['api']['key']);
+                 $response = $sendgrid->send($mail);
+                 $em = fopen($_SERVER["DOCUMENT_ROOT"]."/emailcontent.txt", "a+");
+                 fwrite($em, $emailtxt."\n");
+                 fclose($em);
 
-            if ($response->statusCode() !== 202) {
-                throw new \RuntimeException($response->body());
+                if ($response->statusCode() !== 202) {
+                    throw new \RuntimeException($response->body());
+                }
+                echo "OK Mail Sent";
+            } catch (\Exception $e) {
+                echo 'Message could not be sent. Mailer Error: ', $e->getMessage();
+                 $em = fopen($_SERVER["DOCUMENT_ROOT"]."/failedemails.txt", "a+");
+                fwrite($em, $e."\n");
+                fclose($em);
             }
-            echo "OK Mail Sent";
-        } catch (\Exception $e) {
-            echo 'Message could not be sent. Mailer Error: ', $e->getMessage();
-                   $em = fopen($_SERVER["DOCUMENT_ROOT"]."/failedemails.txt","a+");
-              fwrite($em,$e."\n");
-              fclose($em);
         }
-        
-        
-            }
-        
-    
-}
+    }
 
 
 
 
-   public function santizestring($string){
+    public function santizestring($string)
+    {
         $clean = filter_var($string, FILTER_SANITIZE_STRING);
         return $clean;
-        }
+    }
       
-        public function clean_data($value,$type) {
-          if ($type == "text") {
-                          $value = preg_replace("/[^a-zA-Z0-9\-\_\ go]/","",$value);
-          }
-          if ($type == "email") {
-                          $value = preg_replace("/[^a-zA-Z0-9\-\.\@]/","",$value);
-          }
-          if ($type == "date") {
-                          $value = preg_replace("/[^a-zA-Z0-9\-\.\@\\\/]/","",$value);
-          }
-          if ($type == "password") {
-                          $value = preg_replace("/[\'\"\;]/","",$value);      
-          }
-          if ($type == "number") {
-                          $value = preg_replace("/![0-9]/","",$value);        
-          } 
-          if ($type == "array") {
-                          $value = preg_replace("/[^a-zA-Z0-9\,]/","",$value);                        
-          }              
-          if ($type == "mac") {
-                          $value = preg_replace("/[^a-zA-Z0-9\,\:]/","",$value);                     
-          }    
-          $clean = $this->santizestring($value);          
-          return $value;
-      }
-
-
-
- 
-
-
+    public function clean_data($value, $type)
+    {
+        if ($type == "text") {
+                          $value = preg_replace("/[^a-zA-Z0-9\-\_\ go]/", "", $value);
+        }
+        if ($type == "email") {
+                      $value = preg_replace("/[^a-zA-Z0-9\-\.\@]/", "", $value);
+        }
+        if ($type == "date") {
+                      $value = preg_replace("/[^a-zA-Z0-9\-\.\@\\\/]/", "", $value);
+        }
+        if ($type == "password") {
+                      $value = preg_replace("/[\'\"\;]/", "", $value);
+        }
+        if ($type == "number") {
+                      $value = preg_replace("/![0-9]/", "", $value);
+        }
+        if ($type == "array") {
+                      $value = preg_replace("/[^a-zA-Z0-9\,]/", "", $value);
+        }
+        if ($type == "mac") {
+                      $value = preg_replace("/[^a-zA-Z0-9\,\:]/", "", $value);
+        }
+            $clean = $this->santizestring($value);
+            return $value;
+    }
 }

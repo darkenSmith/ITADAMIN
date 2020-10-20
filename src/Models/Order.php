@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Helpers\Database;
 use App\Helpers\Logger;
 
 /**

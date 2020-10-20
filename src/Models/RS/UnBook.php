@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Models\Conf;
+namespace App\Models\RS;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
 
 /**
  * Class UnBook
- * @package App\Models\Conf
+ * @package App\Models\RS
  */
 class UnBook extends AbstractModel
 {
-
     public $response;
+    public $id;
 
     /**
-     * CompanyUpdate constructor.
+     * UnBook constructor.
      */
     public function __construct()
     {
@@ -24,7 +24,7 @@ class UnBook extends AbstractModel
         parent::__construct();
     }
 
-    public function unbookrequest()
+    public function undo()
     {
         $stuff = $_POST['stuff'];
         $dell = 0;
@@ -32,19 +32,19 @@ class UnBook extends AbstractModel
 
         foreach ($stuff as $value) {
             $colupdate = "
-
-            update request
-            set been_collected = " . $dell . ",
-            laststatus = 'UnBooked',
-            deleted = 0,
-            collection_date = NULL,
-            modifydate = getdate(),
-            updatedBy = '" . $who . "'
-            where Request_ID =" . $value . "
-
-            
-            delete from Booked_Collections
-            where RequestID ='" . $value . "' and ([SurveyComplete] like  ''  or [SurveyComplete]  is null)";
+        
+        update request
+        set been_collected = " . $dell . ",
+        laststatus = 'UnBooked',
+        deleted = 0,
+        collection_date = NULL,
+        modifydate = getdate(),
+        updatedBy = '" . $who . "'
+        where Request_ID =" . $value . "
+        
+          
+        delete from Booked_Collections
+        where RequestID ='" . $value . "' and ([SurveyComplete] like  ''  or [SurveyComplete]  is null)";
 
             $stmtu = $this->sdb->prepare($colupdate);
             return $stmtu->execute();

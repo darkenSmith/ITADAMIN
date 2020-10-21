@@ -314,7 +314,7 @@ class User extends AbstractModel
             $result->execute();
             $this->stoneUsers = $result->fetchAll(\PDO::FETCH_OBJ);
 
-            $sql = 'SELECT * FROM recyc_users WHERE (role_id = 3 OR role_id = 4)"';
+            $sql = 'SELECT * FROM recyc_users WHERE (role_id = 3 OR role_id = 4)';
             $result = $this->rdb->prepare($sql);
             $result->execute();
             $this->users = $result->fetchAll(\PDO::FETCH_OBJ);

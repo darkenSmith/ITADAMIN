@@ -34,6 +34,7 @@ class Database
             if ($database['driver'] === 'sqlsrv') {
                 $driver = sprintf('%s:%s', $database['driver'], 'Server');
                 $dbName = sprintf('%s=%s', 'Database', $database['dbname']);
+                $database['host'] .= ',' . $database['port'];
                 $port = '';
             } else {
                 $driver = sprintf('%s:%s', $database['driver'], 'host');

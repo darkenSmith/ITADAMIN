@@ -90,10 +90,9 @@ class RSController extends AbstractController
     // Checked
     public function arc()
     {
-        $arcdata = new Arcdata();
-        $arcData= $arcdata->getdata();
-        $areas = $arcdata->getareas();
-
+        $arc= new Arcdata();
+        $arcData= $arc->getdata();
+        $areas = $arc->getareas();
         $this->template->view(
             'RECBooking/pages/Archive',
             array_merge(['arcData' => $arcData, 'areas' => $areas], $this->getCommonData())

@@ -9,7 +9,7 @@ use App\Models\RS\BdmDetail;
 use App\Models\RS\BdView;
 use App\Models\RS\Bookingdata;
 use App\Models\RS\Charge;
-use App\Models\RS\download;
+use App\Models\RS\Download;
 use App\Models\RS\GoodInData;
 use App\Models\RS\GoodsInMail;
 use App\Models\RS\GoodsOutData;
@@ -327,7 +327,7 @@ class RSController extends AbstractController
         $amrsup->update();
     }
 
-    public function goodsiInMail()
+    public function goodsInMail()
     {
         $goodsInMail = new GoodsInMail();
         echo $goodsInMail->process();

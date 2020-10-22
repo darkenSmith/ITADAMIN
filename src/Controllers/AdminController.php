@@ -131,4 +131,13 @@ class AdminController extends AbstractController
             ]
         );
     }
+
+    public function addUserPost()
+    {
+        if ($_POST) {
+            $data = new user();
+            $data->addUser();
+            echo $data->response;
+        }
+    }
 }

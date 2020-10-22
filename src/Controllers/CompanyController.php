@@ -34,6 +34,8 @@ class CompanyController extends AbstractController
                 'pages/company',
                 [
                     'data' => $data,
+                    'id' => $_GET['id'],
+                    'company' => $company,
                     'summary' => $summary,
                     'collections' => $collections
                 ]

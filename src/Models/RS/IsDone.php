@@ -3,6 +3,7 @@
 namespace App\Models\RS;
 
 use App\Helpers\Database;
+use App\Helpers\Logger;
 use App\Models\AbstractModel;
 use App\Models\RS\CurlStatuschange;
 
@@ -27,17 +28,8 @@ class IsDone extends AbstractModel
 
     public function tocollected()
     {
-     
-
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-
 
         $stuff = $_POST['stuff'];
-
-
-
 
         foreach ($stuff as $value) {
             if (!empty($value)) {
@@ -115,7 +107,7 @@ declare @t table(
       PC int,
 	   PCOther int,
 	     PCAMD int,
-      [All in One] int,
+      [AllInOne] int,
 	      [All in OneOther] int,
 		   [All in OneAMD] int,
       LAPTOP int,
@@ -206,7 +198,7 @@ declare @t table(
   PC as pcq,
   PCOther as pco,
     PCAMD as pcamd,
-    [All in One] as aioq, 
+    [AllInOne] as aioq, 
    [All in OneOther] as aioother, 
    [All in OneAMD] as aioAMD, 
    LAPTOP as lapq,
@@ -239,9 +231,10 @@ declare @t table(
                 $rw = $stmtreqn->fetch(\PDO::FETCH_ASSOC);
 
 
-                $fy = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_new2.txt", "a+");
-                fwrite($fy, $newsql);
-                fclose($fy);
+                Logger::getInstance("isDone.log")->debug(
+                    'is_done_query_new2',
+                    [$newsql]
+                );
 
       // PHP Date
                 $week   = date("W")-1;
@@ -258,11 +251,10 @@ declare @t table(
                 $finaltime = date("Y-m-d H:i:s", strtotime($timeconvert));
 
 
-                $f2 = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_part3", "a+");
-                fwrite($f2, "\n".$timeconvert."\n");
-                fclose($f2);
-
-
+                Logger::getInstance("isDone.log")->debug(
+                    'is_done_query_part3',
+                    [$timeconvert]
+                );
 
                 $totals_sql = "
 
@@ -291,14 +283,10 @@ group by rq.req_id,   rt.owner";
                 $totalst->execute();
                 $t = $totalst->fetch(\PDO::FETCH_ASSOC);
 
-
-
-                $f = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_totals.txt", "a+");
-                fwrite($f, "\n".$totals_sql."\n");
-                fclose($f);
-
-
-
+                Logger::getInstance("isDone.log")->debug(
+                    'is_done_totals',
+                    [$totals_sql]
+                );
 
 
                 $commissql = "
@@ -317,14 +305,14 @@ exec commisionable ".$value."
  select replace(SalesOrderNumber, 'ord-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders where CustomerPONumber like '%".$value."'
 
 ";
-                $ordstmt = $this->sdb->prepare($ordsql);
+                $ordstmt = $this->gdb->prepare($ordsql);
                 $ordstmt->execute();
                 $orddata = $ordstmt->fetch(\PDO::FETCH_ASSOC);
 
-                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_dataord.txt", "a+");
-                fwrite($fw, "\n".isset($orddata['ord'])."\n");
-                fclose($fw);
-
+                Logger::getInstance("isDone.log")->debug(
+                    'is_done_query_dataord',
+                    [isset($orddata['ord'])]
+                );
 
                 if (isset($orddata['ord'])) {
                          // var_dump($orddata['ord']);
@@ -338,23 +326,19 @@ exec commisionable ".$value."
                 $colcheck = "
 select count(*) as c from Collections_Log where Customer like '".$rw['custname']."' and OrderNum ='".$trimord."'";
 
-
-                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_check.txt", "a+");
-                fwrite($fw, "\n".$colcheck."\n");
-                fclose($fw);
-
+                Logger::getInstance("isDone.log")->debug(
+                    'is_done_query_check',
+                    [$colcheck]
+                );
 
                 $checkstmt = $this->sdb->prepare($colcheck);
                 $checkstmt->execute();
                 $checkdata = $checkstmt->fetch(\PDO::FETCH_ASSOC);
 
-                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_check.txt", "a+");
-                fwrite($fw, "\n".$checkdata['c']."\n");
-                fclose($fw);
-
-
-
-
+                Logger::getInstance("isDone.log")->debug(
+                    'is_done_query_check',
+                    [$checkdata['c']]
+                );
 
                 $user = $_SESSION['user']['username'];
 
@@ -371,9 +355,11 @@ values(".$trimord.")
 ";
                         $berstmt = $this->sdb->prepare($bersql);
                         $berstmt->execute();
-                        $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_berlist.txt", "a+");
-                        fwrite($fw, "\n"."ber"."\n");
-                        fclose($fw);
+
+                        Logger::getInstance("isDone.log")->debug(
+                            'is_done_query_berlist',
+                            [$bersql]
+                        );
                     }
                 }
 
@@ -512,19 +498,19 @@ REPLACE(SalesOrderNumber, 'ORD-', '') LIKE  '".$trimord."'";
   )
   ";
 
-                      $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_updatecol.txt", "a+");
-                      fwrite($fw, $updatelog);
-                      fclose($fw);
 
-
+                    Logger::getInstance("is_done_query_updatecol.log")->debug(
+                        'updatelog',
+                        [$updatelog]
+                    );
                        $stmtupdatecol = $this->sdb->prepare($updatelog);
                       $stmtupdatecol->execute();
 
 
-                      $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_updatecol.txt", "a+");
-                      fwrite($fw, $updatelog);
-                      fclose($fw);
-
+                    Logger::getInstance("is_done_query_updatecol.log")->debug(
+                        'updatelog',
+                        [$updatelog]
+                    );
 
                       $sqlii = "UPDATE request SET done = 1 WHERE request_id =".$value;
                       $stmt = $this->sdb->prepare($sqlii);

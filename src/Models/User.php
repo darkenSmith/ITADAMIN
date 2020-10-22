@@ -354,14 +354,18 @@ class User extends AbstractModel
                     // Change tag: addCustomer
                     // Check if adding a user with a customer
                     if (($_POST["role_id"] == "3" || $_POST["role_id"] == "4") && count($_POST["customer_id"]) > 0) {
-                        // Add each custome to the user
-                        //foreach($_POST["customer_id"] as $customer_id) {
-                        // Insert record
-                        $sql = "INSERT INTO recyc_customer_links_to_company (user_id, company_id) VALUES (:id,:customer_id)";
-                        $statement = $this->rdb->prepare($sql);
-                        $values = array(':id' => $this->user->id, ':customer_id' => $_POST["customer_id"]);
-                        $statement->execute($values);
-                        //}
+                        foreach ($_POST["customer_id"] as $customerId) {
+                            $sql = "INSERT INTO recyc_customer_links_to_company (user_id, company_id) VALUES (:id,:customer_id)";
+                            $values = array(':id' => $this->user->id, ':customer_id' => $customerId);
+
+                            Logger::getInstance("User.log")->debug(
+                                'insert-recyc_customer_links_to_company',
+                                [$sql,$values, $_POST["customer_id"], $customerId]
+                            );
+
+                            $statement = $this->rdb->prepare($sql);
+                            $statement->execute($values);
+                        }
                     }
                     // End change tag addCustomer
 

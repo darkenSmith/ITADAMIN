@@ -11,7 +11,7 @@ class Overview extends AbstractModel
 
     public $company;
     public $page = null;
-    private $unallocated;
+    public $unallocated;
 
     /**
      * Overview constructor.

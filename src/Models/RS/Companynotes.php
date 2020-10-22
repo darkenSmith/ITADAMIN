@@ -1,7 +1,7 @@
 <?php
-
 namespace App\Models\RS;
 
+use App\Helpers\Logger;
 use App\Models\AbstractModel;
 use App\Helpers\Database;
 
@@ -15,7 +15,7 @@ class Companynotes extends AbstractModel
     public $id;
 
     /**
-     * ApprovData constructor.
+     * Companynotes constructor.
      */
     public function __construct()
     {
@@ -29,54 +29,54 @@ class Companynotes extends AbstractModel
         $sql="
         select 
         id as id,
-        [CompanyName] as name
-        ,Location as loc
-        ,crm 
-        ,cmp 
-        ,letter as let
-        ,Department as dep
-        ,Owner as own
-        ,GDPR as gdpr
-        ,is_AMR as isamr
-        ,is_Rebate as isreb
-        , rpt
-        ,Sector as sec
-        ,Type as typ
-        ,Notes as note
-        ,sharedWith
-        ,[prevowner] as prev
-        ,[DateAdded] as dadd
-        ,Reqwuest_id as reqid
+        [CompanyName] as name,
+        Location as loc,
+        crm,
+        cmp,
+        letter as let,
+        Department as dep,
+        Owner as own,
+        GDPR as gdpr,
+        is_AMR as isamr,
+        is_Rebate as isreb,
+        rpt,
+        Sector as sec,
+        Type as typ,
+        Notes as note,
+        sharedWith,
+        [prevowner] as prev,
+        [DateAdded] as dadd,
+        Reqwuest_id as reqid
         from Companies
-        where Location like '%".(isset($_POST["postcode"]) ? $_POST["postcode"] : '%')."%'
-        and (owner like '".(isset($_POST["owner"]) ? $_POST["owner"]."%')" :"%' or owner is null)")."
-        and [CompanyName] like '%".(isset($_POST["ent"]) ? $_POST["ent"] : '%')."%'
-        and Department like '%".(isset($_POST["deptfilter"]) ? $_POST["deptfilter"] : '%')."%'
-        and Owner like '%".(isset($_POST["ownfilter"]) ? $_POST["ownfilter"] : '%')."%'
-        and isnull(rpt, 'AMR') like '%".(isset($_POST["amrst"]) ? $_POST["amrst"] : '%')."%'
-        order by
-        ".(isset($_POST["filter"]) ? $_POST["filter"] : "[CompanyName]")." asc";
+        where Location like :postcode
+        and (owner like :owner or owner is null) 
+        and [CompanyName] like :ent
+        and Department like :deptfilter
+        and Owner like :ownfilter
+        and isnull(rpt, 'AMR') like :amrst";
+        //order by :filter asc";
 
+        $executeData = [
+            ':postcode' => '%' . (isset($_POST["postcode"]) ? $_POST["postcode"] : '%') . '%',
+            ':owner' => (isset($_POST["owner"]) ? $_POST["owner"].'%' : '%') . '%',
+            ':ent' => '%' . (isset($_POST["ent"]) ? $_POST["ent"] : '%') . '%',
+            ':deptfilter' => '%' . (isset($_POST["deptfilter"]) ? $_POST["deptfilter"] : '%') . '%',
+            ':ownfilter' => '%' . (isset($_POST["ownfilter"]) ? $_POST["ownfilter"] : '%') . '%',
+            ':amrst' => '%' . (isset($_POST["amrst"]) ? $_POST["amrst"] : '%') . '%',
+            //':filter' => (isset($_POST["filter"]) ? $_POST["filter"] : "[CompanyName]"),
+        ];
 
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/companysql.txt", "a+");
-        fwrite($fh, $sql."\n");
-        fclose($fh);
-
+        Logger::getInstance("CompanyNotes.log")->debug(
+            'sql',
+            [
+                [trim(preg_replace('/\s\s+/', ' ', $sql)), $executeData],
+                $executeData
+            ]
+        );
 
         $stmt = $this->sdb->prepare($sql);
-        if (!$stmt) {
-            echo "\nPDO::errorInfo():\n";
-            print_r($this->sdb->errorInfo());
-            die();
-        }
-        $stmt->execute();
-
+        $stmt->execute($executeData);
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/companysql.txt", "a+");
-        fwrite($fh, $sql."\n");
-        fclose($fh);
 
         $i = 0;
 

@@ -24,14 +24,9 @@ class Bookingdata extends AbstractModel
         $this->sdb =  Database::getInstance('sql01');
         parent::__construct();
     }
-    
-
-
-    
 
     public function getdata()
     {
-    
         if (isset($_POST["postcode"])) {
             $postcode = $this->clean($_POST["postcode"]);
             $id= $this->clean($_POST["id"]);
@@ -43,16 +38,7 @@ class Bookingdata extends AbstractModel
             $_SESSION['stat'] = isset($_POST["filterstatus"]) ? $_SESSION['stat'] : "AND laststatus not like 'On-Hold'";
         }
 
-             
-
-             
-              
-              
               $sql = "
-
-
-
-
               SET LANGUAGE British;
 
               set nocount on
@@ -116,9 +102,7 @@ class Bookingdata extends AbstractModel
         } else {
             $sql .= "AND (bc.[Job_notes] + bc.[Access_Notes] LIKE '%%' OR bc.[Job_notes] + bc.[Access_Notes] IS NULL) ";
         }
-                
-              
-              
+
         if (isset($_POST['filterstatus']) && $_POST['filterstatus'] == 'deleted') {
             $sql .= "
               AND isnull(deleted, 0) = 1  AND  isnull(DONE, 0) <> 1 
@@ -133,13 +117,8 @@ class Bookingdata extends AbstractModel
         }
               
         if (isset($_POST["collectdate"]) &&  $_POST["collectdate"] != "") {
-            $fu = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/collectdatesearch.txt", "a+");
-            fwrite($fu, date("d-m-y", strtotime($_POST["collectdate"]))."\n");
-            fclose($fu);
             $sql .= "and isnull(cast(rt.collection_date as varchar(50)),'not set') ='".date("d-m-y", strtotime($_POST["collectdate"]))."'";
         }
-                
-              
               
                 $sql .= "
 
@@ -176,38 +155,28 @@ class Bookingdata extends AbstractModel
               ORDER BY
                 ".(isset($_POST["filter"]) && $_POST["filter"] != "" ? $_POST["filter"] : " isnull(cast(collection_date as varchar(50)),'not set') ")." ".(isset($_POST["filter2"]) && $_POST["filter2"] != "" ? $_POST["filter2"] : "  DESC")." 
                 ";
-              
 
-                $stmt = $this->sdb->prepare($sql);
-        if (!$stmt) {
-            echo "\nPDO::errorInfo():\n";
-            print_r($this->sdb->errorInfo());
-        }
+        Logger::getInstance("bookingData.log")->debug(
+            'getdata',
+            [$sql]
+        );
 
-
-
+        $stmt = $this->sdb->prepare($sql);
 
         try {
             $stmt->execute();
             $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-
             $dataarray = array();
             $dataarray = $data;
 
-            
-
-
-
-
-            
-
-
-         
             $this->response = $dataarray;
             return $this->response;
         } catch (\Exception $e) {
-            var_dump($e);
+            Logger::getInstance("bookingData.log")->error(
+                'getdata',
+                [$e->getMessage()]
+            );
         }
 
        // return [];

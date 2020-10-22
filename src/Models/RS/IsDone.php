@@ -392,16 +392,29 @@ REPLACE(SalesOrderNumber, 'ORD-', '') LIKE  '".$trimord."'";
 
 
                 $sqlcompany = " select distinct * from [dbo].[getCompanyinfo]('".$trimord."')";
-                $compdata = $this->gdb->prepare($sqlcompany);
+                $compdata = $this->sdb->prepare($sqlcompany);
                 $compdata->execute();
                 $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
 
+
+                Logger::getInstance("isDone.log")->debug(
+                    'sqlcompany',
+                    [$sqlcompany]
+                );
+                Logger::getInstance("isDone.log")->debug(
+                    'sqlcompany',
+                    [$compstuff]
+                );
                 $compowner =  $compstuff['Owner'];
                 $dept = $compstuff['dept'];
                 $rpt = $compstuff['rpt'];
                 $sharedwith = $compstuff['sharedWith'];
 
                 if ($checkdata['c'] == 0) {
+                    Logger::getInstance("isDone.log")->debug(
+                        'checkdata[c] == 0',
+                        [$compstuff]
+                    );
                       $updatelog = "INSERT INTO
     Collections_Log (
     dept, 

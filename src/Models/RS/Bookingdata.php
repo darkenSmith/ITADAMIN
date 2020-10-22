@@ -3,6 +3,7 @@
 namespace App\Models\RS;
 
 use App\Helpers\Database;
+use App\Helpers\Logger;
 use App\Models\AbstractModel;
 
 /**
@@ -72,7 +73,6 @@ class Bookingdata extends AbstractModel
               and laststatus like 'booked' then 'booked' When  isnull(cast(collection_date as varchar(50)),'not set') is not null and confirmed = 1 then 'confirmed' when been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and (confirmed = 1  and laststatus like 'confirmed') then 'Confirmed' when laststatus like 'On-Hold' then 'Hold'
                when laststatus like 'cancelled' then  'cancelled'  when (rt.Owner is null or rt.Owner like '') then 'New' when isnull(deleted, 0) = 1 then 'deleted'  else 'Request' end as Stat,
               isnull(Cmp_number, 'N/A') as crm,
-              ---[dbo].[greencrmn](Request_id) crm,
               request_date_added as requestdate,
               isnull(cast(collection_date as varchar(50)),'not set') AS coldate,
                 Customer_name AS name,
@@ -156,7 +156,6 @@ class Bookingdata extends AbstractModel
                 and laststatus like 'booked' then 'booked' When  isnull(cast(collection_date as varchar(50)),'not set') is not null and confirmed = 1 then 'confirmed' when been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and (confirmed = 1  and laststatus like 'confirmed') then 'Confirmed' when laststatus like 'On-Hold' then 'Hold'
                  when laststatus like 'cancelled' then  'cancelled'  when (rt.Owner is null or rt.Owner like '') then 'New' when isnull(deleted, 0) = 1 then 'deleted'  else 'Request' end,
                 isnull(Cmp_number, 'N/A') ,
-                ---[dbo].[greencrmn](Request_id) crm,
                 request_date_added,
                 isnull(cast(collection_date as varchar(50)),'not set') ,
                   Customer_name, 
@@ -178,7 +177,7 @@ class Bookingdata extends AbstractModel
                 ".(isset($_POST["filter"]) && $_POST["filter"] != "" ? $_POST["filter"] : " isnull(cast(collection_date as varchar(50)),'not set') ")." ".(isset($_POST["filter2"]) && $_POST["filter2"] != "" ? $_POST["filter2"] : "  DESC")." 
                 ";
               
-              //var_dump($sql);
+
                 $stmt = $this->sdb->prepare($sql);
         if (!$stmt) {
             echo "\nPDO::errorInfo():\n";

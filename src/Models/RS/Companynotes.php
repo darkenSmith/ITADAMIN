@@ -60,8 +60,8 @@ class Companynotes extends AbstractModel
             ':postcode' => '%' . (isset($_POST["postcode"]) ? $_POST["postcode"] : '%') . '%',
             ':owner' => (isset($_POST["owner"]) ? $_POST["owner"].'%' : '%') . '%',
             ':ent' => '%' . (isset($_POST["ent"]) ? $_POST["ent"] : '%') . '%',
-            ':deptfilter' => '%' . (isset($_POST["deptfilter"]) ? $_POST["deptfilter"] : '%') . '%',
-            ':ownfilter' => '%' . (isset($_POST["ownfilter"]) ? $_POST["ownfilter"] : '%') . '%',
+            ':deptfilter' => '%' . (isset($_POST["deptfilter"]) ? $_POST["deptfilter"] : '') . '%',
+            ':ownfilter' => '%' . (isset($_POST["ownfilter"]) ? $_POST["ownfilter"] : '') . '%',
             ':amrst' => '%' . (isset($_POST["amrst"]) ? $_POST["amrst"] : '%') . '%',
             //':filter' => (isset($_POST["filter"]) ? $_POST["filter"] : "[CompanyName]"),
         ];

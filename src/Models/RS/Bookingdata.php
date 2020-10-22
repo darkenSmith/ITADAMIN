@@ -47,17 +47,31 @@ class Bookingdata extends AbstractModel
               Request_id as id,
                     SUM(qty) as totalunits,
                     sum(qty * convert(DECIMAL(9 , 2),typicalweight)) as totalweight,
-                    (select sum(qty) from Req_Detail join productlist as p on product_ID = prod_id where req_id =Request_id  and commisionable = 1) as commisionable,
-                    (select sum(qty) from Req_Detail join productlist as p on product_ID = prod_id where req_id =Request_id  and commisionable = 0) as noncommisionable,
+                    (select sum(qty) from Req_Detail join productlist as p on product_ID = prod_id 
+                    where req_id =Request_id  and commisionable = 1) as commisionable,
+                    (select sum(qty) from Req_Detail join productlist as p on product_ID = prod_id 
+                    where req_id =Request_id  and commisionable = 0) as noncommisionable,
               prev_orders as prev,
               [SurveyComplete] as scomp,
               ISNULL(RT.Owner, BC.Owner) as Owner,
               approved,
               process,
               rt.ord ordern,
-              case when been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and (confirmed = 0  or confirmed is null) 
-              and laststatus like 'booked' then 'booked' When  isnull(cast(collection_date as varchar(50)),'not set') is not null and confirmed = 1 then 'confirmed' when been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and (confirmed = 1  and laststatus like 'confirmed') then 'Confirmed' when laststatus like 'On-Hold' then 'Hold'
-               when laststatus like 'cancelled' then  'cancelled'  when (rt.Owner is null or rt.Owner like '') then 'New' when isnull(deleted, 0) = 1 then 'deleted'  else 'Request' end as Stat,
+              case when been_collected = 1 AND isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and 
+              (confirmed = 0  or confirmed is null) and laststatus like 'booked' 
+              then 'booked' 
+              When isnull(cast(collection_date as varchar(50)),'not set') is not null and confirmed = 1 
+              then 'confirmed' 
+              when been_collected = 1 AND isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and 
+              (confirmed = 1  and laststatus like 'confirmed') 
+              then 'Confirmed' 
+              when laststatus like 'On-Hold' 
+              then 'Hold'
+              when laststatus like 'cancelled' 
+              then 'cancelled'  
+              when (rt.Owner is null or rt.Owner like '') 
+              then 'New' when isnull(deleted, 0) = 1 
+              then 'deleted'  else 'Request' end as Stat,
               isnull(Cmp_number, 'N/A') as crm,
               request_date_added as requestdate,
               isnull(cast(collection_date as varchar(50)),'not set') AS coldate,
@@ -76,8 +90,7 @@ class Bookingdata extends AbstractModel
                 case when isnull(GDPRconf, 0) = 1 then 'Yes' else 'No' end as gdpr,
                 rt.postcode AS postcode, 
                 bc.emailsentdate
-              
-              
+             
               FROM
                request as rt with(nolock)
               LEFT join Booked_Collections as bc with(nolock) on
@@ -112,7 +125,7 @@ class Bookingdata extends AbstractModel
             $sql .= "
               AND isnull(deleted, 0) <> 1  AND  isnull(DONE, 0) <> 1 
                ".(isset($_POST["filterstatus"]) ? $_POST["filterstatus"] : "AND laststatus not like 'On-Hold' ")."
-                AND rt.postcode LIKE '%".(isset($postcode) && $postcode != "" ? '%'.$postcode.'%' : '%')."%'
+                AND rt.postcode LIKE '%".(isset($postcode) && $postcode != "" ? '%'.$postcode.'%' : '')."%'
                 And (rt.area1 like '".(isset($_POST["areafilter"]) && $_POST["areafilter"] != "" ? $_POST["areafilter"] : '%' )."' )";
         }
               

@@ -29,4 +29,10 @@ class BookingController extends AbstractController
     {
         echo "<h1>New Collection Request</h1>";
     }
+
+    public function upload()
+    {
+        $collections = new Collection();
+        echo $collections->upload();
+    }
 }

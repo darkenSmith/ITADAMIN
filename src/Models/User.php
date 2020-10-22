@@ -459,9 +459,9 @@ class User extends AbstractModel
         }
 
         $content .= '<p>This link is valid for 48 hours.</p>';
-        $content .= '<p><a href="http://recwebtest.stonegroup.co.uk/login/reset/' . $this->token . '">Click here to ' . $method . ' your password</a></p>';
+        $content .= '<p><a href="https://itadadmin.stonegroup.co.uk/login/reset/' . $this->token . '">Click here to ' . $method . ' your password</a></p>';
         $content .= '<p>Alternatively copy and paste this into the address bar of your internet browser:</p>';
-        $content .= '<p>http://recwebtest.stonegroup.co.uk/login/reset/' . $this->token . '</p>';
+        $content .= '<p>https://itadadmin.stonegroup.co.uk/login/reset/' . $this->token . '</p>';
         $content .= '<p>If you have any problems resetting your password, please reply to this email.</p>';
         $content .= '<p>Thanks</p>';
         $content .= '<p>Stone Computers</p>';

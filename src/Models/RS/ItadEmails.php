@@ -52,7 +52,7 @@ class ItadEmails extends AbstractModel
         
         $yes='Yes';
         
-        $path2 = 'https://recwebtest.stonegroup.co.uk/Conf/thankyoucust/'.$rid;
+        $path2 = 'https://itadadmin.stonegroup.co.uk/Conf/thankyoucust/'.$rid;
         //$path2 = 'thankyou.php';
         $sTime = '';
         

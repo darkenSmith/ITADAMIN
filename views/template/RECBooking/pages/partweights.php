@@ -533,7 +533,7 @@ if(!isNaN(val3) && val3.length != 0) {
         });
 }
 
-location.reload('http://recwebtest.stonegroup.co.uk/RS/RGR/?ye=');
+location.reload('https://itadadmin.stonegroup.co.uk/RS/RGR/?ye=');
   });
 
 });

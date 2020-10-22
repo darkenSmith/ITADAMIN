@@ -5,7 +5,6 @@ namespace App\Models\RS;
 use App\Helpers\Database;
 use App\Helpers\Logger;
 use App\Models\AbstractModel;
-use App\Models\RS\CurlStatuschange;
 
 /**
  * Class ApprovData
@@ -21,7 +20,7 @@ class IsDone extends AbstractModel
      */
     public function __construct()
     {
-        $this->sdb =  Database::getInstance('sql01');
+        $this->sdb = Database::getInstance('sql01');
         $this->gdb = Database::getInstance('greenoak');
         parent::__construct();
     }
@@ -56,41 +55,39 @@ class IsDone extends AbstractModel
   FROM
     request AS r with(nolock)
   WHERE
-    Request_ID = '".$value."'";
+    Request_ID = '" . $value . "'";
 
-    // $fw = fopen($_SERVER["DOCUMENT_ROOT"]."step1is_done_query_data1.txt","a+");
-    // fwrite($fw,$colupdate);
-    // fclose($fw);
+                // $fw = fopen($_SERVER["DOCUMENT_ROOT"]."step1is_done_query_data1.txt","a+");
+                // fwrite($fw,$colupdate);
+                // fclose($fw);
 
                 $stmtu = $this->sdb->prepare($colupdate);
                 $stmtu->execute();
                 $ro = $stmtu->fetch(\PDO::FETCH_ASSOC);
 
-    //   $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_data1.txt","a+");
-    //   fwrite($fw,$colupdate);
-    //   fclose($fw);
+                //   $fw = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_query_data1.txt","a+");
+                //   fwrite($fw,$colupdate);
+                //   fclose($fw);
 
                 $pos = $ro['postcode'];
 
                 $apicall = new CurlStatuschange();
 
-                $who =  str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
+                $who = str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
 
                 $update_req = "
   update request 
   set done = 1,
   laststatus = 'Done',
-  modifedby = '".$who."',
+  modifedby = '" . $who . "',
   modifydate = getdate()
-  where request_id = '".$value."' 
+  where request_id = '" . $value . "' 
   ";
                 $stmtreq = $this->sdb->prepare($update_req);
                 $stmtreq->execute();
-    // out for now cant connect while vpn
-     // $apicall->updateAPI($value, 'Done');
+                // out for now cant connect while vpn
+                // $apicall->updateAPI($value, 'Done');
 
-
-  
 
                 $newsql = " 
 
@@ -140,33 +137,33 @@ declare @t table(
   rt.Customer_name,
   postcode,
   ord,
-  isnull((select qty from Req_Detail where prod_id = 11 and req_id = ".$value."), 0) as TFT,
-  isnull((select qty from Req_Detail where prod_id = 3 and req_id = ".$value."), 0) as PC,
-    isnull((select qty from Req_Detail where prod_id = 55 and req_id = ".$value."), 0) as [PCother],
-	    isnull((select qty from Req_Detail where prod_id = 53 and req_id = ".$value."), 0) as [PCAMD],
-  isnull((select qty from Req_Detail where prod_id = 31 and req_id = ".$value."), 0) as Allinone_PC,
-    isnull((select qty from Req_Detail where prod_id = 61 and req_id = ".$value."), 0) as [Allinone_PCother],
-	   isnull((select qty from Req_Detail where prod_id = 63 and req_id = ".$value."), 0) as [Allinone_PCAMD],
-  isnull((select qty from Req_Detail where prod_id = 5 and req_id = ".$value."), 0) as Laptop,
-    isnull((select qty from Req_Detail where prod_id = 57 and req_id = ".$value."), 0) as LaptopOther,
-	  isnull((select qty from Req_Detail where prod_id = 59 and req_id = ".$value."), 0) as LaptopAMD,
-  isnull((select qty from Req_Detail where prod_id = 7 and req_id = ".$value."), 0) as Server,
-  isnull((select qty from Req_Detail where prod_id = 25 and req_id = ".$value."),0) as DesktopPrinter,
-  isnull((select qty from Req_Detail where prod_id = 27 and req_id = ".$value."),0) as Standalone_Printer,
-  isnull((select qty from Req_Detail where prod_id = 41 and req_id = ".$value."),0) as Lap_trolly,
-  isnull((select qty from Req_Detail where prod_id = 13 and req_id = ".$value."), 0) as CRT,
-  isnull((select qty from Req_Detail where prod_id = 43 and req_id = ".$value."), 0) as Switches,
-  isnull((select qty from Req_Detail where prod_id = 9 and req_id = ".$value."), 0) as Projector,
-  isnull((select qty from Req_Detail where prod_id = 29 and req_id = ".$value."),0) as Smartboard,
-    isnull((select qty from Req_Detail where prod_id = 47 and req_id = ".$value."),0) as Smartphone,
-  isnull((select qty from Req_Detail where prod_id = 45 and req_id = ".$value."),0) as ApplePhone,
-  isnull((select qty from Req_Detail where prod_id = 49 and req_id = ".$value."),0) as AppleTablet,
-  isnull((select qty from Req_Detail where prod_id = 51 and req_id = ".$value."),0) as Tablet,
-  isnull((select qty from Req_Detail where prod_id = 15 and req_id = ".$value."),0) as TV,
+  isnull((select qty from Req_Detail where prod_id = 11 and req_id = " . $value . "), 0) as TFT,
+  isnull((select qty from Req_Detail where prod_id = 3 and req_id = " . $value . "), 0) as PC,
+    isnull((select qty from Req_Detail where prod_id = 55 and req_id = " . $value . "), 0) as [PCother],
+	    isnull((select qty from Req_Detail where prod_id = 53 and req_id = " . $value . "), 0) as [PCAMD],
+  isnull((select qty from Req_Detail where prod_id = 31 and req_id = " . $value . "), 0) as Allinone_PC,
+    isnull((select qty from Req_Detail where prod_id = 61 and req_id = " . $value . "), 0) as [Allinone_PCother],
+	   isnull((select qty from Req_Detail where prod_id = 63 and req_id = " . $value . "), 0) as [Allinone_PCAMD],
+  isnull((select qty from Req_Detail where prod_id = 5 and req_id = " . $value . "), 0) as Laptop,
+    isnull((select qty from Req_Detail where prod_id = 57 and req_id = " . $value . "), 0) as LaptopOther,
+	  isnull((select qty from Req_Detail where prod_id = 59 and req_id = " . $value . "), 0) as LaptopAMD,
+  isnull((select qty from Req_Detail where prod_id = 7 and req_id = " . $value . "), 0) as Server,
+  isnull((select qty from Req_Detail where prod_id = 25 and req_id = " . $value . "),0) as DesktopPrinter,
+  isnull((select qty from Req_Detail where prod_id = 27 and req_id = " . $value . "),0) as Standalone_Printer,
+  isnull((select qty from Req_Detail where prod_id = 41 and req_id = " . $value . "),0) as Lap_trolly,
+  isnull((select qty from Req_Detail where prod_id = 13 and req_id = " . $value . "), 0) as CRT,
+  isnull((select qty from Req_Detail where prod_id = 43 and req_id = " . $value . "), 0) as Switches,
+  isnull((select qty from Req_Detail where prod_id = 9 and req_id = " . $value . "), 0) as Projector,
+  isnull((select qty from Req_Detail where prod_id = 29 and req_id = " . $value . "),0) as Smartboard,
+    isnull((select qty from Req_Detail where prod_id = 47 and req_id = " . $value . "),0) as Smartphone,
+  isnull((select qty from Req_Detail where prod_id = 45 and req_id = " . $value . "),0) as ApplePhone,
+  isnull((select qty from Req_Detail where prod_id = 49 and req_id = " . $value . "),0) as AppleTablet,
+  isnull((select qty from Req_Detail where prod_id = 51 and req_id = " . $value . "),0) as Tablet,
+  isnull((select qty from Req_Detail where prod_id = 15 and req_id = " . $value . "),0) as TV,
 
-  isnull((select qty from Req_Detail where prod_id IN (19) and req_id = ".$value.")  +
-  (select qty from Req_Detail where prod_id IN (21) and req_id = ".$value.") +
-  (select qty from Req_Detail where prod_id IN (23) and req_id = ".$value."), 0) as other,
+  isnull((select qty from Req_Detail where prod_id IN (19) and req_id = " . $value . ")  +
+  (select qty from Req_Detail where prod_id IN (21) and req_id = " . $value . ") +
+  (select qty from Req_Detail where prod_id IN (23) and req_id = " . $value . "), 0) as other,
   total_units,
   total_weight
   --p.Product, 
@@ -176,7 +173,7 @@ declare @t table(
   on rt.Request_id = r.req_id 
   join productlist as p on
   p.product_ID = r.prod_id
-  where Request_id = '".$value."'
+  where Request_id = '" . $value . "'
   group by Request_id,
   customer_contact,
   postcode,
@@ -236,16 +233,15 @@ declare @t table(
                     [$newsql]
                 );
 
-      // PHP Date
-                $week   = date("W")-1;
-                $q = "Q".ceil(date('n', time())/3);
+                // PHP Date
+                $week = date("W") - 1;
+                $q = "Q" . ceil(date('n', time()) / 3);
                 $date = date("Y");
                 $day = date("l");
 
 
-
-      //$week = $r['week'];
-      //$q = $r['Quarter'];
+                //$week = $r['week'];
+                //$q = $r['Quarter'];
 
                 $timeconvert = $ro['ProposedDate'];
                 $finaltime = date("Y-m-d H:i:s", strtotime($timeconvert));
@@ -271,13 +267,13 @@ rt.Request_id = rq.req_id
 
 
 
-where rq.req_id =".$value."
+where rq.req_id =" . $value . "
 group by rq.req_id,   rt.owner";
 
 
-    // $f = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_totals.txt","a+");
-    // fwrite($f,"\n".print_r($totals_sql,true)."\n");
-    // fclose($f);
+                // $f = fopen($_SERVER["DOCUMENT_ROOT"]."is_done_totals.txt","a+");
+                // fwrite($f,"\n".print_r($totals_sql,true)."\n");
+                // fclose($f);
 
                 $totalst = $this->sdb->prepare($totals_sql);
                 $totalst->execute();
@@ -291,18 +287,18 @@ group by rq.req_id,   rt.owner";
 
                 $commissql = "
 set nocount on
-exec commisionable ".$value."
+exec commisionable " . $value . "
 ";
                 $commisstmt = $this->sdb->prepare($commissql);
                 $commisstmt->execute();
                 $commis = $commisstmt->fetch(\PDO::FETCH_ASSOC);
 
 
-    /// needs to be in sync with request_id - ORD
+                /// needs to be in sync with request_id - ORD
 
 
                 $ordsql = "
- select replace(SalesOrderNumber, 'ord-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders where CustomerPONumber like '%".$value."'
+ select replace(SalesOrderNumber, 'ord-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders where CustomerPONumber like '%" . $value . "'
 
 ";
                 $ordstmt = $this->gdb->prepare($ordsql);
@@ -315,16 +311,15 @@ exec commisionable ".$value."
                 );
 
                 if (isset($orddata['ord'])) {
-                         // var_dump($orddata['ord']);
-                        $trimord = $orddata['ord']; // returns "d"
+                    // var_dump($orddata['ord']);
+                    $trimord = $orddata['ord']; // returns "d"
                 } else {
-                      $trimord = '00000';
+                    $trimord = '00000';
                 }
 
 
-
                 $colcheck = "
-select count(*) as c from Collections_Log where Customer like '".$rw['custname']."' and OrderNum ='".$trimord."'";
+select count(*) as c from Collections_Log where Customer like '" . $rw['custname'] . "' and OrderNum ='" . $trimord . "'";
 
                 Logger::getInstance("isDone.log")->debug(
                     'is_done_query_check',
@@ -343,14 +338,14 @@ select count(*) as c from Collections_Log where Customer like '".$rw['custname']
                 $user = $_SESSION['user']['username'];
 
                 if (!isset($trimord) == false) {
-                              $bercheck = "select count(*) from berresults where ordernum =".$trimord;
-                              $berexs = $this->sdb->prepare($bercheck);
-                              $berexs->execute();
-                              $exs = $berexs->fetch(\PDO::FETCH_ASSOC);
+                    $bercheck = "select count(*) from berresults where ordernum =" . $trimord;
+                    $berexs = $this->sdb->prepare($bercheck);
+                    $berexs->execute();
+                    $exs = $berexs->fetch(\PDO::FETCH_ASSOC);
                     if (!isset($exs)) {
                         $bersql = "
 insert into berresults(ordernum)
-values(".$trimord.")
+values(" . $trimord . ")
 
 ";
                         $berstmt = $this->sdb->prepare($bersql);
@@ -376,35 +371,34 @@ SalesOrders AS s ON d.SalesOrderID = s.SalesOrderID
 left join company as c with(nolock) on
 c.CompanyID = s.CompanyID
 WHERE
-REPLACE(SalesOrderNumber, 'ORD-', '') LIKE  '".$trimord."'";
+REPLACE(SalesOrderNumber, 'ORD-', '') LIKE  '" . $trimord . "'";
 
                 $stmtgreen = $this->gdb->prepare($sqlgreen);
 
                 $stmtgreen->execute();
 
 
-
                 $rg = $stmtgreen->fetch(\PDO::FETCH_ASSOC);
 
 
-    //$user = substr(ucwords($name[0]),0, 1).substr(ucwords($name[1]),0, 1);
-      /// convert time so its the correct format in sql
+                //$user = substr(ucwords($name[0]),0, 1).substr(ucwords($name[1]),0, 1);
+                /// convert time so its the correct format in sql
 
-      $sqlcompget = " select crmnumber from [greenoak].[we3recycler].[dbo].company as c with(nolock)
+                $sqlcompget = " select crmnumber from [greenoak].[we3recycler].[dbo].company as c with(nolock)
       join [greenoak].[we3recycler].[dbo].salesorders as s with(nolock) on
       c.companyid = s.companyid
-       where replace(salesordernumber, 'ORD-', '') = ".$trimord;
-      
-     
-      $compda = $this->gdb->prepare($sqlcompget);
-      $compda->execute();
-      $compstu = $compda->fetch(\PDO::FETCH_ASSOC);
+       where replace(salesordernumber, 'ORD-', '') = " . $trimord;
 
-$sqlcompany = "select owner, department as dept, sharedWith, rpt, CMP from Companies with(nolock)
-where CMP in ('".$compstu['crmnumber']."')" ;
-$compdata = $this->sdb->prepare($sqlcompany);
-$compdata->execute();
-$compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
+
+                $compda = $this->gdb->prepare($sqlcompget);
+                $compda->execute();
+                $compstu = $compda->fetch(\PDO::FETCH_ASSOC);
+
+                $sqlcompany = "select owner, department as dept, sharedWith, rpt, CMP from Companies with(nolock)
+where CMP in ('" . $compstu['crmnumber'] . "')";
+                $compdata = $this->sdb->prepare($sqlcompany);
+                $compdata->execute();
+                $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
 
 
                 Logger::getInstance("isDone.log")->debug(
@@ -412,10 +406,10 @@ $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
                     [$sqlcompany]
                 );
                 Logger::getInstance("isDone.log")->debug(
-                    'sqlcompany',
+                    'compstuff',
                     [$compstuff]
                 );
-                $compowner =  $compstuff['Owner'];
+                $compowner = $compstuff['Owner'];
                 $dept = $compstuff['dept'];
                 $rpt = $compstuff['rpt'];
                 $sharedwith = $compstuff['sharedWith'];
@@ -425,7 +419,7 @@ $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
                         'checkdata[c] == 0',
                         [$compstuff]
                     );
-                      $updatelog = "INSERT INTO
+                    $updatelog = "INSERT INTO
     Collections_Log (
     dept, 
     SharedWith,
@@ -474,20 +468,20 @@ $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
     
  )
   VALUES (
-    '".$dept."',
-    '".$sharedwith."',
-    ".$week.",
-    '".$q."',
-    '".$date."',
-    '".$finaltime."',
-    '".$finaltime."',
-    '".$day."',
-    '".$rw['custname']."',
-    '".$pos."',
-    ".$trimord.",
+    '" . $dept . "',
+    '" . $sharedwith . "',
+    " . $week . ",
+    '" . $q . "',
+    '" . $date . "',
+    '" . $finaltime . "',
+    '" . $finaltime . "',
+    '" . $day . "',
+    '" . $rw['custname'] . "',
+    '" . $pos . "',
+    " . $trimord . ",
     0,
     0,
-    '".$compowner."',
+    '" . $compowner . "',
     0,
     0,
     0,
@@ -516,28 +510,28 @@ $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
     0,
     0,
     getdate(),
-    '".$user."',
-    '".$rg['SiteCode']."/".$rg['SICCode']."'
+    '" . $user . "',
+    '" . $rg['SiteCode'] . "/" . $rg['SICCode'] . "'
   )
   ";
 
 
-                    Logger::getInstance("is_done_query_updatecol.log")->debug(
+                    Logger::getInstance("isDone.log")->debug(
                         'updatelog',
                         [$updatelog]
                     );
-                       $stmtupdatecol = $this->sdb->prepare($updatelog);
-                      $stmtupdatecol->execute();
+                    $stmtupdatecol = $this->sdb->prepare($updatelog);
+                    $insertResult = $stmtupdatecol->execute();
 
 
-                    Logger::getInstance("is_done_query_updatecol.log")->debug(
-                        'updatelog',
-                        [$updatelog]
+                    Logger::getInstance("isDone.log")->debug(
+                        'insertDone',
+                        [$insertResult]
                     );
 
-                      $sqlii = "UPDATE request SET done = 1 WHERE request_id =".$value;
-                      $stmt = $this->sdb->prepare($sqlii);
-                      $stmt->execute();
+                    $sqlii = "UPDATE request SET done = 1 WHERE request_id =" . $value;
+                    $stmt = $this->sdb->prepare($sqlii);
+                    $stmt->execute();
                 }
             }
         }

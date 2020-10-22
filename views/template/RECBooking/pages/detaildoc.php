@@ -953,13 +953,8 @@ and active = 1
         select replace(SalesOrderNumber, 'ORD-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders where CustomerPONumber like '%" . $_GET['rowid'] . "'
         ";
 
+    $stmtord = $gdb->prepare($sqlord);
 
-    $stmtord = $sdb->prepare($sqlord);
-    // if (!$stmtord) {
-    //   echo "\nPDO::errorInfo():\n";
-    //   print_r($sdb->errorInfo());
-    //   die();
-    // }
     $stmtord->execute();
     $dataord = $stmtord->fetch(PDO::FETCH_ASSOC);
     if (isset($dataord['ord'])) {

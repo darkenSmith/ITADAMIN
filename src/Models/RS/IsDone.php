@@ -390,11 +390,21 @@ REPLACE(SalesOrderNumber, 'ORD-', '') LIKE  '".$trimord."'";
     //$user = substr(ucwords($name[0]),0, 1).substr(ucwords($name[1]),0, 1);
       /// convert time so its the correct format in sql
 
+      $sqlcompget = " select crmnumber from [greenoak].[we3recycler].[dbo].company as c with(nolock)
+      join [greenoak].[we3recycler].[dbo].salesorders as s with(nolock) on
+      c.companyid = s.companyid
+       where replace(salesordernumber, 'ORD-', '') = ".$trimord;
+      
+     
+      $compda = $this->gdb->prepare($sqlcompget);
+      $compda->execute();
+      $compstu = $compda->fetch(\PDO::FETCH_ASSOC);
 
-                $sqlcompany = " select distinct * from [dbo].[getCompanyinfo]('".$trimord."')";
-                $compdata = $this->sdb->prepare($sqlcompany);
-                $compdata->execute();
-                $compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
+$sqlcompany = "select owner, department as dept, sharedWith, rpt, CMP from Companies with(nolock)
+where CMP in ('".$compstu['crmnumber']."')" ;
+$compdata = $this->sdb->prepare($sqlcompany);
+$compdata->execute();
+$compstuff = $compdata->fetch(\PDO::FETCH_ASSOC);
 
 
                 Logger::getInstance("isDone.log")->debug(

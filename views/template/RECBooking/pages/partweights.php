@@ -529,11 +529,12 @@ if(!isNaN(val3) && val3.length != 0) {
             {
              // alert(data);
               //  alert("success!");
+                location.reload('/RS/RGR/?ye=');
             }
         });
 }
 
-location.reload('/RS/RGR/?ye=');
+
   });
 
 });

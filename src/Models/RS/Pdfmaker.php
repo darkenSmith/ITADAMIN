@@ -62,23 +62,7 @@ class Pdfmaker extends AbstractModel
 
 
 
-        function uploadFileIntoFolder(ClientContext $ctx, $localPath, $targetFolderUrl)
-        {
-            $fileName = basename($localPath);
-            $fileCreationInformation = new \Office365\SharePoint\FileCreationInformation();
-            $fileCreationInformation->Content = file_get_contents($localPath);
-            $fileCreationInformation->Url = $fileName;
-
-
-            $uploadFile = $ctx->getWeb()->getFolderByServerRelativeUrl($targetFolderUrl)->getFiles()->add($fileCreationInformation);
-            $ctx->executeQuery();
-       //print "File {$uploadFile->getProperty('ServerRelativeUrl')} has been uploaded\r\n";
-
-       //$uploadFile->getListItemAllFields()->setProperty('Title', $fileName);
-       //$uploadFile->getListItemAllFields()->update();
-       //$ctx->executeQuery();
-        }
-
+      
 
         try {
             $authCtx = new AuthenticationContext($Url);
@@ -262,7 +246,7 @@ class Pdfmaker extends AbstractModel
                     //Replace the content with the new content created above.
                     $zip_val->addFromString($key_file_name, $message);
                     $zip_val->close();
-                    uploadFileIntoFolder($ctx, $full_path, $targetFolderUrl);
+                    $this->uploadFileIntoFolder($ctx, $full_path, $targetFolderUrl);
                 }
               
                 unlink($full_path);
@@ -282,26 +266,46 @@ class Pdfmaker extends AbstractModel
           
 
 
-        function uploadFiles($localPath, \Office365\PHP\Client\SharePoint\SPList $targetList)
-        {
-            $ctx = $targetList->getContext();
-            $searchPrefix = $localPath . '.';
-            try {
-                foreach (glob($searchPrefix) as $filename) {
-                    $fileCreationInformation = new \Office365\PHP\Client\SharePoint\FileCreationInformation();
-                    $fileCreationInformation->Content = file_get_contents($filename);
-                    $fileCreationInformation->Url = basename($filename);
-                    $uploadFile = $targetList->getRootFolder()->getFiles()->add($fileCreationInformation);
-                    $ctx->executeQuery();//upload the file
-                    $listEntity = $uploadFile->getListItemAllFields(); //now update associated list item entity
-                    $listEntity->setProperty('Title', "it is a test");
-                    $listEntity->update(); //tell query to update entity
-                    $ctx->executeQuery();
-                    print "File {$uploadFile->getProperty('Name')} has been uploaded\r\n";
-                }
-            } catch (Exception $e) {
-                echo 'Error : '. $e->getMessage();
+
+    }
+
+    public function uploadFileIntoFolder(ClientContext $ctx, $localPath, $targetFolderUrl)
+    {
+        $fileName = basename($localPath);
+        $fileCreationInformation = new \Office365\SharePoint\FileCreationInformation();
+        $fileCreationInformation->Content = file_get_contents($localPath);
+        $fileCreationInformation->Url = $fileName;
+
+
+        $uploadFile = $ctx->getWeb()->getFolderByServerRelativeUrl($targetFolderUrl)->getFiles()->add($fileCreationInformation);
+        $ctx->executeQuery();
+   //print "File {$uploadFile->getProperty('ServerRelativeUrl')} has been uploaded\r\n";
+
+   //$uploadFile->getListItemAllFields()->setProperty('Title', $fileName);
+   //$uploadFile->getListItemAllFields()->update();
+   //$ctx->executeQuery();
+    }
+
+    public function uploadFiles($localPath, \Office365\PHP\Client\SharePoint\SPList $targetList)
+    {
+        $ctx = $targetList->getContext();
+        $searchPrefix = $localPath . '.';
+        try {
+            foreach (glob($searchPrefix) as $filename) {
+                $fileCreationInformation = new \Office365\PHP\Client\SharePoint\FileCreationInformation();
+                $fileCreationInformation->Content = file_get_contents($filename);
+                $fileCreationInformation->Url = basename($filename);
+                $uploadFile = $targetList->getRootFolder()->getFiles()->add($fileCreationInformation);
+                $ctx->executeQuery();//upload the file
+                $listEntity = $uploadFile->getListItemAllFields(); //now update associated list item entity
+                $listEntity->setProperty('Title', "it is a test");
+                $listEntity->update(); //tell query to update entity
+                $ctx->executeQuery();
+                print "File {$uploadFile->getProperty('Name')} has been uploaded\r\n";
             }
+        } catch (Exception $e) {
+            echo 'Error : '. $e->getMessage();
         }
     }
+
 }

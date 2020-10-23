@@ -6,11 +6,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <script src="/inc/js/jquery-3.3.1.js"></script>
-  <script src="/inc/js/bootstrap.js"></script>
-  <script src="/inc/js/popper.js"></script>
-  <link href="/inc/css/bootstrap-datepicker.min.css" rel="stylesheet">
-  <link href="/inc/css/imgupload.css" rel="stylesheet">
+  <script src="/assets/js/jquery-3.3.1.js"></script>
+  <script src="/assets/js/bootstrap.js"></script>
+  <script src="/assets/js/popper.js"></script>
+  <link href="/assets/css/bootstrap-datepicker.min.css" rel="stylesheet">
+  <link href="/assets/css/imgupload.css" rel="stylesheet">
   <title>Recycling Goods Receipting</title>
 </head>
 <style>
@@ -533,7 +533,7 @@ if(!isNaN(val3) && val3.length != 0) {
         });
 }
 
-location.reload('https://itadadmin.stonegroup.co.uk/RS/RGR/?ye=');
+location.reload('/RS/RGR/?ye=');
   });
 
 });

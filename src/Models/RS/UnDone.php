@@ -41,11 +41,6 @@ class UnDone extends AbstractModel
         
         ";
         
-                $Ffw = fopen($_SERVER["DOCUMENT_ROOT"]."/STAGE1_query_data.txt", "a+");
-                fwrite($Ffw, "---------------------------------\n".$getord."\n\n");
-                fclose($Ffw);
-        
-        
                 $ordstmt = $this->sdb->prepare($getord);
                 $ordstmt->execute();
                 $ordde = $ordstmt->fetch(\PDO::FETCH_ASSOC);
@@ -76,10 +71,6 @@ class UnDone extends AbstractModel
         
               // out for now cant connect while vpn
      // $apicall->updateAPI($value, 'Done');
-        
-                $fw = fopen($_SERVER["DOCUMENT_ROOT"]."//undone_query_data.txt", "a+");
-                fwrite($fw, "---------------------------------\n".$colupdate."\n\n");
-                fclose($fw);
             }
         }
         

@@ -3,6 +3,7 @@
 namespace App\Models\RS;
 
 use App\Helpers\Database;
+use App\Helpers\Logger;
 use App\Models\AbstractModel;
 use Exception;
 
@@ -16,7 +17,7 @@ class UpdateAps extends AbstractModel
     public $id;
 
     /**
-     * OnHold constructor.
+     * UpdateAps constructor.
      */
     public function __construct()
     {
@@ -52,29 +53,20 @@ class UpdateAps extends AbstractModel
         $Steps = $this->clean($_POST['steps']);
         $twoman = $this->clean($_POST['twoman']);
         //$emailsentdate = $this->clean($_POST['emailsentdate']);
-        
-        
-        
-        
-        
-        
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/manualupdate.txt", "a+");
-        fwrite($fh, $deadline."\n");
-        fclose($fh);
-        
+
+        Logger::getInstance("updateAps.log")->debug(
+            'manualupdate',
+            [$deadline]
+        );
+
         if (!isset($_POST['lortype'])) {
             $lorrytype = '';
         } else {
             $lorrytype = $this->clean($_POST['lortype']);
         }
-        
-        
-        
-        
-        
+
         $own = $this->clean($_POST['owner']);
-        
-        
+
         $reqsql = "
         
         update request
@@ -91,11 +83,11 @@ class UpdateAps extends AbstractModel
         ";
         $stmtup = $this->sdb->prepare($reqsql);
         $stmtup->execute();
-        
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/requestsurvyup.txt", "a+");
-        fwrite($fh, $reqsql."\n");
-        fclose($fh);
-        
+
+        Logger::getInstance("updateAps.log")->debug(
+            'requestsurvyup',
+            [$reqsql]
+        );
         
         $sqal = "
         SET LANGUAGE british
@@ -130,19 +122,16 @@ class UpdateAps extends AbstractModel
         WHERE
           RequestID ='".$id."' ";
 
-
         $stmtup = $this->sdb->prepare($sqal);
         $stmtup->execute();
-     
-        
+
         echo "COMPLETED";
     }
 
 
     public function clean($string)
     {
-        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
-         
+        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens
         return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
     }
 }

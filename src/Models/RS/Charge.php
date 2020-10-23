@@ -16,7 +16,7 @@ class Charge extends AbstractModel
     public $response;
 
     /**
-     * Togglecharge constructor.
+     * Charge constructor.
      */
     public function __construct()
     {
@@ -24,20 +24,12 @@ class Charge extends AbstractModel
         parent::__construct();
     }
 
-
     public function toggle()
     {
-
-
-///set request to Charge///
-
-
         $stuff = $_POST['stuff'];
         $dell = 1;
 
-
         $who =  str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
-
 
         foreach ($stuff as $value) {
             $sqlc = "SELECT ISNULL(charge, 0) AS charge, CASE WHEN ISNULL(charge, 0) = 1 THEN 0 ELSE 1 END AS op FROM Request WHERE Request_id ='" . $value ."'";
@@ -55,10 +47,6 @@ class Charge extends AbstractModel
       modifedby = '".$who."',
       modifydate = getdate()
       where Request_ID =".$value;
-
-            $test = fopen($_SERVER["DOCUMENT_ROOT"]."/sqlc33.txt", "a");
-            fwrite($test, $colupdate."\n");
-            fclose($test);
         }
         $stmtu = $this->sdb->prepare($colupdate);
         $stmtu->execute();

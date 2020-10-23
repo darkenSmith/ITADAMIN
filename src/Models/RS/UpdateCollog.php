@@ -237,9 +237,6 @@ class UpdateCollog extends AbstractModel
         ";
             $berstmt = $this->sdb->prepare($bersql);
             $berstmt->execute();
-            $fw = fopen($_SERVER["DOCUMENT_ROOT"]."/is_done_query_berlist.txt", "a+");
-            fwrite($fw, "\n"."ber"."\n");
-            fclose($fw);
         }
         
         $sqal = "
@@ -375,17 +372,7 @@ class UpdateCollog extends AbstractModel
         set NumOfDaysOld = datediff(day, DateCollected, getdate()) 
         where OrderNum =".$ord;
         
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/wgtoutput.txt", "a+");
-        fwrite($fh, $sqal."\n");
-        fclose($fh);
-        
-        
         $stmtup = $this->sdb->prepare($sqal);
         $stmtup->execute();
-        
-        
-        $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/wgtoutput.txt", "a+");
-        fwrite($fh, $sqal."\n");
-        fclose($fh);
     }
 }

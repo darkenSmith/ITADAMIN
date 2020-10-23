@@ -91,6 +91,10 @@ class Pdfmaker extends AbstractModel
                     [$orddata]
                 );
 
+                $wtnquery = "SELECT d.WasteTransferNumber as WTN FROM [greenoak].[we3recycler].[dbo].Delivery AS d  JOIN [greenoak].[we3recycler].[dbo].SalesOrders AS s ON d.SalesOrderID = s.SalesOrderID WHERE REPLACE([dbo].[zzfnRemoveNonNumericCharacters](CustomerPONumber), '000', '') LIKE ".$val;
+                $stmtwtn = $this->gdb->prepare($wtnquery);
+                $wtndata = $stmtwtn->fetch(\PDO::FETCH_ASSOC);
+
                 $ord = 'ORD-' . $orddata['ord'];
 
                 $sql = "
@@ -141,7 +145,7 @@ class Pdfmaker extends AbstractModel
                     // this data Replace the placeholders with actual values
                     $message = str_replace("{ordernum}", $ord, $message);
                     $message = str_replace("{Requestid}", $data['Request_id'], $message);
-                    $message = str_replace("{WTN}", $data['WTN'], $message);
+                    $message = str_replace("{WTN}", $wtndata['WTN'], $message);
                     $message = str_replace("{Organisation}", $data['Customer_name'], $message);
                     $message = str_replace("{ProposedCollectionDate}", $data['collection_date'], $message);
                     $message = str_replace("{Address1}", $data['add1'], $message);

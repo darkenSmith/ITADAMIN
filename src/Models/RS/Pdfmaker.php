@@ -24,6 +24,7 @@ class Pdfmaker extends AbstractModel
     public function __construct()
     {
         $this->sdb = Database::getInstance('sql01');
+        $this->gdb = Database::getInstance('greenoak');
         parent::__construct();
     }
 
@@ -81,7 +82,7 @@ class Pdfmaker extends AbstractModel
 
                 $ord_sql = "
                           select [dbo].[zzfnRemoveNonNumericCharacters](isnull(SalesOrderNumber, '0000000')) as ord from [greenoak].[we3recycler].[dbo].SalesOrders  where CustomerPONumber like '%" . $val . "'";
-                $ord_stmt = $this->sdb->prepare($ord_sql);
+                $ord_stmt = $this->gdb->prepare($ord_sql);
                 $ord_stmt->execute();
                 $orddata = $ord_stmt->fetch(\PDO::FETCH_ASSOC);
 

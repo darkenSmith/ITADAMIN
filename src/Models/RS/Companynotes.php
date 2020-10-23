@@ -121,11 +121,6 @@ class Companynotes extends AbstractModel
             $sqlstuff2 = "select distinct case when [owner] = 'Recycling' then 'ITAD' else [owner] end as own from Companies with(nolock)";
 
             $stmt3 = $this->sdb->prepare($sqlstuff2);
-        if (!$stmt3) {
-            echo "\nPDO::errorInfo():\n";
-            print_r($this->sdb->errorInfo());
-            die();
-        }
             $stmt3->execute();
             $datastuff2 = $stmt3->fetchAll(\PDO::FETCH_ASSOC);
             $this->response = $datastuff2;
@@ -138,10 +133,6 @@ class Companynotes extends AbstractModel
         where (Department is not null) order by Department";
         
         $stmt2 = $this->sdb->prepare($sqlstuff);
-        if (!$stmt2) {
-            echo "\nPDO::errorInfo():\n";
-            print_r($this->sdb->errorInfo());
-        }
         $stmt2->execute();
         
         $datastuff = $stmt2->fetchAll(\PDO::FETCH_ASSOC);

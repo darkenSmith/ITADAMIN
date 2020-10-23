@@ -296,11 +296,11 @@ $cust = "\"Request_id\"";
                     setTimeout(function () {
                         window.document.location = '/RS/downloadcsv/';
                     }, 10000);
-
+                    alert("PDF and eMail sent");
+                    console.log("PDF and eMail sent");
                 }
             });
 
-            console.log("PDF and eMail sent");
             return false;
         });
 

@@ -65,7 +65,7 @@ class Pdfmaker extends AbstractModel
             );
         }
 
-        $template_file_name = 'assets/files/copy.docx';
+        $template_file_name = PROJECT_DIR  . 'assets/files/copy.docx';
         $folder = "files";
 
         try {
@@ -202,6 +202,11 @@ class Pdfmaker extends AbstractModel
                     //Replace the content with the new content created above.
                     $zip_val->addFromString($key_file_name, $message);
                     $zip_val->close();
+                    Logger::getInstance("pdfMaker.log")->debug(
+                        'calling uploadFileIntoFolder',
+                        [$ctx, $full_path, $targetFolderUrl]
+                    );
+
                     $this->uploadFileIntoFolder($ctx, $full_path, $targetFolderUrl);
                 }
 

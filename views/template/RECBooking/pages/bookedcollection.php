@@ -296,11 +296,11 @@ $cust = "\"Request_id\"";
                     setTimeout(function () {
                         window.document.location = '/RS/downloadcsv/';
                     }, 10000);
-
+                    alert("PDF and eMail sent");
+                    console.log("PDF and eMail sent");
                 }
             });
 
-            console.log("PDF and eMail sent");
             return false;
         });
 
@@ -428,6 +428,8 @@ $cust = "\"Request_id\"";
                 <input type="submit" value="Submit" class="btn btn-success">
     </form>
 </div>
+</div>
+</div>
 
 <br>
 <div class="form-row">
@@ -448,7 +450,6 @@ $cust = "\"Request_id\"";
     </div>
 </div>
 
-<div>
 <h2><?php echo $filter_txt.count($bookList) ?></h2>
 <table id='tbldata' width='100%' class='sortable table table-striped'>
     <thead>
@@ -549,3 +550,5 @@ $cust = "\"Request_id\"";
 
     ?>
 </div>
+</div>
+

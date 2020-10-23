@@ -4,6 +4,7 @@ namespace App\Models\RS;
 
 use App\Helpers\Config;
 use App\Helpers\Database;
+use App\Helpers\Logger;
 use App\Models\AbstractModel;
 use SendGrid;
 use SendGrid\Mail\Mail;
@@ -199,11 +200,20 @@ class GoodsInMail extends AbstractModel
             $sendgrid = new SendGrid($sendgridConfig['api']['key']);
             $response = $sendgrid->send($email);
 
+            Logger::getInstance("goodsInMail.log")->debug(
+                'sendEmail - statusCode',
+                [$response->statusCode()]
+            );
+
             if ($response->statusCode() !== 202) {
                 throw new \RuntimeException($response->body());
             }
             echo "OK Mail Sent";
         } catch (\Exception $e) {
+            Logger::getInstance("goodsInMail.log")->error(
+                'sendEmail',
+                [$e->getMessage()]
+            );
             echo 'Message could not be sent. Mailer Error: ', $e->getMessage();
         }
     }

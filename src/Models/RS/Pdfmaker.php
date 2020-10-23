@@ -3,11 +3,18 @@
 namespace App\Models\RS;
 
 use App\Helpers\Database;
-use App\Helpers\Logger;
 use App\Models\AbstractModel;
+
+
+
+
+
 use Office365\Runtime\Auth\AuthenticationContext;
+
 use Office365\SharePoint\ClientContext;
 use ZipArchive;
+
+require_once './vendor/autoload.php';
 
 /**
  * Class ApprovData
@@ -23,23 +30,28 @@ class Pdfmaker extends AbstractModel
      */
     public function __construct()
     {
-        $this->sdb = Database::getInstance('sql01');
-        $this->gdb = Database::getInstance('greenoak');
+        $this->sdb =  Database::getInstance('sql01');
         parent::__construct();
     }
 
     public function printdoc()
     {
+     
+
+    
         $pass = '1t@D458!';
         $Usershare = 'itad.365@stonegroup.co.uk';
+
 
         $_SESSION['err'] = '';
         $id = $_POST['stuff'];
 
-        $UserName = $Usershare;
+        $UserName  = $Usershare;
         $Password = $pass;
         $Url = 'https://stonegroupltd.sharepoint.com';
         $Url2 = 'https://stonegroupltd.sharepoint.com/sites/Recycling';
+
+
 
         $localPath = "./files/copy.docx";
         $targetLibraryTitle = "Documents";
@@ -47,6 +59,10 @@ class Pdfmaker extends AbstractModel
         $fileUrl = "/sites/Recycling/Shared Documents/templatetest.docx";
         $listTitle = "";
         $delete = 0;
+
+
+
+      
 
         try {
             $authCtx = new AuthenticationContext($Url);
@@ -57,49 +73,76 @@ class Pdfmaker extends AbstractModel
             $items = $list->getItems();  //prepare a query to retrieve from the
             $ctx->load($items);  //save a query to retrieve list items from the server
             $ctx->executeQuery(); //submit query to SharePoint Online REST service
-
-        } catch (\Exception $e) {
-            Logger::getInstance("pdfMaker.log")->debug(
-                'printdoc',
-                [$e->getMessage()]
-            );
+       //  // var_dump($items);
+  
+    
+      
+            $fp = fopen($_SERVER["DOCUMENT_ROOT"]."/listclear.txt", 'a+');
+            fwrite($fp, 'listclear');
+            fclose($fp);
+        } catch (Exception $e) {
+          //echo 'Error: ',  $e->getMessage(), "\n";
+            $fp = fopen($_SERVER["DOCUMENT_ROOT"]."/startSHAREerr.txt", 'a+');
+            fwrite($fp, $e->getMessage());
+            fclose($fp);
         }
-
-        $template_file_name = 'assets/files/copy.docx';
-        $folder = "files";
-
+    
+          $template_file_name = 'assets/files/copy.docx';
+          $folder   = "files";
+          
+           
         try {
             if (!file_exists($folder)) {
-                if (!mkdir($folder) && !is_dir($folder)) {
-                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $folder));
-                }
+                mkdir($folder);
             }
-
+               
+           
             // add calss Zip Archive
             $zip_val = new ZipArchive;
 
             foreach ($id as $val) {
+                        //Copy the Template file to the Result Directory
+                  
+                        // $tmpfname = tempnam("/tmp", "docx");
 
-                $ord_sql = "
-                          select [dbo].[zzfnRemoveNonNumericCharacters](isnull(SalesOrderNumber, '0000000')) as ord from [greenoak].[we3recycler].[dbo].SalesOrders  where CustomerPONumber like '%" . $val . "'";
-                $ord_stmt = $this->gdb->prepare($ord_sql);
-                $ord_stmt->execute();
-                $orddata = $ord_stmt->fetch(\PDO::FETCH_ASSOC);
+                        // $handle = fopen($tmpfname, "w");
+                        // fwrite($handle, $template_file_name);
+                        // fclose($handle);
+                   
 
-                Logger::getInstance("pdfMaker.log")->debug(
-                    'printdoc',
-                    [$orddata]
-                );
+                        $ord_sql = "
+                          select [dbo].[zzfnRemoveNonNumericCharacters](isnull(SalesOrderNumber, '0000000')) as ord from [greenoak].[we3recycler].[dbo].SalesOrders  where CustomerPONumber like '%".$val."'";
+                      $ord_stmt = $this->gdb->prepare($ord_sql);
+                      $ord_stmt->execute();
+                      $orddata = $ord_stmt->fetch(\PDO::FETCH_ASSOC);
+                    
+                      $fp = fopen($_SERVER["DOCUMENT_ROOT"]."/order.txt", 'a+');
+                            fwrite($fp, print_r($orddata, true));
+                            fclose($fp);
 
-                $ord = 'ORD-' . $orddata['ord'];
+
+                            $ord = 'ORD-'.$orddata['ord'];
+
+                $wtnquery = "SELECT d.WasteTransferNumber as WTN FROM [greenoak].[we3recycler].[dbo].Delivery AS d  JOIN [greenoak].[we3recycler].[dbo].SalesOrders AS s ON d.SalesOrderID = s.SalesOrderID WHERE REPLACE([dbo].[zzfnRemoveNonNumericCharacters](CustomerPONumber), '000', '') LIKE ".$val;
+
+                    $stmtwtn = $this->gdb->prepare($wtnquery);
+                    $wtndata = $stmtwtn->fetch(\PDO::FETCH_ASSOC);
 
                 $sql = "
                 SET Language British;
-                select * from dbo.reqOrderline(" . $val . ")";
+                select * from dbo.reqOrderline(".$val.")";
                 $stmt = $this->sdb->prepare($sql);
+                if (!$stmt) {
+                    echo "\nPDO::errorInfo():\n";
+                    print_r($this->sdb->errorInfo());
+                    die();
+                }
                 $stmt->execute();
-
+    
                 $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+
+
 
                 $sqlw = "
           select
@@ -111,37 +154,45 @@ class Pdfmaker extends AbstractModel
           join productlist as p with(nolock) on 
           p.product_ID = prod_id 
           
-          where req_id =" . $val . "
+          where req_id =".$val."
           group by req_id";
                 $stmtw = $this->sdb->prepare($sqlw);
+                if (!$stmtw) {
+                    echo "\nPDO::errorInfo():\n";
+                    print_r($this->sdb->errorInfo());
+                    die();
+                }
                 $stmtw->execute();
 
                 $dataw = $stmtw->fetch(\PDO::FETCH_ASSOC);
 
-                $fileName = $data['Customer_name'] . "-RC-000" . $val . ".docx";
 
-                $full_path = $folder . '/' . $fileName;
+
+                $fileName = $data['Customer_name']."-RC-000".$val.".docx";
+              
+                $full_path = $folder.'/'.$fileName;
                 copy($template_file_name, $full_path);
 
-
-                //Docx file is nothing but a zip file. Open this Zip File
+           
+              //Docx file is nothing but a zip file. Open this Zip File
                 if ($zip_val->open($full_path) == true) {
                     // In the Open XML Wordprocessing format content is stored.
                     // In the document.xml file located in the word directory.
-
+                   
                     $key_file_name = 'word/document.xml';
                     $message = $zip_val->getFromName($key_file_name);
-
-                    Logger::getInstance("pdfMaker.log")->debug(
-                        'worddocdeit',
-                        [$message]
-                    );
+                  
+                  
+                    $fp = fopen($_SERVER["DOCUMENT_ROOT"]."/worddocdeit.txt", 'a+');
+                    fwrite($fp, $message);
+                    fclose($fp);
+                               
                     //$timestamp = date('d-M-Y H:i:s');
-
+                   
                     // this data Replace the placeholders with actual values
                     $message = str_replace("{ordernum}", $ord, $message);
                     $message = str_replace("{Requestid}", $data['Request_id'], $message);
-                    $message = str_replace("{WTN}", $data['WTN'], $message);
+                    $message = str_replace("{WTN}", $wtndata['WTN'], $message);
                     $message = str_replace("{Organisation}", $data['Customer_name'], $message);
                     $message = str_replace("{ProposedCollectionDate}", $data['collection_date'], $message);
                     $message = str_replace("{Address1}", $data['add1'], $message);
@@ -193,27 +244,33 @@ class Pdfmaker extends AbstractModel
                     $message = str_replace("{other3}", $data['other3name'], $message);
                     $message = str_replace("{Position}", $data['customer_contact_positon'], $message);
                     $message = str_replace("{totalUnits}", $data['totaldataunit'], $message);
-
-
+                  
+              
+                
                     //Replace the content with the new content created above.
                     $zip_val->addFromString($key_file_name, $message);
                     $zip_val->close();
                     $this->uploadFileIntoFolder($ctx, $full_path, $targetFolderUrl);
                 }
-
+              
                 unlink($full_path);
             }
-        } catch (\Exception $exc) {
-            $error_message = "Error creating the Word Document";
-            Logger::getInstance("pdfMaker.log")->error(
-                'faildocgen',
-                [$exc->getMessage()]
-            );
+        } catch (Exception $exc) {
+            $error_message =  "Error creating the Word Document";
+            $fh = fopen($_SERVER["DOCUMENT_ROOT"]."/faildocgen.txt", "a+");
+            fwrite($fh, $exc."\n");
+            fclose($fh);
             //var_dump($exc);
             header("Content-type: application/json");
-
+              
             echo json_encode($exc);
         }
+      
+
+          
+
+
+
     }
 
     public function uploadFileIntoFolder(ClientContext $ctx, $localPath, $targetFolderUrl)
@@ -223,8 +280,14 @@ class Pdfmaker extends AbstractModel
         $fileCreationInformation->Content = file_get_contents($localPath);
         $fileCreationInformation->Url = $fileName;
 
+
         $uploadFile = $ctx->getWeb()->getFolderByServerRelativeUrl($targetFolderUrl)->getFiles()->add($fileCreationInformation);
         $ctx->executeQuery();
+   //print "File {$uploadFile->getProperty('ServerRelativeUrl')} has been uploaded\r\n";
+
+   //$uploadFile->getListItemAllFields()->setProperty('Title', $fileName);
+   //$uploadFile->getListItemAllFields()->update();
+   //$ctx->executeQuery();
     }
 
     public function uploadFiles($localPath, \Office365\PHP\Client\SharePoint\SPList $targetList)
@@ -244,12 +307,9 @@ class Pdfmaker extends AbstractModel
                 $ctx->executeQuery();
                 print "File {$uploadFile->getProperty('Name')} has been uploaded\r\n";
             }
-        } catch (\Exception $e) {
-            Logger::getInstance("pdfMaker.log")->error(
-                'uploadFiles',
-                [$e->getMessage()]
-            );
-            echo 'Error : ' . $e->getMessage();
+        } catch (Exception $e) {
+            echo 'Error : '. $e->getMessage();
         }
     }
+
 }

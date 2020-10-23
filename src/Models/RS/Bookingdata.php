@@ -33,10 +33,34 @@ class Bookingdata extends AbstractModel
             $ord = $this->clean($_POST["ent"]);
             $notes = $this->clean($_POST["notesja"]);
         }
-              
-        if (isset($_SESSION['stat'])) {
-            $_SESSION['stat'] = isset($_POST["filterstatus"]) ? $_SESSION['stat'] : "AND laststatus not like 'On-Hold'";
+
+        if ($_POST["filterstatus"] == 'All') {
+            $filterStatus = " and (laststatus not like 'On-Hold' or  laststatus in('Request', 'confirmed', 'booked', 'cancelled')) ";
+        } elseif ($_POST["filterstatus"] == 'Confirmed') {
+            $filterStatus = " and been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and confirmed = 1 and( laststatus  like 'Confirmed') ";
+        } elseif ($_POST["filterstatus"] == 'Booked') {
+            $filterStatus = " and  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and confirmed = 0 and ( laststatus = 'booked') ";
+        } elseif ($_POST["filterstatus"] == 'Requests') {
+            $filterStatus = " and (been_collected = 0 or been_collected is null ) AND  isnull(cast(collection_date as varchar(50)),'not set') IS NULL and (laststatus not like 'unbooked' and laststatus not like 'On-Hold') ";
+        } elseif ($_POST["filterstatus"] == 'Unbooked') {
+            $filterStatus = " and (been_collected = 0 or been_collected is null ) AND  isnull(cast(collection_date as varchar(50)),'not set') IS NULL and (laststatus like 'unbooked') ";
+        } elseif ($_POST["filterstatus"] == 'On-Hold') {
+            $filterStatus = " and laststatus like 'On-Hold' ";
+        } elseif ($_POST["filterstatus"] == 'deleted') {
+            $filterStatus = " deleted ";
         }
+
+        if (isset($_SESSION['stat'])) {
+            $_SESSION['stat'] = isset($filterStatus) ? $_SESSION['stat'] : "AND laststatus not like 'On-Hold'";
+        }
+
+        if ($_POST["filter"] == 'Collection Date') {
+            $filter = " isnull(cast(collection_date as varchar(50)),'not set') ";
+        } else {
+            $filter = $this->clean($_POST["filter"]);
+        }
+
+
 
               $sql = "
               SET LANGUAGE British;
@@ -124,7 +148,7 @@ class Bookingdata extends AbstractModel
         } else {
             $sql .= "
               AND isnull(deleted, 0) <> 1  AND  isnull(DONE, 0) <> 1 
-               ".(isset($_POST["filterstatus"]) ? $_POST["filterstatus"] : "AND laststatus not like 'On-Hold' ")."
+               ".(isset($filterStatus) ? $filterStatus : "AND laststatus not like 'On-Hold' ")."
                 AND rt.postcode LIKE '%".(isset($postcode) && $postcode != "" ? '%'.$postcode.'%' : '')."%'
                 And (rt.area1 like '".(isset($_POST["areafilter"]) && $_POST["areafilter"] != "" ? $_POST["areafilter"] : '%' )."' )";
         }
@@ -166,7 +190,7 @@ class Bookingdata extends AbstractModel
                   rt.postcode , 
                   bc.emailsentdate
               ORDER BY
-                ".(isset($_POST["filter"]) && $_POST["filter"] != "" ? $_POST["filter"] : " isnull(cast(collection_date as varchar(50)),'not set') ")." ".(isset($_POST["filter2"]) && $_POST["filter2"] != "" ? $_POST["filter2"] : "  DESC")." 
+                ".(isset($filter) && $filter != "" ? $filter : " isnull(cast(collection_date as varchar(50)),'not set') ")." ".(isset($_POST["filter2"]) && $_POST["filter2"] != "" ? $_POST["filter2"] : "  DESC")." 
                 ";
 
         Logger::getInstance("bookingData.log")->debug(
@@ -174,9 +198,9 @@ class Bookingdata extends AbstractModel
             [$sql]
         );
 
-        $stmt = $this->sdb->prepare($sql);
 
         try {
+            $stmt = $this->sdb->prepare($sql);
             $stmt->execute();
             $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 

@@ -52,31 +52,17 @@ $cust = "\"Request_id\"";
 <title>Booked Collections</title>
 <script type="text/javascript">
     jQuery(document).ready(function ($) {
-
-
         var stuff = [];
         var sep = 0;
         var emailstuff = [];
         var sep2 = 0;
-        // approved = $('#tbldata tbody tr #approv').val();
-
-        // if(approved != ' '){
-
-        //   $(this).css({'color':'red'});
-
         $('#tbldata tr:has(td)').find('.ordernum').each(function () {
-
             if ($(this).html().length == 0) {
-
-//$(this).find('.checkboxes').val();
                 console.log($(this).find('checkboxes').html())
-
             }
         });
 
-
         $('#tbldata tr:has(td)').find('.approv').each(function () {
-
             ap = $(this).val();
             // console.log(ap);
             if (ap.trim()) {
@@ -88,22 +74,14 @@ $cust = "\"Request_id\"";
         });
 
         $('#tbldata tr:has(td)').find('.process').each(function () {
-
             ap2 = $(this).val();
 
             if (ap2.trim()) {
-
                 console.log(ap2);
                 $(this).css("background-color", "#800080");
                 $(this).css("color", "white");
             }
         });
-
-
-//     setTimeout(function() {
-//     location.reload(false);
-// }, 180000);
-
 
         var file = '\RS_Files\file.csv';
         $("a.tooltipLink").tooltip();
@@ -131,7 +109,6 @@ $cust = "\"Request_id\"";
 
             });
         }
-
 
         $("select.filter").change(function () {
             var selectedCountry = $(".filter option:selected").val();
@@ -162,7 +139,6 @@ $cust = "\"Request_id\"";
             }
         });
 
-
         $('#tbldata tr:has(td)').find('.checkboxes').change(function () {
             var checked = $(this).prop("checked");
 
@@ -192,26 +168,17 @@ $cust = "\"Request_id\"";
                 selectedemailRows = [];
                 laststuff = [];
             } else {
-
                 // Neils code start
                 stuff.splice(stuff.indexOf(orderNum), 1);
                 emailstuff.splice(emailstuff.indexOf(emailAddress), 1);
                 // End Neils code
-
             }
 
-
             console.log(stuff);
-
-            // console.log(laststuff);
-            // console.log(lastemailstuff);
         });
 
         $('#buttonDone').click(function () {
-
             console.log($(this).html());
-
-
             $.ajax({
                 type: "POST",
                 url: "/RS/isdone/",
@@ -239,9 +206,7 @@ $cust = "\"Request_id\"";
             location.reload();
         });
 
-
         $('#confirmbtn').click(function () {
-
             // alert('testtest');
             $.ajax({
                 type: "POST",
@@ -256,9 +221,7 @@ $cust = "\"Request_id\"";
             //location.reload();
         });
 
-
         $('#chargebtn').click(function () {
-
             // alert('testtest');
             $.ajax({
                 type: "POST",
@@ -273,9 +236,7 @@ $cust = "\"Request_id\"";
             location.reload();
         });
 
-
         $('#Uncon').click(function () {
-
             // alert('testtest');
             $.ajax({
                 type: "POST",
@@ -289,7 +250,6 @@ $cust = "\"Request_id\"";
             console.log("Orders marked as booked");
             //location.reload();
         });
-
 
         $('#Unbok').click(function () {
 
@@ -324,10 +284,7 @@ $cust = "\"Request_id\"";
 //location.reload();
         });
 
-
         $('#buttonEmail').click(function () {
-
-
             $.ajax({
                 type: "POST",
                 url: "/RS/isPdf/",
@@ -343,22 +300,8 @@ $cust = "\"Request_id\"";
                 }
             });
 
-
-            // $.ajax({
-            //   type: "POST",
-            //     url: "/RS/isemail/",
-            //     data: {emailstuff : emailstuff},
-            //     success: function(data)
-            //     {
-            //       alert(data);
-            //         alert("success!");
-            //     }
-            // });
-
             console.log("PDF and eMail sent");
             return false;
-
-
         });
 
 
@@ -434,8 +377,7 @@ $cust = "\"Request_id\"";
                     <option value="request_ID">RequestID</option>
                     <option value="ORD">SalesOrderNumber</option>
                     <option value="Request_date_added">Date Added</option>
-                    <option selected value=" isnull(cast(collection_date as varchar(50)),'not set')">Collection Date
-                    </option>
+                    <option selected value="Collection Date">Collection Date</option>
                     <option value="Customer_email">Customer eMail</option>
                 </select>
                 <select name="filter2">
@@ -448,22 +390,22 @@ $cust = "\"Request_id\"";
                 </select>
                 <select name="filterstatus">
                     <option selected
-                            value="and (laststatus not like 'On-Hold' or  laststatus in('Request', 'confirmed', 'booked', 'cancelled')) ">
+                            value="All">
                         All
                     </option>
-                    <option value="and been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and confirmed = 1 and( laststatus  like 'Confirmed')">
+                    <option value="Confirmed">
                         Confirmed
                     </option>
-                    <option value="and  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and confirmed = 0 and ( laststatus = 'booked')">
+                    <option value="Booked">
                         Booked
                     </option>
-                    <option value="and (been_collected = 0 or been_collected is null ) AND  isnull(cast(collection_date as varchar(50)),'not set') IS NULL and (laststatus not like 'unbooked' and laststatus not like 'On-Hold')">
+                    <option value="Requests">
                         Requests
                     </option>
-                    <option value="and (been_collected = 0 or been_collected is null ) AND  isnull(cast(collection_date as varchar(50)),'not set') IS NULL and (laststatus like 'unbooked')">
+                    <option value="Unbooked">
                         Unbooked
                     </option>
-                    <option value="and laststatus like 'On-Hold'">On-Hold</option>
+                    <option value="On-Hold">On-Hold</option>
                     <option value="deleted">show deleted</option>
                 </select>
                 <br><Br>
@@ -472,13 +414,9 @@ $cust = "\"Request_id\"";
                     <option selected value="%"> Default</option>
                     <?php
                     foreach ($arealist as $area) {
-
                         echo "<option  value='" . $area['area1'] . "'> " . $area['area1'] . " </option>";
-
                     }
                     ?>
-
-
                     <option value="Empty"> Empty</option>
                 </select>
                 <input type='hidden' id='sort' value='asc'>
@@ -490,8 +428,7 @@ $cust = "\"Request_id\"";
                 <input type="submit" value="Submit" class="btn btn-success">
     </form>
 </div>
-</div>
-</div>
+
 <br>
 <div class="form-row">
     <div class="col">
@@ -510,9 +447,8 @@ $cust = "\"Request_id\"";
 
     </div>
 </div>
-</div>
 
-</div>
+<div>
 <h2><?php echo $filter_txt.count($bookList) ?></h2>
 <table id='tbldata' width='100%' class='sortable table table-striped'>
     <thead>
@@ -542,65 +478,38 @@ $cust = "\"Request_id\"";
         <th> Survey Complete</th>
         <th> Prev Date</th>
         <th> Owner</th>
-        <th><span onclick='sortTable(\"customer_contact\");'>contact</span></th>
+        <th><span onclick='sortTable("customer_contact");'>contact</span></th>
         <th>tel</th>
-        <th><span onclick='sortTable(\"customer_email\");'>email</span></th>
+        <th><span onclick='sortTable("customer_email");'>email</span></th>
         <th hidden> Status Notes</th>
     </tr>
     </thead>
     <tbody>
 
     <?php
-
     foreach ($bookList as $b) {
-
-        //$bookqaulify = $bookq->qualifying($b['id']);
-
-        //  var_dump($bookqaulify);
-
-
-        //die();
-
-
         $datecheck = $b["coldate"];
 
         if ($datecheck === 'not set') {
-
-
             $time = '-';
-
         } else {
-
             $time = date("d/m/Y", strtotime($datecheck));
-
         }
 
-
         $chargereq = $b["charge"];
-
         if ($chargereq == 1) {
             $chargereq = 'YES';
         } else {
             $chargereq = '-';
         }
 
-
-//  $portalcheck = "SELECT COUNT(*) AS usercheck FROM recyc_users WHERE username ='".$row['email']."'";
-//  $portstmt = $conn3->prepare($portalcheck);
-//  $portstmt->execute();
-//  $port = $portstmt->fetch(PDO::FETCH_ASSOC);
-
         $timesurv = date("d/m/Y", strtotime($b["emailsentdate"]));
 
         if ($timesurv == '01/01/1970' || $timesurv == '01/01/1900') {
-
             $timesurv = '-';
-
         } else {
             $timesurv = date("d/m/Y", strtotime($b["emailsentdate"]));
-
         }
-
 
         echo "
   <tr>
@@ -633,20 +542,10 @@ $cust = "\"Request_id\"";
     <td >" . $b["tel"] . "</td>
     <td  ><span class='emailsel_" . $b["id"] . "'>" . $b["email"] . "</span></td>
     <td hidden >" . $b["upnotes"] . "</td> 
-    
   </tr>
- 
   ";
     }
-    echo "</tbody>
-</table>
-";
-
+    echo "</tbody></table>";
 
     ?>
-
-    </div>
-    </div>
-
-
-    
+</div>

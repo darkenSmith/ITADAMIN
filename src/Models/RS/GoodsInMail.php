@@ -239,7 +239,7 @@ class GoodsInMail extends AbstractModel
 
             $email->setFrom($_SESSION['user']['username'], 'Stone Computers Recycling System');
             $email->setSubject("Collection intake Sheet  - Request-ID:" . $rid);
-            $email->addTo($sendgridConfig['from']['ITADSystem']);
+            $email->addTo('StoneITAD@stonegroup.co.uk');
             $email->addContent("text/html", $table);
             $sendgrid = new SendGrid($sendgridConfig['api']['key']);
             $response = $sendgrid->send($email);

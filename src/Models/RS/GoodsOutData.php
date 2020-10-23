@@ -74,6 +74,9 @@ class GoodsOutData extends AbstractModel
         return $this->totalloads;
     }
 
+    /**
+     * @return bool
+     */
     public function goodsInAdd()
     {
         $loadnum = $_POST['loadnum'];
@@ -82,19 +85,27 @@ class GoodsOutData extends AbstractModel
         $Supplier = $_POST['Supplier'];
         $palletnum = $_POST['palletnum'];
 
-        $colupdate = "insert into palletloads(loadnum, weight, type, supplier, palletref)
-  values(" . $loadnum . ", " . $wgt . ", '" . $Type . "', '" . $Supplier . "', " . $palletnum . ")";
+        Logger::getInstance("GoodsOutData.log")->debug(
+            "goodsInAdd start",
+            []
+        );
+
+        $colupdate = "insert into palletloads(loadnum, weight, type, supplier, palletref) values(" . $loadnum . ", " . $wgt . ", '" . $Type . "', '" . $Supplier . "', " . $palletnum . ")";
 
         try {
             $stmtu = $this->sdb->prepare($colupdate);
             $stmtu->execute();
-
+            Logger::getInstance("GoodsOutData.log")->debug(
+                "goodsInAdd success",
+                [$colupdate]
+            );
             return true;
         } catch (Exception $e) {
             Logger::getInstance("GoodsOutData.log")->warning(
                 "goodsInAdd failed",
                 [
-                    $e->getMessage()
+                    $e->getMessage(),
+                    $colupdate
                 ]
             );
         }

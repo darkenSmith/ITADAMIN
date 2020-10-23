@@ -25,8 +25,8 @@
                         despatchdate: despatchdate,
                         company: company
                     }, success: function (data) {
-                        alert('success');
                         console.log(data);
+                        alert('success');
                         location.reload("/RS/Goodsout/");
                     }
                 });
@@ -50,8 +50,8 @@
                         palletnum: palletnum
                     },
                     success: function (data) {
-                        alert('success');
                         console.log(data);
+                        alert('success');
                         location.reload("/RS/Goodsout/");
                     }
                 });

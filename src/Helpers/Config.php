@@ -32,8 +32,8 @@ class Config
 
         if (file_exists(PROJECT_DIR . "app.dev.ini")) {
             $this->config = $this->parse(PROJECT_DIR . "app.dev.ini", true);
-        } elseif (file_exists(PROJECT_DIR . "app.ini")) {
-            $this->config = $this->parse(PROJECT_DIR . "app.ini", true);
+        } elseif (file_exists(PROJECT_DIR . ".app.ini")) {
+            $this->config = $this->parse(PROJECT_DIR . ".app.ini", true);
         }
 
         if (!empty($type)) {

@@ -18,3 +18,8 @@
   RewriteRule ^/?([a-zA-Z0-9]+)/$ index.php?controller=$1&action=index [QSA,L]
 
 </IfModule>
+
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak)$">
+Order Allow,Deny
+Deny from all
+</FilesMatch>

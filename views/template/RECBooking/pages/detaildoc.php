@@ -205,7 +205,6 @@ asc
 
 
     foreach ($data as $row) {
-
         $sqlnotes = "
 SET NOCOUNT on
 declare @postcode varchar(10)
@@ -265,8 +264,6 @@ order by isnull(replace(c.location, ' ', ''), 'null')
 
     // while($row = sqlsrv_fetch_array($stmt)){
     foreach ($datar as $roww) {
-
-
         echo "
 <tr>
 <th> Total Units </th>
@@ -289,7 +286,6 @@ order by isnull(replace(c.location, ' ', ''), 'null')
     $pl = array();
     // while($row = sqlsrv_fetch_array($stmt)){
     foreach ($data2 as $row) {
-
         //Creates a loop to loop through results
         if ($row['asset'] == 1) {
             $nd = "checked";
@@ -322,10 +318,10 @@ order by isnull(replace(c.location, ' ', ''), 'null')
         if ($row['prodname'] == 'Other1') {
             echo "
    <td> <input type='text' id='other1' class='group1' value='" . $row['o1'] . "' disabled></td>";
-        } else if ($row['prodname'] == 'Other2') {
+        } elseif ($row['prodname'] == 'Other2') {
             echo "
     <td> <input type='text' id='other2' class='group1' value='" . $row['o2'] . "' disabled></td>";
-        } else if ($row['prodname'] == 'Other3') {
+        } elseif ($row['prodname'] == 'Other3') {
             echo "
       <td> <input type='text' id='other3' class='group1' value='" . $row['o3'] . "' disabled></td>";
         }
@@ -333,17 +329,16 @@ order by isnull(replace(c.location, ' ', ''), 'null')
         if ($row['prodname'] == 'Other4') {
             echo "
         <td> <input type='text' id='other4' class='group1' value='" . $row['o4'] . "' disabled></td>";
-        } else if ($row['prodname'] == 'Other5') {
+        } elseif ($row['prodname'] == 'Other5') {
             echo "
          <td> <input type='text' id='other5' class='group1' value='" . $row['o5'] . "' disabled></td>";
-        } else if ($row['prodname'] == 'Other6') {
+        } elseif ($row['prodname'] == 'Other6') {
             echo "
            <td> <input type='text' id='other6' class='group1' value='" . $row['o6'] . "' disabled></td>";
         }
 
 
         $pl[] = $row['prodid'];
-
     }
 
     echo " 
@@ -389,14 +384,10 @@ and active = 1
     ";
 
     foreach ($adddata as $op) {
-
-
         echo "
     <option value='" . $op['product_ID'] . "'>" . $op['product'] . "</option>
 
 ";
-
-
     }
 
     echo " 
@@ -980,8 +971,6 @@ and active = 1
 
     // while($row = sqlsrv_fetch_array($stmt)){
     foreach ($data as $row) {
-
-
         $portalcheck = "SELECT case when COUNT(*) > 0 then 'Customer has portal access' else 'Customer has no portal access' end AS usercheck FROM recyc_users WHERE username ='" . $row['email'] . "'";
         $portstmt = $rdb->prepare($portalcheck);
         $portstmt->execute();
@@ -1009,10 +998,7 @@ and active = 1
           ";
 
         foreach ($companies as $comp) {
-
             echo "<option value='" . $comp['company_id'] . "'>" . $comp['company_name'] . "</option> ";
-
-
         }
 
 
@@ -1022,10 +1008,7 @@ and active = 1
           <option value='0' selected>Please select a role type</option>";
 
         foreach ($perm as $roles) {
-
             echo "<option value='" . $roles['id'] . "'>" . $roles['name'] . "</option> ";
-
-
         }
 
 
@@ -1042,8 +1025,6 @@ and active = 1
         foreach ($list as $e) {
             //var_dump($e);
             echo "<option value='" . $e . "'>" . $e . "</option> ";
-
-
         }
 
         echo "</select></div>";
@@ -1061,21 +1042,17 @@ and active = 1
         }
 
         if (isset($row['ProposedDate'])) {
-
             $timepro = date("d/m/y", strtotime($row['ProposedDate']));
             $_SESSION['protime'] = $timepro;
         } else {
-
             $timepro = '';
             $_SESSION['protime'] = $timepro;
         }
 
 
         if (isset($row['survdue'])) {
-
             $DEADtime = date("d-m-y H:i:s", strtotime($row['survdue']));
         } else {
-
             $DEADtime = '';
         }
 
@@ -1256,8 +1233,6 @@ and active = 1
 
 
         echo $menudet;
-
-
     }
 
 
@@ -1276,8 +1251,6 @@ and active = 1
 
     $datanote = $stmtnote->fetchAll(PDO::FETCH_ASSOC);
     foreach ($datanote as $row) {
-
-
         echo " <tr hidden>
         <th> notes</th>
         <td><textarea>  " . $row['notes'] . " </textarea></td>
@@ -1576,10 +1549,10 @@ and active = 1
     $DEADtime = '';
     /*----------------------------------------------------------------------------------------------------
 Change Log
-Date			tag						Ticket				By						Description
+Date            tag                     Ticket              By                      Description
 ------------------------------------------------------------------------------------------------------
-06/09/18	Created											Alex.Smith		Created
-07/09/18	tidy                        Neil.Baker    Tidy HTML and remove incorrect tags, remove duplicate includes for DB, move DB include to top of file
+06/09/18    Created                                         Alex.Smith      Created
+07/09/18    tidy                        Neil.Baker    Tidy HTML and remove incorrect tags, remove duplicate includes for DB, move DB include to top of file
 ------------------------------------------------------------------------------------------------------*/
 
     $sqlaps = "
@@ -1630,8 +1603,6 @@ WHERE
 
     // while($arow = sqlsrv_fetch_array($stmtaps)){
     foreach ($data as $arow) {
-
-
         $lorry = $arow['lflag'];
 
 
@@ -1739,31 +1710,22 @@ WHERE
 ///////////////
 
         if (isset($arow['email_sent'])) {
-
             $deadtime = date("d-m-y H:i:s", strtotime($arow['deadline']));
         } else {
-
             $deadtime = '';
-
         }
 
 
         if (isset($arow['sursentdate'])) {
-
             $survtime = date("d-m-y H:i:s", strtotime($arow['sursentdate']));
         } else {
-
             $survtime = '';
-
         }
 
         if (isset($arow['emailsentdate'])) {
-
             $emailsentdate = date("d-m-y H:i:s", strtotime($arow['emailsentdate']));
         } else {
-
             $emailsentdate = '';
-
         }
 
 
@@ -1804,19 +1766,19 @@ WHERE
 //   <th>  Help On-Site</th>
 // <td><input type='text' id='help_on' class='group2' value='".$help."' disabled></td>
 // </tr>
-// <tr> 
+// <tr>
 // <th>  Two-Man</th>
 // <td><input type='text' id='twoman' class='group2' value='". $twoman."' disabled></td>
 // </tr>
-// <tr> 
+// <tr>
 // <th>  Steps </th>
 // <td><input type='text' id='steps' class='group2' value='". $steps."' disabled></td>
 // </tr>
-// <tr> 
+// <tr>
 // <th>  Ground Floor </th>
 // <td><input type='text' id='ground' class='group2' value='". $ground."' disabled></td>
 // </tr>
-// <tr> 
+// <tr>
 // <th>  Lift  </th>
 // <td><input type='text' id='lift' class='group2' value='". $lift."' disabled></td>
 // </tr>
@@ -1853,8 +1815,6 @@ WHERE
   </tr>
   </table>
  ";
-
-
     }
 
 
@@ -2152,9 +2112,9 @@ WHERE
 
                 var ord = <?php  if (isset($_SESSION['ord'])) {
                         echo $_SESSION['ord'];
-                    }
-                    echo '0';
-                    ?>;
+                          }
+                          echo '0';
+                            ?>;
                 var amrs = $('#upamr').val();
                 var amrcomp = $('#amr').val();
                 var isrebate = $('#isre').val();
@@ -2284,9 +2244,7 @@ WHERE
         $timin = date("Y-m-d", $test);
     }
     if (!isset($_GET['pd'])) {
-
     } else {
-
         //echo "Now in Booking";
 
         $test = strtotime(str_replace('/', '-', $_GET['pd']));
@@ -2333,7 +2291,6 @@ WHERE
         $cenvertedTime = date('Y-m-d H:i:s', strtotime('+16 hour', strtotime($datediff)));
 
         if (!$r['Checker'] == 'There all ready') {
-
             $userint = get_current_user();
 
             $result = strtoupper(substr($userint, 0, 2));
@@ -2346,9 +2303,7 @@ WHERE
 
 
             if ($ord == '') {
-
                 if (isset($_SESSION['ordman'])) {
-
                     $ord = $_SESSION['ordman'];
                 }
             }
@@ -2374,9 +2329,7 @@ WHERE
 
 
             echo "<meta http-equiv='refresh' content='0'>";
-
         } else {
-
             echo "<p>in booked collections log</p>";
             $sqlbookup = "     
               update Booked_Collections
@@ -2414,7 +2367,6 @@ WHERE
         }
 
         $sqladdtoportal = '';
-
     }
 
     $stmttotal = $sdb->prepare($totalswu);
@@ -2435,7 +2387,6 @@ WHERE
     echo "<table id='tbdtl' cellpadding='1' cellspacing ='1'>";
     // while($row = sqlsrv_fetch_array($stmt)){
     foreach ($datar as $roww) {
-
     }
 
     $stmtrest = $sdb->prepare($sql);
@@ -2446,8 +2397,6 @@ WHERE
     $datarest = $stmtrest->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($datarest as $row) {
-
-
         echo "
   
     
@@ -2490,6 +2439,8 @@ WHERE
             $stmt6->execute();
             $data = $stmt6->fetch(PDO::FETCH_ASSOC);
             $path = isset($data['fi']) ? $data['fi'] : ' ';
+
+            $path = str_replace("/uploads//upload/", "/uploads/images/", $path);
 
             if ($data) {
                 echo "<div id='image_preview'><img id='kool' src='" . $path . "' alt='' width='250' height='200'></div>";
@@ -2639,7 +2590,6 @@ if (isset($dataord['ord'])) {
 $rg = $stmtgreen->fetch(PDO::FETCH_ASSOC);
 
 if (isset($rg['SiteCode'])) {
-
     $sitecode = $rg['SiteCode'];
     $siccode = $rg['SICCode'];
 } else {

@@ -51,7 +51,7 @@ class User extends AbstractModel
         $password = md5(stripslashes($_POST['password']));
 
         if (!empty($password) && !empty($username)) {
-            $sql = 'SELECT * FROM recyc_users WHERE username = :user AND password = :pass AND active = 1 LIMIT 1';
+            $sql = 'SELECT * FROM recyc_users WHERE username = :user AND password = :pass AND active = 1 AND role_id <> 3 LIMIT 1';
             $result = $this->rdb->prepare($sql);
             $values = array(':user' => $username, ':pass' => $password);
             $result->execute($values);
@@ -96,7 +96,7 @@ class User extends AbstractModel
         $password = md5(stripslashes($_POST['password']));
 
         if (!empty($password) && !empty($username)) {
-            $sql = 'SELECT * FROM recyc_users WHERE username = :user AND password = :pass AND active = 1 LIMIT 1';
+            $sql = 'SELECT * FROM recyc_users WHERE username = :user AND password = :pass AND active = 1 AND role_id <> 3 LIMIT 1';
 
             $result = $this->rdb->prepare($sql);
             $values = array(':user' => $username, ':pass' => $password);
@@ -122,7 +122,7 @@ class User extends AbstractModel
                 } elseif ($result['password'] != $password) {
                     $alert = 'Incorrect Password';
                 } else {
-                    $alert = 'Incorrect Password';
+                    $alert = 'YUser does not exist';
                 }
             } else {
                 $alert = 'User does not exist';

@@ -81,7 +81,7 @@ class Pdfmaker extends AbstractModel
             foreach ($id as $val) {
 
                 $ord_sql = "
-                          select [dbo].[zzfnRemoveNonNumericCharacters](isnull(SalesOrderNumber, '0000000')) as ord from [greenoak].[we3recycler].[dbo].SalesOrders  where CustomerPONumber like '%" . $val . "'";
+                          select replace(SalesOrderNumber, 'ORD-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders  where CustomerPONumber like '%" . $val . "'";
                 $ord_stmt = $this->gdb->prepare($ord_sql);
                 $ord_stmt->execute();
                 $orddata = $ord_stmt->fetch(\PDO::FETCH_ASSOC);

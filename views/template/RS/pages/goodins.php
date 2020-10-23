@@ -110,7 +110,7 @@
                 console.log(arr);
                 console.log(arr2);
 
-                console.log("mail")
+                console.log("mail");
                 $.ajax({
                     url: "/RS/goodsinmail/",
                     type: "POST",
@@ -121,6 +121,7 @@
 
                     },
                     success: function(data){   // A function to be called if request succeeds
+                        alert('Mail Sent!')
                         location.reload("/RS/Goodsin/");
                     }
                 });
@@ -650,10 +651,10 @@
 <tr>
 <th   class='red' id='prod'> TFT Monitors </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number' id='tftmonreq' class='req' value = '".$tft."' /></td>
-<td class='red'> <input type='number' id='tftmonbl' class='bl' value='".$tftmonbl."'/> </td>
-<td class='red'> <input type='number' id='tftmonber' class='ber' value='".$tftmonber."'/></td>
-<td class='red'> <input type='number' id='tftmonwgt' class='wgt' value='".$tftmonwight."'/></td>
+<td class='red'> <input type='number' id='tftmonreq' class='req' value = '".($tft ?? '')."' /></td>
+<td class='red'> <input type='number' id='tftmonbl' class='bl' value='".($tftmonbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='tftmonber' class='ber' value='".($tftmonber ?? '')."'/></td>
+<td class='red'> <input type='number' id='tftmonwgt' class='wgt' value='".($tftmonwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='tftmondisc' class='dis'/></td>
 </tr>
@@ -661,10 +662,10 @@
 <tr>
 <th class='red'  id='prod'> TFT TV Monitors </th>
 <td class='red' > Yes</td>
-<td class='red' > <input type='number' id='tfttvmonreq'  class='req' value='".$tfttv."'/></td>
-<td class='red' > <input type='number' id='tfttvmonbl' class='bl' value='". $tfttvnbl."'/> </td>
-<td class='red' > <input type='number' id='tfttvmonber' min='0' class='ber' value='".$tfttvber."'/></td>
-<td class='red' > <input type='number' id='tfttvmonwgt' class='wgt' value='".$tfttvwight."'/></td>
+<td class='red' > <input type='number' id='tfttvmonreq'  class='req' value='".($tfttv ?? '')."'/></td>
+<td class='red' > <input type='number' id='tfttvmonbl' class='bl' value='". ($tfttvnbl ?? '')."'/> </td>
+<td class='red' > <input type='number' id='tfttvmonber' min='0' class='ber' value='".($tfttvber ?? '')."'/></td>
+<td class='red' > <input type='number' id='tfttvmonwgt' class='wgt' value='".($tfttvwight ?? '')."'/></td>
 <td  class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red' > <input type='number' id='tfttvmondisc' class='dis'/></td>
 </tr>
@@ -672,10 +673,10 @@
 <tr>
 <th id='prod'> PC - DT/TOWER Generic </th>
 <td> Yes</td>
-<td> <input type='number' id='pcreq'  class='req' value='".$pc."' /></td>
-<td> <input type='number' id='pcbl' class='bl' value='".$pcbl."'/> </td>
-<td> <input type='number' id='pcber' class='ber' value='".$pcber."'/></td>
-<td> <input type='number' id='pcwgt'  class='wgt' value='".$pcwight."'/></td>
+<td> <input type='number' id='pcreq'  class='req' value='".($pc ?? '')."' /></td>
+<td> <input type='number' id='pcbl' class='bl' value='".($pcbl ?? '')."'/> </td>
+<td> <input type='number' id='pcber' class='ber' value='".($pcber ?? '')."'/></td>
+<td> <input type='number' id='pcwgt'  class='wgt' value='".($pcwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='pcdisc' class='dis'/></td>
 </tr>
@@ -684,9 +685,9 @@
 <th id='prod'> PC - Apple </th>
 <td> Yes</td>
 <td> <input type='number'  class='req' id='pcappreq' value='0'/></td>
-<td> <input type='number' id='pcappbl' class='bl' value='".$pcappmonbl."'/> </td>
-<td> <input type='number' id='pcappber' class='ber' value='".$pcappber."'/></td>
-<td> <input type='number' id='pcappwgt' class='wgt' value='".$pcappwight."'/></td>
+<td> <input type='number' id='pcappbl' class='bl' value='".($pcappmonbl ?? '')."'/> </td>
+<td> <input type='number' id='pcappber' class='ber' value='".($pcappber ?? '')."'/></td>
+<td> <input type='number' id='pcappwgt' class='wgt' value='".($pcappwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='pcappdisc' class='dis'/></td>
 </tr>
@@ -694,10 +695,10 @@
 <tr class='red'>
 <th id='prod' class='red'> All in One - Generic </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='pcappreq' value='".$aio."'/></td>
-<td class='red'> <input type='number' id='pcappbl' class='bl' value='".$aiobl."'/> </td>
-<td class='red'> <input type='number' id='pcappber' class='ber' value='".$aiober."'/></td>
-<td class='red'> <input type='number' id='pcappwgt' class='wgt' value='".$aiowight."'/></td>
+<td class='red'> <input type='number'  class='req' id='pcappreq' value='".($aio ?? '')."'/></td>
+<td class='red'> <input type='number' id='pcappbl' class='bl' value='".($aiobl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='pcappber' class='ber' value='".($aiober ?? '')."'/></td>
+<td class='red'> <input type='number' id='pcappwgt' class='wgt' value='".($aiowight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='pcappdisc' class='dis'/></td>
 </tr>
@@ -706,9 +707,9 @@
 <th id='prod' class='red'> All in One - Apple Imac </th>
 <td class='red'> Yes</td>
 <td class='red'> <input type='number'  class='req' id='pcappimreq' value='0'/></td>
-<td class='red'>  <input type='number' id='pcappimbl' class='bl' value='".$aioappimacbl."'/> </td>
-<td class='red'> <input type='number' id='pcappimber' class='ber' value='".$aioappimacber."'/></td>
-<td class='red'> <input type='number' id='pcappimwgt' class='wgt' value='".$aioappimacwight."'/></td>
+<td class='red'>  <input type='number' id='pcappimbl' class='bl' value='".($aioappimacbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='pcappimber' class='ber' value='".($aioappimacber ?? '')."'/></td>
+<td class='red'> <input type='number' id='pcappimwgt' class='wgt' value='".($aioappimacwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='pcappimdisc' class='dis'/></td>
 </tr>
@@ -717,18 +718,18 @@
 <td class='red'> Yes</td>
 <td class='red'> <input type='number'  class='req' id='pcappemreq' value='0'/></td>
 <td class='block'> </td>
-<td class='red'> <input type='number' id='pcapprmber' class='ber' value='".$aioemacber."'/></td>
-<td class='red'> <input type='number' id='pcapprmwgt' class='wgt' value='".$aioemacwight."'/></td>
+<td class='red'> <input type='number' id='pcapprmber' class='ber' value='".($aioemacber ?? '')."'/></td>
+<td class='red'> <input type='number' id='pcapprmwgt' class='wgt' value='".($aioemacwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='pcapprmdisc' class='dis'/></td>
 </tr>
 <tr class='red'>
 <th id='prod' class='red'> Laptops </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='lapre' value='".$lap."'/></td>
-<td class='red'> <input type='number' id='lapbl' class='bl' value='".$Laptopbl."'/> </td>
-<td class='red'> <input type='number' id='lapber' class='ber' value='".$Laptopber."'/></td>
-<td class='red'> <input type='number' id='lapwgt' class='wgt' value='".$Laptopwight."'/></td>
+<td class='red'> <input type='number'  class='req' id='lapre' value='".($lap ?? '')."'/></td>
+<td class='red'> <input type='number' id='lapbl' class='bl' value='".($Laptopbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='lapber' class='ber' value='".($Laptopber ?? '')."'/></td>
+<td class='red'> <input type='number' id='lapwgt' class='wgt' value='".($Laptopwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='lapdisc' class='dis'/></td>
 </tr>
@@ -736,59 +737,59 @@
 <th id='prod' class='red'> Laptop - Apple Macbook </th>
 <td class='red'> Yes</td>
 <td class='red'> <input type='number'  class='req' id='lapappreq' value='0'/></td>
-<td class='red'> <input type='number' id='lapappbl' class='bl' value='".$applapbl."'/> </td>
-<td class='red'> <input type='number' id='lapappber' class='ber' value='".$applapber."'/></td>
-<td class='red'> <input type='number' id='lapappwgt' class='wgt' value='".$applapwight."'/></td>
+<td class='red'> <input type='number' id='lapappbl' class='bl' value='".($applapbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='lapappber' class='ber' value='".($applapber ?? '')."'/></td>
+<td class='red'> <input type='number' id='lapappwgt' class='wgt' value='".($applapwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='lapappdisc' class='dis'/></td>
 </tr>
 <tr>
 <th id='prod'> Servers </th>
 <td> Yes</td>
-<td> <input type='number'  class='req' id='srvreq' value='".$srv."'/></td>
-<td> <input type='number' id='srvbl' class='bl' value='".$srvbl."'/> </td>
+<td> <input type='number'  class='req' id='srvreq' value='".($srv ?? '')."'/></td>
+<td> <input type='number' id='srvbl' class='bl' value='".($srvbl ?? '')."'/> </td>
 <td class='block'> </td>
-<td> <input type='number' id='srvwgt' class='wgt' value='".$srvwight."'/></td>
+<td> <input type='number' id='srvwgt' class='wgt' value='".($srvwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='srvdisc' class='dis'/></td>
 </tr>
 <tr class='red'>
 <th class='red' id='prod'> Tablets - Generic </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='tabreq' value='".$tab."'/></td>
-<td class='red'> <input type='number' id='tabbl' class='bl' value='".$tabbl."'/> </td>
-<td class='red'> <input type='number' id='tabber' class='ber' value='".$tabber."'/></td>
-<td class='red'> <input type='number' id='tabwgt' class='wgt' value='".$tabwight."'/></td>
+<td class='red'> <input type='number'  class='req' id='tabreq' value='".($tab ?? '')."'/></td>
+<td class='red'> <input type='number' id='tabbl' class='bl' value='".($tabbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='tabber' class='ber' value='".($tabber ?? '')."'/></td>
+<td class='red'> <input type='number' id='tabwgt' class='wgt' value='".($tabwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'>  <input type='number' id='tabdisc' class='dis'/></td>
 </tr>
 <tr class='red'>
 <th class='red' id='prod'> Tablets - Apple </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='tabappreq' value='".$apptab."'/></td>
-<td class='red'> <input type='number' id='tabappbl' class='bl' value='".$apptabbl."'/> </td>
-<td class='red'> <input type='number' id='tabappber' class='ber' value='".$apptabber."'/></td>
-<td class='red'> <input type='number' id='tabappwgt' class='wgt' value='".$apptabwight."'/></td>
+<td class='red'> <input type='number'  class='req' id='tabappreq' value='".($apptab ?? '')."'/></td>
+<td class='red'> <input type='number' id='tabappbl' class='bl' value='".($apptabbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='tabappber' class='ber' value='".($apptabber ?? '')."'/></td>
+<td class='red'> <input type='number' id='tabappwgt' class='wgt' value='".($apptabwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='tabappdisc' class='dis'/></td>
 </tr>
 <tr class='red'>
 <th id='prod' class='red'> Smart Phone </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='smartpreq' value='".$sphne."'/></td>
-<td class='red'> <input type='number' id='smartpbl' class='bl' value='".$spbl."'/> </td>
-<td class='red'> <input type='number' id='smartpber' class='ber' value='".$spber."'/></td>
-<td class='red'> <input type='number' id='smartpwgt' class='wgt' value='".$spwight."'/></td>
+<td class='red'> <input type='number'  class='req' id='smartpreq' value='".($sphne ?? '')."'/></td>
+<td class='red'> <input type='number' id='smartpbl' class='bl' value='".($spbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='smartpber' class='ber' value='".($spber ?? '')."'/></td>
+<td class='red'> <input type='number' id='smartpwgt' class='wgt' value='".($spwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='smartpdisc' class='dis'/></td>
 </tr>
 <tr class='red'>
 <th class='red' id='prod'> Apple Phone </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='smartpreq' value='".$apphne."'/></td>
-<td class='red'> <input type='number' id='smartapbl' class='bl' value='".$apbl."'/> </td>
-<td class='red'> <input type='number' id='smartapber' class='ber' value='".$apber."'/></td>
-<td class='red'> <input type='number' id='smartapwgt' class='wgt' value='".$apwight."'/></td>
+<td class='red'> <input type='number'  class='req' id='smartpreq' value='".($apphne ?? '')."'/></td>
+<td class='red'> <input type='number' id='smartapbl' class='bl' value='".($apbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='smartapber' class='ber' value='".($apber ?? '')."'/></td>
+<td class='red'> <input type='number' id='smartapwgt' class='wgt' value='".($apwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='smartpdisc' class='dis'/></td>
 </tr>
@@ -796,39 +797,39 @@
 <th  class='red' id='prod'> Non Smart Phone </th>
 <td class='red'> Yes</td>
 <td class='red'> <input type='number'  class='req' id='nsmartpreq' value='0'/></td>
-<td class='red'> <input type='number' id='nsmartpbl' class='bl' value='".$nonsmartbl."'/> </td>
-<td class='red'> <input type='number' id='nsmartpber' class='ber' value='".$nonsmartber."'/></td>
-<td class='red'> <input type='number' id='nsmartpwgt' class='wgt' value='".$nonsmartwight."'/></td>
+<td class='red'> <input type='number' id='nsmartpbl' class='bl' value='".($nonsmartbl ?? '')."'/> </td>
+<td class='red'> <input type='number' id='nsmartpber' class='ber' value='".($nonsmartber ?? '')."'/></td>
+<td class='red'> <input type='number' id='nsmartpwgt' class='wgt' value='".($nonsmartwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='nsmartpdisc' class='dis'/></td>
 </tr>
 <tr>
 <th id='prod' class='red'> Printers </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='printreq' value='".$pri."'/></td>
+<td class='red'> <input type='number'  class='req' id='printreq' value='".($pri ?? '')."'/></td>
 <td class='block'> </td>
-<td class='red'> <input type='number' id='printber' class='ber' value='".$printber."'/></td>
-<td class='red'>  <input type='number' id='printwgt' class='wgt' value='".$printwight."'/></td>
+<td class='red'> <input type='number' id='printber' class='ber' value='".($printber ?? '')."'/></td>
+<td class='red'>  <input type='number' id='printwgt' class='wgt' value='".($printwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td class='red'> <input type='number' id='printdisc' class='dis'/></td>
 </tr>
 <tr>
 <th id='prod'> MFD Printers </th>
 <td> Yes</td>
-<td> <input type='number'  class='req' id='mfdprintpreq' value='".$mfdpri."'/></td>
+<td> <input type='number'  class='req' id='mfdprintpreq' value='".($mfdpri ?? '')."'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='mfdprintber' class='ber' value='".$mfdmonber."'/></td>
-<td> <input type='number' id='mfdprintwgt' class='wgt' value='".$mfdwight."'/></td>
+<td> <input type='number' id='mfdprintber' class='ber' value='".($mfdmonber ?? '')."'/></td>
+<td> <input type='number' id='mfdprintwgt' class='wgt' value='".($mfdwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='mfdprintdisc' class='dis'/></td>
 </tr>
 <tr class='red'>
 <th  class='red' id='prod'> CRT Monitors / TV</th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='crtreq' value='".$crt."'/></td>
+<td class='red'> <input type='number'  class='req' id='crtreq' value='".($crt ?? '')."'/></td>
 <td class='block'> </td>
-<td class='red'> <input type='number' id='crtber' class='ber' value='".$crtber."'/></td>
-<td class='red'> <input type='number' id='crtwgt' class='wgt' value='".$crtwight."'/></td>
+<td class='red'> <input type='number' id='crtber' class='ber' value='".($crtber ?? '')."'/></td>
+<td class='red'> <input type='number' id='crtwgt' class='wgt' value='".($crtwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='crtdisc' class='dis'/></td>
 </tr>
@@ -837,18 +838,18 @@
 <td> Yes</td>
 <td> <input type='number'  class='req' id='scanreq' value='0'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='scanber' class='ber' value='".$scanber."'/></td>
-<td> <input type='number' id='scanwgt' class='wgt' value='".$scanwight."'/></td>
+<td> <input type='number' id='scanber' class='ber' value='".($scanber ?? '')."'/></td>
+<td> <input type='number' id='scanwgt' class='wgt' value='".($scanwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='scandisc' class='dis'/></td>
 </tr>
 <tr class = 'yellow'>
 <th  class = 'yellow' id='prod'> Batteries - UPS </th>
 <td class = 'yellow'> Yes</td>
-<td class = 'yellow'> <input type='number'  class='req' id='battreq' value='".$batups."'/></td>
+<td class = 'yellow'> <input type='number'  class='req' id='battreq' value='".($batups ?? '')."'/></td>
 <td class='block'> </td>
-<td class = 'yellow'> <input type='number' id='battber' class='ber' value='".$batupsber."'/></td>
-<td class = 'yellow'> <input type='number' id='battwgt' class='wgt' value='".$batupswight."'/></td>
+<td class = 'yellow'> <input type='number' id='battber' class='ber' value='".($batupsber ?? '')."'/></td>
+<td class = 'yellow'> <input type='number' id='battwgt' class='wgt' value='".($batupswight ?? '')."'/></td>
 <td class='ewc' style='color:#e6e600 !important;'>20:06:01</td>
 <td class = 'yellow'> <input type='number' id='battdisc' class='dis'/></td>
 </tr>
@@ -857,8 +858,8 @@
 <td class = 'yellow'> Yes</td>
 <td class = 'yellow'> <input type='number'  class='req' id='acidreq' value='0'/></td>
 <td class='block'> </td>
-<td class = 'yellow'> <input type='number' id='acidber' class='ber' value='".$acidber."'/></td>
-<td class = 'yellow'> <input type='number' id='acidwgt' class='wgt' value='".$acidwight."'/></td>
+<td class = 'yellow'> <input type='number' id='acidber' class='ber' value='".($acidber ?? '')."'/></td>
+<td class = 'yellow'> <input type='number' id='acidwgt' class='wgt' value='".($acidwight ?? '')."'/></td>
 <td class='ewc' style='color:#e6e600 !important;'>20:06:01</td>
 <td class = 'yellow'> <input type='number' id='aciddisc' class='dis'/></td>
 </tr>
@@ -868,8 +869,8 @@
 <td class = 'yellow'> Yes</td>
 <td  class = 'yellow'> <input type='number'  class='req' id='batnicreq' value='0'/></td>
 <td  class='block'> </td>
-<td class = 'yellow'> <input type='number' class='ber' id='batnicber' value='".$nicber."'/></td>
-<td class = 'yellow'> <input type='number' id='batnicwgt' class='wgt' value='".$nicwight."'/></td>
+<td class = 'yellow'> <input type='number' class='ber' id='batnicber' value='".($nicber ?? '')."'/></td>
+<td class = 'yellow'> <input type='number' id='batnicwgt' class='wgt' value='".($nicwight ?? '')."'/></td>
 <td class='ewc' style='color:#e6e600 !important; '>20:06:01</td>
 <td class = 'yellow'> <input type='number' id='batnicdisc' class='dis'/></td>
 </tr>
@@ -879,8 +880,8 @@
 <td class='green'> Yes</td>
 <td class='green'> <input type='number'  class='req' id='nonhazreq' value='0'/></td>
 <td class='block'> </td>
-<td class='green'> <input type='number' id='nonhazber' class='ber' value='".$nonhazber."'/></td>
-<td class='green'> <input type='number' id='nonhazwgt'  class='wgt' value='".$nonhazwight."'/></td>
+<td class='green'> <input type='number' id='nonhazber' class='ber' value='".($nonhazber ?? '')."'/></td>
+<td class='green'> <input type='number' id='nonhazwgt'  class='wgt' value='".($nonhazwight ?? '')."'/></td>
 <td class='ewc' style='color:green !important;'>20:01:34</td>
 <td class='green'> <input type='number' id='nonhazdisc' class='dis'/></td>
 </tr>
@@ -888,10 +889,10 @@
 <tr>
 <th id='prod'> Projectors </th>
 <td> Yes</td>
-<td> <input type='number'  class='req' id='projreq' value='".$proj."'/></td>
+<td> <input type='number'  class='req' id='projreq' value='".($proj ?? '')."'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='projber' class='ber' value='".$projber."'/></td>
-<td> <input type='number' id='projwgt'  class='wgt' value='".$projwight."'/></td>
+<td> <input type='number' id='projber' class='ber' value='".($projber ?? '')."'/></td>
+<td> <input type='number' id='projwgt'  class='wgt' value='".($projwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='projdisc' class='dis'/></td>
 </tr>
@@ -901,8 +902,8 @@
 <td> Yes</td>
 <td> <input type='number'  class='req' id='thinreq' value='0'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='thinber' class='ber' value='".$thinber."'/></td>
-<td> <input type='number' id='thinwgt'  class='wgt' value='".$thinwight."'/></td>
+<td> <input type='number' id='thinber' class='ber' value='".($thinber ?? '')."'/></td>
+<td> <input type='number' id='thinwgt'  class='wgt' value='".($thinwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='thindisc' class='dis'/></td>
 </tr>
@@ -910,10 +911,10 @@
 <tr>
 <th id='prod'> Switches </th>
 <td> Yes</td>
-<td> <input type='number'  class='req' id='swireq' value='".$swi."'/></td>
+<td> <input type='number'  class='req' id='swireq' value='".($swi ?? '')."'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='swiber' class='ber' value='".$swiber."'/></td>
-<td> <input type='number' id='swiwgt'  class='wgt' value='".$swiwight."'/></td>
+<td> <input type='number' id='swiber' class='ber' value='".($swiber ?? '')."'/></td>
+<td> <input type='number' id='swiwgt'  class='wgt' value='".($swiwight ?? '')."'/></td>
 <td class='ewc' style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='swidisc' class='dis'/></td>
 </tr>
@@ -921,10 +922,10 @@
 <tr class='red'>
 <th class='red' id='prod'> Smartboards </th>
 <td class='red'> Yes</td>
-<td class='red'> <input type='number'  class='req' id='smartbreq' value='".$smartb."'/></td>
+<td class='red'> <input type='number'  class='req' id='smartbreq' value='".($smartb ?? '')."'/></td>
 <td class='block'> </td>
-<td class='red'> <input type='number' id='smartbber' class='ber' value='".$smartber."'/></td>
-<td class='red'> <input type='number' id='smartbwgt'  class='wgt' value='".$smartwight."'/></td>
+<td class='red'> <input type='number' id='smartbber' class='ber' value='".($smartber ?? '')."'/></td>
+<td class='red'> <input type='number' id='smartbwgt'  class='wgt' value='".($smartwight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='smartbdisc' class='dis'/></td>
 </tr>
@@ -945,8 +946,8 @@
 <td class='red'> Yes</td>
 <td class='red'> <input type='number'  class='req' id='pdareq' value='0'/></td>
 <td class='block'> </td>
-<td class='red'> <input type='number' id='pdaber' class='ber' value='".$pdaber."'/></td>
-<td class='red'> <input type='number' id='pdawgt'  class='wgt' value='".$pdawight."'/></td>
+<td class='red'> <input type='number' id='pdaber' class='ber' value='".($pdaber ?? '')."'/></td>
+<td class='red'> <input type='number' id='pdawgt'  class='wgt' value='".($pdawight ?? '')."'/></td>
 <td class='ewc' style='color:red !important;'>20:01:35</td>
 <td class='red'> <input type='number' id='pdadisc' class='dis'/></td>
 </tr>
@@ -956,8 +957,8 @@
 <td> Yes</td>
 <td> <input type='number'  class='req' id='skyreq' value='0'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='skyber' class='ber' value='".$skyber."'/></td>
-<td> <input type='number' id='skywgt'  class='wgt' value='".$skywight."'/></td>
+<td> <input type='number' id='skyber' class='ber' value='".($skyber ?? '')."'/></td>
+<td> <input type='number' id='skywgt'  class='wgt' value='".($skywight ?? '')."'/></td>
 <td style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='skydisc' class='dis'/></td>
 </tr>
@@ -967,8 +968,8 @@
 <td> Yes</td>
 <td> <input type='number'  class='req' id='gamereq' value='0'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='gameber' class='ber' value='".$gameber."'/></td>
-<td> <input type='number' id='gamewgt'  class='wgt' value='".$gamewight."' /></td>
+<td> <input type='number' id='gameber' class='ber' value='".($gameber ?? '')."'/></td>
+<td> <input type='number' id='gamewgt'  class='wgt' value='".($gamewight ?? '')."' /></td>
 <td style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='gamedisc' class='dis'/></td>
 </tr>
@@ -989,8 +990,8 @@
 <td> Yes</td>
 <td> <input type='number'  class='req' id='datareq' value='0'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='databer' class='ber' value='".$databer."'/></td>
-<td> <input type='number' id='datawgt'  class='wgt' value='".$datawight."'/></td>
+<td> <input type='number' id='databer' class='ber' value='".($databer ?? '')."'/></td>
+<td> <input type='number' id='datawgt'  class='wgt' value='".($datawight ?? '')."'/></td>
 <td style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='datadisc' class='dis'/></td>
 </tr>
@@ -998,10 +999,10 @@
 <tr>
 <th id='prod'> Loose Hard Drives </th>
 <td> Yes</td>
-<td> <input type='number'  class='req' id='loosereq' value='".$hdd."'/></td>
+<td> <input type='number'  class='req' id='loosereq' value='".($hdd ?? '')."'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='looseber' class='ber' value='".$hhdber."'/></td>
-<td> <input type='number' id='loosewgt'  class='wgt' value='".$hhdwight."'/></td>
+<td> <input type='number' id='looseber' class='ber' value='".($hhdber ?? '')."'/></td>
+<td> <input type='number' id='loosewgt'  class='wgt' value='".($hhdwight ?? '')."'/></td>
 <td style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='loosedisc' class='dis'/></td>
 </tr>
@@ -1011,8 +1012,8 @@
 <td> Yes</td>
 <td> <input type='number'  class='req' id='backreq' value='0'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='backber' class='ber' value='".$devber."'/></td>
-<td> <input type='number' id='backwgt'  class='wgt' value='".$devwight."'/></td>
+<td> <input type='number' id='backber' class='ber' value='".($devber ?? '')."'/></td>
+<td> <input type='number' id='backwgt'  class='wgt' value='".($devwight ?? '')."'/></td>
 <td style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='backdisc' class='dis'/></td>
 </tr>
@@ -1022,8 +1023,8 @@
 <td> Yes</td>
 <td> <input type='number'  class='req' id='extreq' value='0'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='extber' class='ber' value='".$extber."'/></td>
-<td> <input type='number' id='extwgt'  class='wgt' value='".$extwight."'/></td>
+<td> <input type='number' id='extber' class='ber' value='".($extber ?? '')."'/></td>
+<td> <input type='number' id='extwgt'  class='wgt' value='".($extwight ?? '')."'/></td>
 <td style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='extdisc' class='dis'/></td>
 </tr>
@@ -1031,10 +1032,10 @@
 <tr>
 <th id='prod'> Other:</th>
 <td> Yes</td>
-<td> <input type='number'  class='req' id='otherreq' value='".$to."'/></td>
+<td> <input type='number'  class='req' id='otherreq' value='".($to ?? '')."'/></td>
 <td class='block'> </td>
-<td> <input type='number' id='otherber' class='ber' value='".$otherber."'/></td>
-<td> <input type='number' id='otherwgt' class='wgt' value='".$otherwight."'/></td>
+<td> <input type='number' id='otherber' class='ber' value='".($otherber ?? '')."'/></td>
+<td> <input type='number' id='otherwgt' class='wgt' value='".($otherwight ?? '')."'/></td>
 <td style='color:blue !important;'>20:01:36</td>
 <td> <input type='number' id='otherdisc' class='dis'/></td>
 </tr>

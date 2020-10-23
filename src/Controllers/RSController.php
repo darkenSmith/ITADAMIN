@@ -381,7 +381,8 @@ class RSController extends AbstractController
                 'res' => $res ?? null,
                 'name' => $name ?? null,
                 'ordnum' => $ordnum ?? null,
-                'subinfo' => $subinfo ?? null
+                'info' => $info ?? null,
+                'check' => $check ?? null,
             ]
         );
     }

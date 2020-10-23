@@ -6,6 +6,7 @@ use App\Helpers\Config;
 use App\Helpers\Database;
 use App\Helpers\Logger;
 use App\Models\AbstractModel;
+use Psr\Log\NullLogger;
 use SendGrid;
 use SendGrid\Mail\Mail;
 
@@ -26,6 +27,10 @@ class GoodsInMail extends AbstractModel
 
     public function process()
     {
+        Logger::getInstance("goodsInMail.log")->debug(
+            'process - start'
+        );
+
         $content1 = $_POST['array1'];
         $content2 = $_POST['array2'];
 
@@ -37,9 +42,19 @@ class GoodsInMail extends AbstractModel
 
         $ordernum = '';
 
+        Logger::getInstance("goodsInMail.log")->debug(
+            'process - json decoded encoded'
+        );
+
         foreach ($arrfinal2 as $output2) {
+            Logger::getInstance("goodsInMail.log")->debug(
+                'process - foreach',
+                [$output2]
+            );
+
             $ord = array_slice($output2, 0, 1);
             $id = array_slice($output2, 1, 1);
+            $id = !empty($id) ? $id : null;
             $driver = array_slice($output2, 2, 1);
             $driver2 = array_slice($output2, 3, 1);
             $scrap = array_slice($output2, 4, 1);
@@ -57,15 +72,21 @@ class GoodsInMail extends AbstractModel
             $stmt->execute();
             $data = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-            if ($data['CH'] == 0) {
-                $sqlin = "insert into [RECwarehouse_collection]( [RequestID]  ,[ordernum] ,[Driver1] ,[Driver2] ,[verfied]  ,[TotalUnits]  ,[Totalweights] ,[TotalReds] ,[TotalYellow] ,[Comments] ,[Countby], [Bookedin by], [TimeOf_Process] ,[Customer])
+            Logger::getInstance("goodsInMail.log")->debug(
+                'process - foreach data.ch',
+                [$data]
+            );
+
+            try {
+                if ($data['CH'] == 0) {
+                    $sqlin = "insert into [RECwarehouse_collection]( [RequestID]  ,[ordernum] ,[Driver1] ,[Driver2] ,[verfied]  ,[TotalUnits]  ,[Totalweights] ,[TotalReds] ,[TotalYellow] ,[Comments] ,[Countby], [Bookedin by], [TimeOf_Process] ,[Customer])
         values('" . implode(",", $id) . "', '" . implode(",", $ord) . "', '" . implode(",", $driver) . "', '" . implode(",", $driver2) . "', 'NO', '" . implode(",", $totalunits) . "', '" . implode(",", $totalweights) . "', '" . implode(",", $totalred) . "', '" . implode(",", $totalyells) . "', '', '', '" . $_SESSION['user']['lastname'] . "', getdate(), '" . implode(",", $cust) . "' )
         ";
-                $stmtIN = $this->sdb->prepare($sqlin);
-                $stmtIN->execute();
-                $_SESSION['ORDD'] = implode(",", $ord);
-            } else {
-                $sqlin = "
+                    $stmtIN = $this->sdb->prepare($sqlin);
+                    $stmtIN->execute();
+                    $_SESSION['ORDD'] = implode(",", $ord);
+                } else {
+                    $sqlin = "
       update [RECwarehouse_collection] 
       set Driver1 = '" . implode(",", $driver) . "',
           Driver2 = '" . implode(",", $driver2) . "',
@@ -79,9 +100,15 @@ class GoodsInMail extends AbstractModel
           [Bookedin by] ='" . $_SESSION['user']['lastname'] . "'
           where RequestID = '" . implode(",", $id) . "'
       ";
-                $stmtIN = $this->sdb->prepare($sqlin);
-                $stmtIN->execute();
-                $_SESSION['ORDD'] = implode(",", $ord);
+                    $stmtIN = $this->sdb->prepare($sqlin);
+                    $stmtIN->execute();
+                    $_SESSION['ORDD'] = implode(",", $ord);
+                }
+            } catch (\Exception $e) {
+                Logger::getInstance("goodsInMail.log")->error(
+                    'process - foreach insert-update',
+                    [$e->getMessage()]
+                );
             }
 
             $table = "
@@ -129,6 +156,10 @@ class GoodsInMail extends AbstractModel
         }
 
         foreach ($arrfinal as $output) {
+            Logger::getInstance("goodsInMail.log")->debug(
+                'process - foreach 2',
+                [$output]
+            );
             $name = array_slice($output, 0, 1);
             $req = array_slice($output, 1, 1);
             $bl = array_slice($output, 2, 1);
@@ -148,9 +179,22 @@ class GoodsInMail extends AbstractModel
         $table .= "</tr></tbody></table></html>";
 
         $rid = $_POST['rid'] ?? null;
+
+        Logger::getInstance("goodsInMail.log")->debug(
+            'process - sendEmail called',
+            [$rid]
+        );
         $this->sendEmail($table, $rid);
+        Logger::getInstance("goodsInMail.log")->debug(
+            'process - sendEmail passed',
+            [$rid]
+        );
 
         foreach ($arrfinal as $output) {
+            Logger::getInstance("goodsInMail.log")->debug(
+                'process - foreach 3',
+                [$output]
+            );
             $name = array_slice($output, 0, 1);
             $req = array_slice($output, 1, 1);
             $bl = array_slice($output, 2, 1);

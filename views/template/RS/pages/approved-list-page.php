@@ -54,6 +54,9 @@ $table = "
     <th> lastname</th>
     <th> email</th>
     <th> approved </th>
+    <th> Company Name </th>
+    <th> Company Number </th>
+    <th> CMP </th>
     </tr>
     </thead> <tbody>";
 
@@ -64,6 +67,9 @@ foreach ($new as $l) {
     $email = $l->email;
     $approved = $l->approved;
     $idd = $l->idnum;
+    $cmp = $l->cmp;
+    $companyname = $l->company_name;
+    $CompanyNUM = $l->CompanyNUM;
 
     $table .= "
 <tr id='" . $idd . "'>
@@ -73,6 +79,10 @@ foreach ($new as $l) {
     <td>" . $lastname . " </td>
     <td>" . $email . " </td>
     <td>" . $approved . " </td>
+    <td>" . $companyname . " </td>
+    <td>" . $companyname . " </td>
+    <td>" . $cmp . " </td>
+
     <tr>
     ";
 }

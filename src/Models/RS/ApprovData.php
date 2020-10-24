@@ -25,10 +25,10 @@ class ApprovData extends AbstractModel
     {
         $sql = "SELECT Userr.id, Userr.username, Userr.firstname, Userr.lastname, Userr.approved, Userr.CompanyNUM, c.company_name, c.cmp FROM recyc_users AS Userr
 
-        left JOIN recyc_customer_links_to_company AS L ON
+        JOIN recyc_customer_links_to_company AS L ON
         L.user_id = Userr.id
         
-        left JOIN recyc_company_sync AS c ON 
+        JOIN recyc_company_sync AS c ON 
         c.company_id = L.company_id ";
         $result = $this->rdb->query($sql);
 

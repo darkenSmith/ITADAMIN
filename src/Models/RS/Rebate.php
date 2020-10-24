@@ -75,23 +75,19 @@ rebateid as rid
             $update = $this->sdb->prepare($sql);
             $update->execute();
 
-            $sqlcheck = "select ord as c from rebate where ord like '" . $ordernum . "' ";
-            $check = $this->sdb->prepare($sqlcheck);
-            $check->execute();
-            $c = $check->fetch(\PDO::FETCH_ASSOC);
+            $sqlcheck = "select count(*) as c from rebate where ord like '" . $ordernum . "' ";
+            $stmt = $this->sdb->prepare($sqlcheck);
+            $stmt->execute();
+            $c = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-            $boolrebate = $c;
+            $boolrebate = $c['c'];
 
-            if (empty($boolrebate)) {
+            if ($boolrebate == 0) {
                 $sql2 = "
-        select replace(so.SalesOrderNumber, 'ORD-', '') as ordernum, CompanyName, CRMNumber, cl.rebate from Companies as c with(nolock) 
-        join SalesOrders as so with(nolock) on
-        so.CompanyID = c.CompanyID
-        join [sql01].ITADsys.[dbo].request as rt on
-        REPLACE(rt.ord, 'ORD-', '') collate SQL_Latin1_General_CP1_CI_AS =  replace(so.SalesOrderNumber, 'ORD-', '')
-        join [sql01].ITADsys.[dbo].Collections_Log as cl on
-        cl.ordernum = REPLACE(rt.ord, 'ORD-', '')
-        where REPLACE(rt.ord, 'ORD-', '')  = REPLACE('" . $ordernum . "', 'ORD-', '') 
+                select ord, Customer_name, Cmp_number, cl.rebate
+                from request as r
+                join Collections_Log as cl on cast(replace(cl.OrderNum, 'ORD-', '') as varchar(max)) = cast(replace(r.ord, 'ORD-', '') as varchar(max))
+                where cast(replace(cl.OrderNum, 'ORD-', '') as varchar(max)) = '".$ordernum."'
         ";
                 $dataof = $this->sdb->prepare($sql2);
                 $dataof->execute();
@@ -99,7 +95,7 @@ rebateid as rid
                 $greendata = $dataof->fetch(\PDO::FETCH_ASSOC);
 
                 $sqlin = "INSERT INTO rebate(ord, [Month], [DateSent], RaisedBy, [CustomerName], ValueExclVAT, InvValueExclVAT, DiffExclVAT, [CommentsINVNumber], Status, CMP_Num, updateby)
-            values('" . $greendata['ordernum'] . "', substring(DATENAME(mm, GETDATE()), 0, 4), getdate(), '" . $user . "', '" . $greendata['CompanyName'] . "', '" . $greendata['rebate'] . "', 0, '" . $greendata['rebate'] . "', ' ', 'awaiting', '" . $greendata['CRMNumber'] . "', '" . $user . "' );";
+            values('" . $greendata['ord'] . "', substring(DATENAME(mm, GETDATE()), 0, 4), getdate(), '" . $user . "', '" . $greendata['Customer_name'] . "', '" . $greendata['rebate'] . "', 0, '" . $greendata['rebate'] . "', ' ', 'awaiting', '" . $greendata['Cmp_number'] . "', '" . $user . "' );";
 
                 $insreb = $this->sdb->prepare($sqlin);
                 $insreb->execute();

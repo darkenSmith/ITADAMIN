@@ -99,6 +99,32 @@ rebateid as rid
 
                 $insreb = $this->sdb->prepare($sqlin);
                 $insreb->execute();
+
+
+                $boostsql = "select 
+                R.CMP_Num as 'cmp', 
+                R.ORD as 'ordn', 
+                R.ValueExclVAT * (SELECT Value FROM stone360config  WHERE Name = 'Boost_Ratio')as 'BoostValue',
+                GETDATE() as 'BoostedDate',
+                (select request_id from request as rr where replace(Rr.ORD, 'ORD-', '') like c.OrderNum) as 'id',
+                'Awaiting' as 'Status'
+                 from collections_log as c
+                join rebate as r on 
+                r.ORD like c.OrderNum  where c.OrderNum like :ord";
+                $booststmt	= $this->sdb->prepare( $boostsql );
+                $booststmt->execute(array(':ord' => $ordernum));
+    
+                $boostdata = $booststmt->fetch(\PDO::FETCH_OBJ);
+    
+    
+                $boostins = "insert into boosts(CMP_Num, ord, Value, BoostDate, Status, Request_ID)
+                            values(:cmp, :order, :val, getdate(), :status, :req)";
+    
+                        $booststmt	= $this->sdb->prepare( $boostins );
+                        $booststmt->execute(array(':cmp' => $boostdata->cmp, ':order' => $boostdata->ordn, ':val' => $boostdata->BoostValue,
+                      ':status' => $boostdata->Status, ':req' => $boostdata->id));
+    
+    
             } else {
                 return 'all ready in rebate table -' . $o;
             }
@@ -269,30 +295,7 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
             $dataof2 = $this->sdb->prepare($sqp);
             $dataof2->execute();
 
-            $boostsql = "select 
-            R.CMP_Num as 'cmp', 
-            R.ORD as 'ordn', 
-            R.ValueExclVAT * (SELECT Value FROM stone360config  WHERE Name = 'Boost_Ratio')as 'BoostValue',
-            GETDATE() as 'BoostedDate',
-            (select request_id from request as rr where replace(Rr.ORD, 'ORD-', '') like c.OrderNum) as 'id',
-            'Awaiting' as 'Status'
-             from collections_log as c
-            join rebate as r on 
-            r.ORD like c.OrderNum  where c.OrderNum like :ord";
-            $booststmt	= $this->sdb->prepare( $boostsql );
-            $booststmt->execute(array(':ord' => $ordernum));
-
-            $boostdata = $booststmt->fetch(\PDO::FETCH_OBJ);
-
-
-            $boostins = "insert into boosts(CMP_Num, ord, Value, BoostDate, Status, Request_ID)
-                        values(:cmp, :order, :val, getdate(), :status, :req)";
-
-                    $booststmt	= $this->sdb->prepare( $boostins );
-                    $booststmt->execute(array(':cmp' => $boostdata->cmp, ':order' => $boostdata->ordn, ':val' => $boostdata->BoostValue,
-                  ':status' => $boostdata->Status, ':req' => $boostdata->id));
-
-
+         
         }
 
         return "invoice updated";

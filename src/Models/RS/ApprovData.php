@@ -4,7 +4,6 @@ namespace App\Models\RS;
 
 use App\Models\AbstractModel;
 use App\Helpers\Logger;
-use App\Models\Company;
 
 
 /**
@@ -15,13 +14,12 @@ class ApprovData extends AbstractModel
 {
     public $response;
     public $id;
-    public $refreshing;
+
     /**
      * ApprovData constructor.
      */
     public function __construct()
     {
-        $this->refreshing = new Company();
         parent::__construct();
     }
 
@@ -55,18 +53,17 @@ class ApprovData extends AbstractModel
 
     public function updateapp()
     {
-        
         $id = isset($_POST['idnum']) ? $_POST['idnum'] : '';
 
         if (!empty($id)) {
             $sql = "UPDATE recyc_users
           set approved = (case when approved = 'Y' then 'N' ELSE 'Y' END)
           Where id = :id";
+
             try {
                 $result = $this->rdb->prepare($sql);
                 $result->execute(array(':id' => $id));
                 $this->apicurlrequest($id);
-                $this->refreshing->refresh(true);
             } catch (\PDOException $e) {
                 return false;
             }

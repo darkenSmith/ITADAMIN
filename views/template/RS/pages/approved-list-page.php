@@ -80,7 +80,7 @@ foreach ($new as $l) {
     <td>" . $email . " </td>
     <td>" . $approved . " </td>
     <td>" . $companyname . " </td>
-    <td>" . $companyname . " </td>
+    <td>" . $CompanyNUM . " </td>
     <td>" . $cmp . " </td>
 
     <tr>

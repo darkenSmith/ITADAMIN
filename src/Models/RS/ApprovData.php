@@ -56,6 +56,7 @@ class ApprovData extends AbstractModel
             try {
                 $result = $this->rdb->prepare($sql);
                 $result->execute(array(':id' => $id));
+                $this->apicurlrequest($id);
             } catch (\PDOException $e) {
                 return false;
             }
@@ -63,5 +64,34 @@ class ApprovData extends AbstractModel
             return true;
         }
         return false;
+    }
+
+        public function apicurlrequest($userid){
+
+            // create & initialize a curl session
+    $curl = curl_init();
+
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://stoneapi.stonegroup.co.uk/stoneapp/rmApproval/".$userid,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_SSL_VERIFYPEER  => false,
+        CURLOPT_HTTPHEADER => array(),
+    ));
+    $output = curl_exec($curl);
+
+    $fp = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/responseAPI.txt", 'a+');
+    fwrite($fp, $output);
+    fclose($fp);
+
+
+    $this->response = $output;
+    return $this->response;
     }
 }

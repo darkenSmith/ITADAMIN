@@ -1,12 +1,10 @@
 <?php
 
 use App\Helpers\Database;
-use App\Models\RS\BookedAPIupdate;
 
 $sdb = Database::getInstance('sql01');
 $gdb = Database::getInstance('greenoak');
 $rdb = Database::getInstance('recycling');
-$bookapi = new BookedAPIupdate();
 ?>
 <style>
     th {
@@ -2265,8 +2263,6 @@ WHERE
 
         $stmtp = $sdb->prepare($sqlUpdate);
         $stmtp->execute();
-        $bookapi->updatebookdateAPI($_GET["rowid"], $timin);
-        
 
 
         $CHECKIFTHERESQL = "

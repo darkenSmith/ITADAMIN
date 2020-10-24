@@ -49,8 +49,7 @@ class ApprovData extends AbstractModel
 
         if (!empty($id)) {
             $sql = "UPDATE recyc_users
-          set approved = (case when approved = 'Y' then 'N' ELSE 'Y' END),
-          active =  (case when active = 1 then 0 ELSE 1 END)
+          set approved = (case when approved = 'Y' then 'N' ELSE 'Y' END)
           Where id = :id";
 
             try {

@@ -5,6 +5,7 @@ namespace App\Models\Conf;
 use App\Helpers\Database;
 use App\Helpers\Logger;
 use App\Models\AbstractModel;
+use App\Models\RS\CurlStatuschange;
 use Exception;
 
 /**
@@ -27,6 +28,7 @@ class Confirm extends AbstractModel
 
     public function confirmlist()
     {
+        $apicall = new CurlStatuschange();
         $stuff = $_POST['stuff'];
 
         $who = str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
@@ -45,6 +47,7 @@ set booking_status = 'confirmed'
 where RequestID ='" . $value . "'";
 
             $stmtu = $this->sdb->prepare($colupdate);
+            $apicall->updateAPI($value, 'Confirmed');
             try {
                 $stmtu->execute();
             } catch (Exception $e) {

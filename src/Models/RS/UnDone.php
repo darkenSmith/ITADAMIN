@@ -70,7 +70,7 @@ class UnDone extends AbstractModel
                 $stmtu->execute();
         
               // out for now cant connect while vpn
-     // $apicall->updateAPI($value, 'Done');
+            $apicall->updateAPI($value, 'Booked');
             }
         }
         

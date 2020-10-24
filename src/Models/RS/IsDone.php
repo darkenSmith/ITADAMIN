@@ -85,8 +85,7 @@ class IsDone extends AbstractModel
   ";
                 $stmtreq = $this->sdb->prepare($update_req);
                 $stmtreq->execute();
-                // out for now cant connect while vpn
-                // $apicall->updateAPI($value, 'Done');
+                $apicall->updateAPI($value, 'Done');
 
 
                 $newsql = " 

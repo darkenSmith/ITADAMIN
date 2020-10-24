@@ -4,6 +4,7 @@ namespace App\Models\Conf;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
+use App\Models\RS\CurlStatuschange;
 
 /**
  * Class UnBook
@@ -24,6 +25,7 @@ class UnBook extends AbstractModel
 
     public function unbookrequest()
     {
+        $apicall = new CurlStatuschange();
         $stuff = $_POST['stuff'];
         $dell = 0;
         $who = str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
@@ -46,6 +48,7 @@ class UnBook extends AbstractModel
 
             $stmtu = $this->sdb->prepare($colupdate);
             $stmtu->execute();
+            $apicall->updateAPI($value, 'Confirmed');
         }
 
         return true;

@@ -51,6 +51,7 @@ Thumbs.db
 /logs/
 *.DS_Store
 
+info.php
 app.ini
 app.dev.ini
 app.live.ini

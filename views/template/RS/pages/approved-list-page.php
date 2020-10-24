@@ -61,15 +61,15 @@ $table = "
     </thead> <tbody>";
 
 foreach ($new as $l) {
-    $userna = $l->username;
-    $firstname = $l->firstname;
-    $lastname = $l->lastname;
-    $email = $l->email;
-    $approved = $l->approved;
-    $idd = $l->idnum;
-    $cmp = $l->cmp;
-    $companyname = $l->company_name;
-    $CompanyNUM = $l->CompanyNUM;
+    $userna = $l->username ?? '';
+    $firstname = $l->firstname ?? '';
+    $lastname = $l->lastname ?? '';
+    $email = $l->email ?? '';
+    $approved = $l->approved ?? '';
+    $idd = $l->idnum ?? '';
+    $cmp = $l->cmp ?? '';
+    $companyname = $l->company_name ?? '';
+    $CompanyNUM = $l->CompanyNUM ?? '';
 
     $table .= "
 <tr id='" . $idd . "'>

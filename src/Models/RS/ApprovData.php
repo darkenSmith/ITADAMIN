@@ -25,7 +25,7 @@ class ApprovData extends AbstractModel
 
     public function getlist()
     {
-        $sql = "SELECT Userr.id, Userr.username, Userr.firstname, Userr.lastname, Userr.approved, Userr.CompanyNUM, c.company_name, c.cmp FROM recyc_users AS Userr
+        $sql = "SELECT Userr.id as idnum, Userr.username, Userr.firstname, Userr.lastname, Userr.approved, Userr.CompanyNUM, c.company_name, c.cmp FROM recyc_users AS Userr
 
         JOIN recyc_customer_links_to_company AS L ON
         L.user_id = Userr.id

@@ -1,15 +1,10 @@
 <?php
 
+$path = '/var/www/html/itadadmin.stonegroup.co.uk';
+require_once $path . '/cron.php';
+
 use App\Models\Company;
 use App\Models\OrderSync;
-
-define('PROJECT_DIR', __DIR__ . '/');
-define('VIEW_DIR', __DIR__ . '/views/');
-define('TEMPLATE_DIR', VIEW_DIR . 'template/');
-define('LAYOUT_DIR', VIEW_DIR . 'layout/');
-
-require_once('../vendor/autoload.php');
-
 
 if (!empty($argv[1]) && $argv[1] === 'sync') {
 // Get companies

@@ -151,7 +151,8 @@
         });
 
 
-        $('#rebtn').on('click', function () {
+        $('#rebtn').on('click', function (e) {
+            e.preventDefault();
             click2++;
             $('#rebarea').show();
             if (click2 > 1) {
@@ -448,6 +449,7 @@
             </select>
             <br>
             <br>
+        </div>
     </form>
 
     <div id='subsearch'>

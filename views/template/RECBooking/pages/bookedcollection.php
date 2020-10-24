@@ -210,20 +210,6 @@ $cust = "\"Request_id\"";
         location.reload();
       });
 
-      $('#cancelDone').click(function() {
-                  var msg = "conf";
-        $.ajax({
-          type: "POST",
-          url: "/RS/delrequestmulti/",
-          data: {stuff : stuff,
-           msg : msg},
-          success: function(data) {
-            alert("The requests will be deleted");
-            
-          }
-        });
-        location.reload();
-      });
 
         $('#confirmbtn').click(function () {
             // alert('testtest');
@@ -422,7 +408,7 @@ $cust = "\"Request_id\"";
                         Requests
                     </option>
                     <option value="Unbooked">
-                        Unbooked
+                        Cancelled
                     </option>
                     <option value="On-Hold">On-Hold</option>
                     <option value="deleted">show deleted</option>
@@ -455,7 +441,6 @@ $cust = "\"Request_id\"";
     <div class="col">
         <button id='buttonDone' class='btn btn-primary'>Collected</button>
         <button id='delDone' class='btn btn-danger'>Delete</button>
-        <button id='cancelDone'  class='btn btn-danger'>Cancelled</button>
         <button id='buttonEmail' class='btn btn-info'>Print</button>
         <button id='confirmbtn' class='btn btn-warning'>Confirm</button>
         <button id='chargebtn' class='btn btn-secondary'>Chargable?</button>

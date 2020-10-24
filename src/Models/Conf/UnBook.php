@@ -37,6 +37,7 @@ class UnBook extends AbstractModel
             set been_collected = " . $dell . ",
             laststatus = 'UnBooked',
             deleted = 0,
+            confirmed = 0,
             collection_date = NULL,
             modifydate = getdate(),
             updatedBy = '" . $who . "'
@@ -48,7 +49,7 @@ class UnBook extends AbstractModel
 
             $stmtu = $this->sdb->prepare($colupdate);
             $stmtu->execute();
-            $apicall->updateAPI($value, 'Confirmed');
+            $apicall->updateAPI($value, 'Unbook');
         }
 
         return true;

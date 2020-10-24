@@ -72,11 +72,11 @@ rebateid as rid
             $sql = "UPDATE Collections_Log
                 SET rebate = '" . $inv . "'
                 where replace(OrderNum, 'ORD-', '') = '" . $ordernum . "' ";
-            $update = $this->rdb->prepare($sql);
+            $update = $this->sdb->prepare($sql);
             $update->execute();
 
             $sqlcheck = "select ord as c from rebate where ord like '" . $ordernum . "' ";
-            $check = $this->rdb->prepare($sqlcheck);
+            $check = $this->sdb->prepare($sqlcheck);
             $check->execute();
             $c = $check->fetch(\PDO::FETCH_ASSOC);
 
@@ -84,7 +84,7 @@ rebateid as rid
 
             if (empty($boolrebate)) {
                 $sql2 = "
-        select replace(so.SalesOrderNumber, 'ORD-', '') as ordernum, CompanyName, CRMNumber, cl.rebate from Company as c with(nolock) 
+        select replace(so.SalesOrderNumber, 'ORD-', '') as ordernum, CompanyName, CRMNumber, cl.rebate from Companies as c with(nolock) 
         join SalesOrders as so with(nolock) on
         so.CompanyID = c.CompanyID
         join [sql01].ITADsys.[dbo].request as rt on
@@ -93,7 +93,7 @@ rebateid as rid
         cl.ordernum = REPLACE(rt.ord, 'ORD-', '')
         where REPLACE(rt.ord, 'ORD-', '')  = REPLACE('" . $ordernum . "', 'ORD-', '') 
         ";
-                $dataof = $this->gdb->prepare($sql2);
+                $dataof = $this->sdb->prepare($sql2);
                 $dataof->execute();
 
                 $greendata = $dataof->fetch(\PDO::FETCH_ASSOC);
@@ -101,7 +101,7 @@ rebateid as rid
                 $sqlin = "INSERT INTO rebate(ord, [Month], [DateSent], RaisedBy, [CustomerName], ValueExclVAT, InvValueExclVAT, DiffExclVAT, [CommentsINVNumber], Status, CMP_Num, updateby)
             values('" . $greendata['ordernum'] . "', substring(DATENAME(mm, GETDATE()), 0, 4), getdate(), '" . $user . "', '" . $greendata['CompanyName'] . "', '" . $greendata['rebate'] . "', 0, '" . $greendata['rebate'] . "', ' ', 'awaiting', '" . $greendata['CRMNumber'] . "', '" . $user . "' );";
 
-                $insreb = $this->rdb->prepare($sqlin);
+                $insreb = $this->sdb->prepare($sqlin);
                 $insreb->execute();
             } else {
                 return 'all ready in rebate table -' . $o;
@@ -260,7 +260,7 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
          DateInvReceived = GETDATE(),
          [CommentsINVNumber] = '" . $inv . "'
          WHERE ORD = replace('" . $ordernum . "','ORD-', '') ";
-            $dataof = $this->rdb->prepare($sqlup);
+            $dataof = $this->sdb->prepare($sqlup);
             $dataof->execute();
 
             $sqp = "update Collections_Log
@@ -270,7 +270,7 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
 		cl.OrderNum = r.ord
         where  replace(ORD, '-ORD', '') = replace('" . $ordernum . "','ORD-', '')
                   ";
-            $dataof2 = $this->rdb->prepare($sqp);
+            $dataof2 = $this->sdb->prepare($sqp);
             $dataof2->execute();
 
             $boostsql = "select 
@@ -283,7 +283,7 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
              from collections_log as c
             join rebate as r on 
             r.ORD like c.OrderNum  where c.OrderNum like :ord";
-            $booststmt	= $this->rdb->prepare( $boostsql );
+            $booststmt	= $this->sdb->prepare( $boostsql );
             $booststmt->execute(array(':ord' => $ordernum));
 
             $boostdata = $booststmt->fetch(\PDO::FETCH_OBJ);
@@ -292,7 +292,7 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
             $boostins = "insert into boosts(CMP_Num, ord, Value, BoostDate, Status, Request_ID)
                         values(:cmp, :order, :val, getdate(), :status, :req)";
 
-                    $booststmt	= $this->rdb->prepare( $boostins );
+                    $booststmt	= $this->sdb->prepare( $boostins );
                     $booststmt->execute(array(':cmp' => $boostdata->cmp, ':order' => $boostdata->ordn, ':val' => $boostdata->BoostValue,
                   ':status' => $boostdata->Status, ':req' => $boostdata->id));
 

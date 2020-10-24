@@ -32,18 +32,21 @@ class DeleteReq extends AbstractModel
         $apicall = new CurlStatuschange();
 
         $stuff = $_POST['stuff'];
+        $msg = $_POST['msg'];
         $dell = 1;
         
         foreach ($stuff as $value) {
             $user =  $_SESSION['user']['firstname'][0].$_SESSION['user']['lastname'][0];
         
             $who =  str_replace('@stonegroup.co.uk', '', $user);
+        if($msg == 'delete'){
+
         
             $colupdate ="
         
             update request  
             set deleted =".$dell.",
-            laststatus = 'cancelled',
+            laststatus = 'Deleted',
             deletedBy = '".$who."'
             where Request_ID =".$value."
           
@@ -53,7 +56,27 @@ class DeleteReq extends AbstractModel
             $stmtu = $this->sdb->prepare($colupdate);
             $stmtu->execute();
 
-            $apicall->updateAPI($value, 'cancelled');
+            $apicall->updateAPI($value, 'deleted');
+             }else{
+                
+                
+                $colupdate ="
+        
+                update request  
+                set laststatus = 'Cancelled',
+                deletedBy = '".$who."'
+                where Request_ID =".$value."
+              
+                update Booked_Collections 
+                set is_canceled = 1
+                where  RequestID like '".$value."'";
+                $stmtu = $this->sdb->prepare($colupdate);
+                $stmtu->execute();
+    
+                $apicall->updateAPI($value, 'deleted');
+                
+
+             }
         }
     }
 }

@@ -29,6 +29,7 @@ class IsDone extends AbstractModel
     {
 
         $stuff = $_POST['stuff'];
+            $apicall = new CurlStatuschange();
 
         foreach ($stuff as $value) {
             if (!empty($value)) {
@@ -71,7 +72,6 @@ class IsDone extends AbstractModel
 
                 $pos = $ro['postcode'];
 
-                $apicall = new CurlStatuschange();
 
                 $who = str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
 

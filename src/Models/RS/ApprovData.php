@@ -3,6 +3,8 @@
 namespace App\Models\RS;
 
 use App\Models\AbstractModel;
+use App\Helpers\Logger;
+
 
 /**
  * Class ApprovData
@@ -91,9 +93,10 @@ class ApprovData extends AbstractModel
     ));
     $output = curl_exec($curl);
 
-    $fp = fopen($_SERVER["DOCUMENT_ROOT"]."/RS_Files/responseAPI.txt", 'a+');
-    fwrite($fp, $output);
-    fclose($fp);
+    Logger::getInstance("AppovedApiLOG.log")->warning(
+        "getareas",
+        [$output]
+    );
 
 
     $this->response = $output;

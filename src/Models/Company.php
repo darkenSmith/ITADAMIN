@@ -186,12 +186,13 @@ class Company extends AbstractModel
 
     public function refresh($return = true)
     {
+        $count = 0;
         try {
-            $sql = "SELECT convert(varchar(255),[CompanyID]) as 'company_id', replace(CompanyName,'''', '') as 'compname', CompanyDescription, CRMNumber as 'ccmp', InvoiceAddressPostCode as 'postcode' FROM [dbo].[Company]";
+            $sql = "SELECT convert(varchar(255),[CompanyID]) as 'company_id', replace(CompanyName,\"''\", '') as 'compname', CompanyDescription, CRMNumber as 'ccmp', InvoiceAddressPostCode as 'postcode' FROM [dbo].[Company]";
             $result = $this->gdb->prepare($sql);
             $result->execute();
             $data = $result->fetchAll(\PDO::FETCH_OBJ);
-            $count = 0;
+
             Logger::getInstance("Company-refresh.log")->debug(
                 'refresh-first',
                 [$data]

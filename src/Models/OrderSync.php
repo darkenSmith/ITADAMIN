@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Database;
+use App\Helpers\Logger;
 
 /**
  * Class OrderSync
@@ -13,7 +14,7 @@ class OrderSync extends AbstractModel
 
     public $orders;
     public $companies;
-    public $newOrders = false;
+    public $newOrders = [];
 
     /**
      * OrderSync constructor.
@@ -26,6 +27,10 @@ class OrderSync extends AbstractModel
 
     public function start()
     {
+        Logger::getInstance("OrderSync.log")->info(
+            'start',
+            []
+        );
         $date = new \DateTime();
         $date->modify('-5 year');
         $from = $date->format('Y-m-d H:i:s');
@@ -46,27 +51,53 @@ class OrderSync extends AbstractModel
 				AND OrderPlacedDate > :from
 				)
 		";
-        $result = $this->gdb->prepare($sql);
-        $result->execute(array(':from' => $from));
-        $this->orders = $result->fetchAll(\PDO::FETCH_OBJ);
+
+        try {
+            $result = $this->gdb->prepare($sql);
+            $result->execute(array(':from' => $from));
+            $this->orders = $result->fetchAll(\PDO::FETCH_OBJ);
+            Logger::getInstance("OrderSync.log")->debug(
+                'start-orders',
+                [$this->orders]
+            );
+        } catch (\Exception $e) {
+            Logger::getInstance("OrderSync.log")->error(
+                'start-error',
+                [$e->getLine(), $e->getMessage()]
+            );
+        }
     }
 
     public function process()
     {
-        $this->newOrders = array();
+        Logger::getInstance("OrderSync.log")->info(
+            'process',
+            []
+        );
         foreach ($this->orders as $order) {
             // first check order information
             $sql = 'SELECT * FROM recyc_order_information WHERE sales_order_number = :order';
-            $result = $this->rdb->prepare($sql);
-            $result->execute(array(':order' => $order->sales_order_number));
-            $exists = $result->fetch(\PDO::FETCH_OBJ);
+            try {
+                $result = $this->rdb->prepare($sql);
+                $result->execute(array(':order' => $order->sales_order_number));
+                $exists = $result->fetch(\PDO::FETCH_OBJ);
 
-            if (!$exists) {
-                $this->newOrders[$order->sales_order_number] = $order;
+                if (!$exists) {
+                    $this->newOrders[$order->sales_order_number] = $order;
+                }
+            } catch (\Exception $e) {
+                Logger::getInstance("OrderSync.log")->error(
+                    'process-error-foreach',
+                    [$e->getLine(), $e->getMessage()]
+                );
             }
         }
 
-        if (count($this->newOrders) > 0) {
+        if (!empty($this->newOrders)) {
+            Logger::getInstance("OrderSync.log")->debug(
+                'this->newOrders count',
+                [count($this->newOrders)]
+            );
             // Display confirmation
             echo '
 			<div class="alert alert-success fade-in" id="reset-container" >
@@ -99,14 +130,28 @@ class OrderSync extends AbstractModel
 					DELPROD.SalesOrderID = :sales
 				";
 
-                $result = $this->gdb->prepare($sql);
-                $result->execute(array(':sales' => $newOrder->sales_order_id));
-                $newOrder->items = $result->fetchAll(\PDO::FETCH_OBJ);
+                try {
+                    $result = $this->gdb->prepare($sql);
+                    $result->execute(array(':sales' => $newOrder->sales_order_id));
+                    $newOrder->items = $result->fetchAll(\PDO::FETCH_OBJ);
+                } catch (\Exception $e) {
+                    Logger::getInstance("OrderSync.log")->error(
+                        'process-error',
+                        [$e->getLine(), $e->getMessage()]
+                    );
+                }
 
                 $sql = "SELECT * from recyc_company_sync WHERE greenoak_id = :greenoak";
-                $result = $this->rdb->prepare($sql);
-                $result->execute(array(':greenoak' => $newOrder->company_id));
-                $newOrder->company = $result->fetch(\PDO::FETCH_OBJ);
+                try {
+                    $result = $this->rdb->prepare($sql);
+                    $result->execute(array(':greenoak' => $newOrder->company_id));
+                    $newOrder->company = $result->fetch(\PDO::FETCH_OBJ);
+                } catch (\Exception $e) {
+                    Logger::getInstance("OrderSync.log")->error(
+                        'process-error',
+                        [$e->getLine(), $e->getMessage()]
+                    );
+                }
 
                 $sql = "(
 				SELECT
@@ -185,9 +230,16 @@ class OrderSync extends AbstractModel
 				)
 				";
 
-                $result = $this->gdb->prepare($sql);
-                $result->execute(array(':salesorderid' => $newOrder->sales_order_id));
-                $newOrder->data = $result->fetch(\PDO::FETCH_OBJ);
+                try {
+                    $result = $this->gdb->prepare($sql);
+                    $result->execute(array(':salesorderid' => $newOrder->sales_order_id));
+                    $newOrder->data = $result->fetch(\PDO::FETCH_OBJ);
+                } catch (\Exception $e) {
+                    Logger::getInstance("OrderSync.log")->error(
+                        'process-error',
+                        [$e->getLine(), $e->getMessage()]
+                    );
+                }
 
                 try {
                     $this->rdb->beginTransaction();
@@ -253,10 +305,18 @@ class OrderSync extends AbstractModel
                     // echo 'added '.$newOrder->sales_order_id.'<br>';
                 } catch (\PDOException $ex) {
                     $this->rdb->rollBack();
+                    Logger::getInstance("OrderSync.log")->error(
+                        'process-error-rollBack',
+                        [$ex->getLine(), $e->getMessage()]
+                    );
                     echo $ex->getMessage();
                 }
             }
         } else {
+            Logger::getInstance("OrderSync.log")->info(
+                'process-end',
+                ["There are no new orders to add."]
+            );
             echo "There are no new orders to add.";
         }
     }

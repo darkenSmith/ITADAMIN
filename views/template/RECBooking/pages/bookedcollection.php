@@ -455,7 +455,7 @@ $cust = "\"Request_id\"";
     </div>
 </div>
 
-<h2><?php echo count($bookList); ?>:Totals<?php echo $filter_txt; ?></h2>
+<h2><?php echo count($bookList); ?>: Totals <?php echo $filter_txt; ?></h2>
 <table id='tbldata' width='100%' class='sortable table table-striped'>
     <thead>
     <tr>

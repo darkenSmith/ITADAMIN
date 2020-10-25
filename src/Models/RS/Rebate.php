@@ -102,6 +102,7 @@ rebateid as rid
 
 
                 $boostsql = "select 
+                rebateid as 'rebateid', 
                 R.CMP_Num as 'cmp', 
                 R.ORD as 'ordn', 
                 R.ValueExclVAT * (SELECT Value FROM stone360config  WHERE Name = 'Boost_Ratio')as 'BoostValue',
@@ -117,11 +118,11 @@ rebateid as rid
                 $boostdata = $booststmt->fetch(\PDO::FETCH_OBJ);
     
     
-                $boostins = "insert into boosts(CMP_Num, ord, Value, BoostDate, Status, Request_ID)
-                            values(:cmp, :order, :val, getdate(), :status, :req)";
+                $boostins = "insert into boosts(rebate_id, CMP_Num, ord, Value, BoostDate, Status, Request_ID)
+                            values(:rebid, :cmp, :order, :val, getdate(), :status, :req)";
     
                         $booststmt	= $this->sdb->prepare( $boostins );
-                        $booststmt->execute(array(':cmp' => $boostdata->cmp, ':order' => $boostdata->ordn, ':val' => $boostdata->BoostValue,
+                        $booststmt->execute(array(':rebid' => $boostdata->rebateid, ':cmp' => $boostdata->cmp, ':order' => $boostdata->ordn, ':val' => $boostdata->BoostValue,
                       ':status' => $boostdata->Status, ':req' => $boostdata->id));
     
     

@@ -2,100 +2,133 @@
 
 namespace App\Models\RS;
 
+use App\Helpers\Config;
 use App\Helpers\Database;
 use App\Helpers\Logger;
 use App\Models\AbstractModel;
 use Office365\Runtime\Auth\AuthenticationContext;
 use Office365\SharePoint\ClientContext;
+use Office365\SharePoint\FileCreationInformation;
 use ZipArchive;
 
 /**
- * Class ApprovData
+ * Class Pdfmaker
  * @package App\Models\RS
  */
 class Pdfmaker extends AbstractModel
 {
     public $response;
     public $id;
+    private $sharePointConfig;
 
     /**
-     * ApprovData constructor.
+     * Pdfmaker constructor.
      */
     public function __construct()
     {
         $this->sdb = Database::getInstance('sql01');
         $this->gdb = Database::getInstance('greenoak');
+        $this->sharePointConfig = Config::getInstance()->get('sharepoint');
+
         parent::__construct();
     }
 
+    /**
+     * user = 'itad.365@stonegroup.co.uk'
+    pass = '1t@D458!'
+    url = 'https://stonegroupltd.sharepoint.com'
+    remote.path = '/sites/Recycling'
+    remote.title = 'Documents'
+    remote.folder = 'Shared Documents/Request - COD'
+    remote.file = '/sites/Recycling/Shared Documents/templatetest.docx'
+    local.path = 'assets/files'
+    local.template = 'copy.docx'
+     */
+
     public function printdoc()
     {
-        $pass = '1t@D458!';
-        $Usershare = 'itad.365@stonegroup.co.uk';
-
         $_SESSION['err'] = '';
         $id = $_POST['stuff'];
 
-        $UserName = $Usershare;
-        $Password = $pass;
-        $Url = 'https://stonegroupltd.sharepoint.com';
-        $Url2 = 'https://stonegroupltd.sharepoint.com/sites/Recycling';
-
-        $localPath = "./files/copy.docx";
-        $targetLibraryTitle = "Documents";
-        $targetFolderUrl = "Shared Documents/Request - COD";
-        $fileUrl = "/sites/Recycling/Shared Documents/templatetest.docx";
-        $listTitle = "";
-        $delete = 0;
-
         try {
-            $authCtx = new AuthenticationContext($Url);
-            $authCtx->acquireTokenForUser($UserName, $Password); //authenticate
-            $ctx = new ClientContext($Url2, $authCtx); //initialize REST client
-            $web = $ctx->getWeb();
-            $list = $web->getLists()->getByTitle($targetLibraryTitle); //init List resource
-            $items = $list->getItems();  //prepare a query to retrieve from the
-            $ctx->load($items);  //save a query to retrieve list items from the server
-            $ctx->executeQuery(); //submit query to SharePoint Online REST service
+            $authCtx = new AuthenticationContext($this->sharePointConfig['url']);
 
-        } catch (\Exception $e) {
-            Logger::getInstance("pdfMaker.log")->debug(
-                'printdoc',
-                [$e->getMessage()]
+            $authCtx->acquireTokenForUser(
+                $this->sharePointConfig['user'],
+                $this->sharePointConfig['pass']
             );
+
+            $ctx = new ClientContext(
+                $this->sharePointConfig['url'] . $this->sharePointConfig['remote']['path'],
+                $authCtx
+            );
+
+            $web = $ctx->getWeb();
+            $list = $web->getLists()->getByTitle($this->sharePointConfig['remote']['title']);
+            $items = $list->getItems();
+            $ctx->load($items);
+            $ctx->executeQuery();
+            Logger::getInstance("pdfMaker.log")->info(
+                'printdoc',
+                ['line' => __LINE__]
+            );
+        } catch (\Exception $e) {
+            Logger::getInstance("pdfMaker.log")->error(
+                'printdoc-try-catch-error',
+                [$e->getLine(), $e->getMessage()]
+            );
+            exit('Can not create connection to Sharepoint!');
         }
 
-        $template_file_name = PROJECT_DIR  . 'assets/files/copy.docx';
-        $folder = "files";
+        $template_file_name = sprintf(
+            '%s%s/%s',
+            PROJECT_DIR,
+            $this->sharePointConfig['local']['path'],
+            $this->sharePointConfig['local']['template']
+        );
+
+        $folder = PROJECT_DIR . $this->sharePointConfig['local']['path'];
 
         try {
-            if (!file_exists($folder)) {
-                if (!mkdir($folder) && !is_dir($folder)) {
-                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $folder));
-                }
+            if (!file_exists($folder) && !mkdir($folder) && !is_dir($folder)) {
+                Logger::getInstance("pdfMaker.log")->warning(
+                    'printdoc',
+                    ['line' => __LINE__, 'throw' => 'Directory "%s" was not created '. $folder]
+                );
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $folder));
             }
 
-            // add calss Zip Archive
             $zip_val = new ZipArchive;
-
+            Logger::getInstance("pdfMaker.log")->debug(
+                'printdoc',
+                ['line' => __LINE__, 'foreach-start' => count($id)]
+            );
             foreach ($id as $val) {
-
-                $ord_sql = "
-                          select replace(SalesOrderNumber, 'ORD-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders  where CustomerPONumber like '%" . $val . "'";
+                $ord_sql = "select replace(SalesOrderNumber, 'ORD-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders  where CustomerPONumber like '%" . $val . "'";
                 $ord_stmt = $this->gdb->prepare($ord_sql);
                 $ord_stmt->execute();
                 $orddata = $ord_stmt->fetch(\PDO::FETCH_ASSOC);
 
                 Logger::getInstance("pdfMaker.log")->debug(
                     'printdoc',
-                    [$orddata]
+                    ['line' => __LINE__, 'orddata' => $orddata]
                 );
 
                 $wtnquery = "SELECT d.WasteTransferNumber as WTN FROM [greenoak].[we3recycler].[dbo].Delivery AS d  JOIN [greenoak].[we3recycler].[dbo].SalesOrders AS s ON d.SalesOrderID = s.SalesOrderID WHERE CustomerPONumber LIKE ".$val;
                 $stmtwtn = $this->gdb->prepare($wtnquery);
                 $wtndata = $stmtwtn->fetch(\PDO::FETCH_ASSOC);
 
+                Logger::getInstance("pdfMaker.log")->debug(
+                    'printdoc',
+                    ['line' => __LINE__, 'wtndata' => $wtndata]
+                );
+
                 $ord = 'ORD-' . $orddata['ord'];
+
+                Logger::getInstance("pdfMaker.log")->debug(
+                    'printdoc',
+                    ['line' => __LINE__, 'ord' => $ord]
+                );
 
                 $sql = "
                 SET Language British;
@@ -104,6 +137,11 @@ class Pdfmaker extends AbstractModel
                 $stmt->execute();
 
                 $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+                Logger::getInstance("pdfMaker.log")->debug(
+                    'printdoc',
+                    ['line' => __LINE__, 'data' => $data]
+                );
 
                 $sqlw = "
           select
@@ -122,11 +160,30 @@ class Pdfmaker extends AbstractModel
 
                 $dataw = $stmtw->fetch(\PDO::FETCH_ASSOC);
 
+                Logger::getInstance("pdfMaker.log")->debug(
+                    'printdoc',
+                    ['line' => __LINE__, 'dataw' => $dataw]
+                );
+
                 $fileName = $data['Customer_name'] . "-RC-000" . $val . ".docx";
-
                 $full_path = $folder . '/' . $fileName;
-                copy($template_file_name, $full_path);
 
+                Logger::getInstance("pdfMaker.log")->info(
+                    'printdoc',
+                    ['line' => __LINE__, 'fileName' => $fileName, 'fullpath' => $full_path]
+                );
+
+                if (!copy($template_file_name, $full_path)) {
+                    Logger::getInstance("pdfMaker.log")->error(
+                        'printdoc',
+                        ['line' => __LINE__, 'failed_to_copy' => [$template_file_name, $full_path]]
+                    );
+                } else {
+                    Logger::getInstance("pdfMaker.log")->info(
+                        'printdoc',
+                        ['line' => __LINE__, 'copied' => [$template_file_name, $full_path]]
+                    );
+                }
 
                 //Docx file is nothing but a zip file. Open this Zip File
                 if ($zip_val->open($full_path) == true) {
@@ -137,81 +194,151 @@ class Pdfmaker extends AbstractModel
                     $message = $zip_val->getFromName($key_file_name);
 
                     Logger::getInstance("pdfMaker.log")->debug(
-                        'worddocdeit',
-                        [$message]
+                        'zip_val->open',
+                        [
+                            'key_file_name' => $key_file_name,
+                            'message' => $message,
+                        ]
                     );
-                    //$timestamp = date('d-M-Y H:i:s');
 
                     // this data Replace the placeholders with actual values
-                    $message = str_replace("{ordernum}", $ord, $message);
-                    $message = str_replace("{Requestid}", $data['Request_id'], $message);
-                    $message = str_replace("{WTN}", $wtndata['WTN'], $message);
-                    $message = str_replace("{Organisation}", $data['Customer_name'], $message);
-                    $message = str_replace("{ProposedCollectionDate}", $data['collection_date'], $message);
-                    $message = str_replace("{Address1}", $data['add1'], $message);
-                    $message = str_replace("{Address2}", $data['add2'], $message);
-                    $message = str_replace("{Address3}", $data['add3'], $message);
-                    $message = str_replace("{Town}", $data['town'], $message);
-                    $message = str_replace("{County}", $data['county'], $message);
-                    $message = str_replace("{Postcode}", $data['PostCode'], $message);
-                    $message = str_replace("{SiteContact}", $data['customer_contact'], $message);
-                    $message = str_replace("{RequestedBy}", $data['contact_name'], $message);
-                    $message = str_replace("{TelePhone}", $data['customer_phone'], $message);
-                    $message = str_replace("{Weight}", $dataw['totalweight'], $message);
-                    $message = str_replace("{sitecontactphone}", $data['contact_tel'], $message);
-                    $message = str_replace("{EmailAddress}", $data['customer_email'], $message);
-                    $message = str_replace("{CollectionInstruction}", $data['req_col_instrct'], $message);
-                    $message = str_replace("{AccessTime}", $data['Early_Access'], $message);
-                    $message = str_replace("{avoid}", $data['Avoid'], $message);
-                    $message = str_replace("{helponsite}", $data['help_onsite'], $message);
-                    $message = str_replace("{Parking}", $data['parking_notes'], $message);
-                    $message = str_replace("{PC Working}", $data['PC_w'], $message);
-                    $message = str_replace("{pcwipe}", $data['pc_wipe'], $message);
-                    $message = str_replace("{aiopcw}", $data['Allinone_PC_w'], $message);
-                    $message = str_replace("{aiopcwipe}", $data['Allinone_PC_wipe'], $message);
-                    $message = str_replace("{lapw}", $data['Laptop_w'], $message);
-                    $message = str_replace("{lapwipe}", $data['Laptop_wipe'], $message);
-                    $message = str_replace("{mps_w}", $data['Mobile_Phone(smart)_w'], $message);
-                    $message = str_replace("{aphne_w}", $data['Apple_Phone_w'], $message);
-                    $message = str_replace("{apptab_w}", $data['AppleTab_Phone_w'], $message);
-                    $message = str_replace("{tab_w}", $data['Tab_Phone_w'], $message);
-                    $message = str_replace("{serw}", $data['Server_w'], $message);
-                    $message = str_replace("{swi_w}", $data['Switches_w'], $message);
-                    $message = str_replace("{boardw}", $data['Harddrive_w'], $message);
-                    $message = str_replace("{spw}", $data['Standalone_Printer_w'], $message);
-                    $message = str_replace("{twoman}", $data['twoman'], $message);
-                    $message = str_replace("{steps}", $data['steps'], $message);
-                    $message = str_replace("{lift}", $data['lift'], $message);
-                    $message = str_replace("{ground}", $data['ground'], $message);
-                    $message = str_replace("{tftw}", $data['TFT_w'], $message);
-                    $message = str_replace("{tvw}", $data['TV_w'], $message);
-                    $message = str_replace("{smartboardw}", $data['SmartBoard_w'], $message);
-                    $message = str_replace("{dpw}", $data['DesktopPrinter_w'], $message);
-                    $message = str_replace("{prow}", $data['Projector_w'], $message);
-                    $message = str_replace("{crtw}", $data['CRT_w'], $message);
-                    $message = str_replace("{other1w}", $data['Other1_w'], $message);
-                    $message = str_replace("{other2w}", $data['Other2_w'], $message);
-                    $message = str_replace("{other3w}", $data['Other3_w'], $message);
-                    $message = str_replace("{other1}", $data['other1name'], $message);
-                    $message = str_replace("{other2}", $data['other2name'], $message);
-                    $message = str_replace("{other3}", $data['other3name'], $message);
-                    $message = str_replace("{Position}", $data['customer_contact_positon'], $message);
-                    $message = str_replace("{totalUnits}", $data['totaldataunit'], $message);
+                    $message = str_replace(
+                        [
+                            "{ordernum}",
+                            "{Requestid}",
+                            "{WTN}",
+                            "{Organisation}",
+                            "{ProposedCollectionDate}",
+                            "{Address1}",
+                            "{Address2}",
+                            "{Address3}",
+                            "{Town}",
+                            "{County}",
+                            "{Postcode}",
+                            "{SiteContact}",
+                            "{RequestedBy}",
+                            "{TelePhone}",
+                            "{Weight}",
+                            "{sitecontactphone}",
+                            "{EmailAddress}",
+                            "{CollectionInstruction}",
+                            "{AccessTime}",
+                            "{avoid}",
+                            "{helponsite}",
+                            "{Parking}",
+                            "{PC Working}",
+                            "{pcwipe}",
+                            "{aiopcw}",
+                            "{aiopcwipe}",
+                            "{lapw}",
+                            "{lapwipe}",
+                            "{mps_w}",
+                            "{aphne_w}",
+                            "{apptab_w}",
+                            "{tab_w}",
+                            "{serw}",
+                            "{swi_w}",
+                            "{boardw}",
+                            "{spw}",
+                            "{twoman}",
+                            "{steps}",
+                            "{lift}",
+                            "{ground}",
+                            "{tftw}",
+                            "{tvw}",
+                            "{smartboardw}",
+                            "{dpw}",
+                            "{prow}",
+                            "{crtw}",
+                            "{other1w}",
+                            "{other2w}",
+                            "{other3w}",
+                            "{other1}",
+                            "{other2}",
+                            "{other3}",
+                            "{Position}",
+                            "{totalUnits}"
+                        ],
+                        [
+                            $ord,
+                            $data['Request_id'],
+                            $wtndata['WTN'],
+                            $data['Customer_name'],
+                            $data['collection_date'],
+                            $data['add1'],
+                            $data['add2'],
+                            $data['add3'],
+                            $data['town'],
+                            $data['county'],
+                            $data['PostCode'],
+                            $data['customer_contact'],
+                            $data['contact_name'],
+                            $data['customer_phone'],
+                            $dataw['totalweight'],
+                            $data['contact_tel'],
+                            $data['customer_email'],
+                            $data['req_col_instrct'],
+                            $data['Early_Access'],
+                            $data['Avoid'],
+                            $data['help_onsite'],
+                            $data['parking_notes'],
+                            $data['PC_w'],
+                            $data['pc_wipe'],
+                            $data['Allinone_PC_w'],
+                            $data['Allinone_PC_wipe'],
+                            $data['Laptop_w'],
+                            $data['Laptop_wipe'],
+                            $data['Mobile_Phone(smart)_w'],
+                            $data['Apple_Phone_w'],
+                            $data['AppleTab_Phone_w'],
+                            $data['Tab_Phone_w'],
+                            $data['Server_w'],
+                            $data['Switches_w'],
+                            $data['Harddrive_w'],
+                            $data['Standalone_Printer_w'],
+                            $data['twoman'],
+                            $data['steps'],
+                            $data['lift'],
+                            $data['ground'],
+                            $data['TFT_w'],
+                            $data['TV_w'],
+                            $data['SmartBoard_w'],
+                            $data['DesktopPrinter_w'],
+                            $data['Projector_w'],
+                            $data['CRT_w'],
+                            $data['Other1_w'],
+                            $data['Other2_w'],
+                            $data['Other3_w'],
+                            $data['other1name'],
+                            $data['other2name'],
+                            $data['other3name'],
+                            $data['customer_contact_positon'],
+                            $data['totaldataunit']
+                        ],
+                        $message
+                    );
 
+                    Logger::getInstance("pdfMaker.log")->debug(
+                        'str-replace-message',
+                        [
+                            'key_file_name' => $key_file_name,
+                            'message' => $message,
+                        ]
+                    );
 
                     //Replace the content with the new content created above.
                     $zip_val->addFromString($key_file_name, $message);
                     $zip_val->close();
-                    Logger::getInstance("pdfMaker.log")->debug(
-                        'calling uploadFileIntoFolder',
-                        [$ctx, $full_path, $targetFolderUrl]
-                    );
 
-                    $this->uploadFileIntoFolder($ctx, $full_path, $targetFolderUrl);
+                    $this->uploadFileIntoFolder($ctx, $full_path, $this->sharePointConfig['remote']['folder']);
                 }
-
                 unlink($full_path);
             }
+
+            Logger::getInstance("pdfMaker.log")->debug(
+                'printdoc',
+                ['line' => __LINE__, 'foreach-end']
+            );
         } catch (\Exception $exc) {
             $error_message = "Error creating the Word Document";
             Logger::getInstance("pdfMaker.log")->error(
@@ -227,38 +354,19 @@ class Pdfmaker extends AbstractModel
 
     public function uploadFileIntoFolder(ClientContext $ctx, $localPath, $targetFolderUrl)
     {
-        $fileName = basename($localPath);
-        $fileCreationInformation = new \Office365\SharePoint\FileCreationInformation();
-        $fileCreationInformation->Content = file_get_contents($localPath);
-        $fileCreationInformation->Url = $fileName;
-
-        $uploadFile = $ctx->getWeb()->getFolderByServerRelativeUrl($targetFolderUrl)->getFiles()->add($fileCreationInformation);
-        $ctx->executeQuery();
-    }
-
-    public function uploadFiles($localPath, \Office365\PHP\Client\SharePoint\SPList $targetList)
-    {
-        $ctx = $targetList->getContext();
-        $searchPrefix = $localPath . '.';
         try {
-            foreach (glob($searchPrefix) as $filename) {
-                $fileCreationInformation = new \Office365\PHP\Client\SharePoint\FileCreationInformation();
-                $fileCreationInformation->Content = file_get_contents($filename);
-                $fileCreationInformation->Url = basename($filename);
-                $uploadFile = $targetList->getRootFolder()->getFiles()->add($fileCreationInformation);
-                $ctx->executeQuery();//upload the file
-                $listEntity = $uploadFile->getListItemAllFields(); //now update associated list item entity
-                $listEntity->setProperty('Title', "it is a test");
-                $listEntity->update(); //tell query to update entity
-                $ctx->executeQuery();
-                print "File {$uploadFile->getProperty('Name')} has been uploaded\r\n";
-            }
+            $fileName = basename($localPath);
+            $fileCreationInformation = new FileCreationInformation();
+            $fileCreationInformation->Content = file_get_contents($localPath);
+            $fileCreationInformation->Url = $fileName;
+
+            $ctx->getWeb()->getFolderByServerRelativeUrl($targetFolderUrl)->getFiles()->add($fileCreationInformation);
+            $ctx->executeQuery();
         } catch (\Exception $e) {
             Logger::getInstance("pdfMaker.log")->error(
-                'uploadFiles',
-                [$e->getMessage()]
+                'uploadFileIntoFolder',
+                [$e->getLine(), $e->getMessage()]
             );
-            echo 'Error : ' . $e->getMessage();
         }
     }
 }

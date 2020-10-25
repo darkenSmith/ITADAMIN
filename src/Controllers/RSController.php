@@ -116,9 +116,7 @@ class RSController extends AbstractController
     // Checked
     public function isPdf()
     {
-        $data = new User();
-        $ispdfmaker = new Pdfmaker();
-        $ispdfmaker->printdoc();
+        echo (new Pdfmaker())->printdoc();
     }
 
     // Checked

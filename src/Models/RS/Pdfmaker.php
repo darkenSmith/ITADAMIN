@@ -33,18 +33,6 @@ class Pdfmaker extends AbstractModel
         parent::__construct();
     }
 
-    /**
-     * user = 'itad.365@stonegroup.co.uk'
-    pass = '1t@D458!'
-    url = 'https://stonegroupltd.sharepoint.com'
-    remote.path = '/sites/Recycling'
-    remote.title = 'Documents'
-    remote.folder = 'Shared Documents/Request - COD'
-    remote.file = '/sites/Recycling/Shared Documents/templatetest.docx'
-    local.path = 'assets/files'
-    local.template = 'copy.docx'
-     */
-
     public function printdoc()
     {
         $_SESSION['err'] = '';
@@ -340,16 +328,16 @@ class Pdfmaker extends AbstractModel
                 ['line' => __LINE__, 'foreach-end']
             );
         } catch (\Exception $exc) {
-            $error_message = "Error creating the Word Document";
             Logger::getInstance("pdfMaker.log")->error(
                 'faildocgen',
                 [$exc->getMessage()]
             );
-            //var_dump($exc);
             header("Content-type: application/json");
 
-            echo json_encode($exc);
+            return json_encode($exc);
         }
+
+        return json_encode(['success' => 1]);
     }
 
     public function uploadFileIntoFolder(ClientContext $ctx, $localPath, $targetFolderUrl)

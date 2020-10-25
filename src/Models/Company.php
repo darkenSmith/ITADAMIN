@@ -188,7 +188,7 @@ class Company extends AbstractModel
     {
         $count = 0;
         try {
-            $sql = "SELECT convert(varchar(255),[CompanyID]) as 'company_id', replace(CompanyName,\"''\", '') as 'compname', CompanyDescription, CRMNumber as 'ccmp', InvoiceAddressPostCode as 'postcode' FROM [dbo].[Company]";
+            $sql = "SELECT convert(varchar(255),[CompanyID]) as 'company_id', CompanyName as 'compname', CompanyDescription, CRMNumber as 'ccmp', InvoiceAddressPostCode as 'postcode' FROM [dbo].[Company]";
             $result = $this->gdb->prepare($sql);
             $result->execute();
             $data = $result->fetchAll(\PDO::FETCH_OBJ);

@@ -108,7 +108,7 @@ class User extends AbstractModel
             $_SESSION['user'] = $result;
             $alert = 1;
         } else {
-            $sql = 'SELECT username, active, password FROM recyc_users  WHERE username = :user';
+            $sql = 'SELECT username, active, password FROM recyc_users  WHERE username = :user LIMIT 1';
             $query = $this->rdb->prepare($sql);
             $values = array(':user' => $username);
             $query->execute($values);
@@ -133,7 +133,7 @@ class User extends AbstractModel
 
     public function resetPassword($token)
     {
-        $sql = 'SELECT * FROM recyc_users WHERE token = :token AND token_expires >= NOW()';
+        $sql = 'SELECT * FROM recyc_users WHERE token = :token AND token_expires >= NOW() LIMIT 1';
         $result = $this->rdb->prepare($sql);
         $result->execute(array(':token' => $token));
         $this->user = $result->fetch(\PDO::FETCH_OBJ);
@@ -144,7 +144,7 @@ class User extends AbstractModel
     public function update($type, $value)
     {
         if ($type == 'password') {
-            $sql = 'UPDATE recyc_users SET password = :pw, token = null, token_expires = null WHERE id = :id';
+            $sql = 'UPDATE recyc_users SET password = :pw, token = null, token_expires = null WHERE id = :id LIMIT 1';
             $values = array(':pw' => $value, ':id' => $this->user->id);
             $result = $this->rdb->prepare($sql);
             $result->execute($values);

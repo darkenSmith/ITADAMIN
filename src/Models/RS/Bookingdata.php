@@ -22,6 +22,7 @@ class Bookingdata extends AbstractModel
     public function __construct()
     {
         $this->sdb =  Database::getInstance('sql01');
+        $this->gdb =  Database::getInstance('greenoak');
         parent::__construct();
     }
 
@@ -34,19 +35,19 @@ class Bookingdata extends AbstractModel
             $notes = $this->clean($_POST["notesja"]);
         }
 
-        if ($_POST["filterstatus"] == 'All') {
+        if (isset($_POST["filterstatus"]) && $_POST["filterstatus"] == 'All') {
             $filterStatus = " and (laststatus not like 'On-Hold' or  laststatus in('Request', 'confirmed', 'booked', 'cancelled')) ";
-        } elseif ($_POST["filterstatus"] == 'Confirmed') {
+        } elseif (isset($_POST["filterstatus"]) && $_POST["filterstatus"] == 'Confirmed') {
             $filterStatus = " and been_collected = 1 AND  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and confirmed = 1 and( laststatus  like 'Confirmed') ";
-        } elseif ($_POST["filterstatus"] == 'Booked') {
+        } elseif (isset($_POST["filterstatus"]) && $_POST["filterstatus"] == 'Booked') {
             $filterStatus = " and  isnull(cast(collection_date as varchar(50)),'not set') IS NOT NULL and confirmed = 0 and ( laststatus = 'booked') ";
-        } elseif ($_POST["filterstatus"] == 'Requests') {
+        } elseif (isset($_POST["filterstatus"]) && $_POST["filterstatus"] == 'Requests') {
             $filterStatus = " and (been_collected = 0 or been_collected is null ) AND  isnull(cast(collection_date as varchar(50)),'not set') IS NULL and (laststatus not like 'unbooked' and laststatus not like 'On-Hold') ";
-        } elseif ($_POST["filterstatus"] == 'Unbooked') {
+        } elseif (isset($_POST["filterstatus"]) && $_POST["filterstatus"] == 'Unbooked') {
             $filterStatus = " and (been_collected = 0 or been_collected is null ) AND  isnull(cast(collection_date as varchar(50)),'not set') IS NULL and (laststatus like 'unbooked') ";
-        } elseif ($_POST["filterstatus"] == 'On-Hold') {
+        } elseif (isset($_POST["filterstatus"]) && $_POST["filterstatus"] == 'On-Hold') {
             $filterStatus = " and laststatus like 'On-Hold' ";
-        } elseif ($_POST["filterstatus"] == 'deleted') {
+        } elseif (isset($_POST["filterstatus"]) && $_POST["filterstatus"] == 'deleted') {
             $filterStatus = " deleted ";
         }
 
@@ -54,13 +55,11 @@ class Bookingdata extends AbstractModel
             $_SESSION['stat'] = isset($filterStatus) ? $_SESSION['stat'] : "AND laststatus not like 'On-Hold'";
         }
 
-        if ($_POST["filter"] == 'Collection Date') {
+        if (isset($_POST["filter"]) && $_POST["filter"] == 'Collection Date') {
             $filter = " isnull(cast(collection_date as varchar(50)),'not set') ";
-        } else {
+        } elseif (isset($_POST["filter"])) {
             $filter = $this->clean($_POST["filter"]);
         }
-
-
 
               $sql = "
               SET LANGUAGE British;
@@ -195,60 +194,63 @@ class Bookingdata extends AbstractModel
 
         Logger::getInstance("bookingData.log")->debug(
             'getdata',
-            [$sql]
+            ['line' => __LINE__, $sql]
         );
 
-
         try {
-            $stmt = $this->sdb->prepare($sql);
-            $stmt->execute();
-            $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $stmt = $this->sdb->query($sql);
+            $data =  $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $result = [];
+            foreach ($data as $item) {
+                $datatordstmt = $this->gdb->query(
+                    "select SalesOrderNumber
+                            from [greenoak].[we3recycler].[dbo].SalesOrders 
+                            where CustomerPONumber like '%" . $item['id'] . "' LIMIT 1"
+                );
+                $datatord = $datatordstmt->fetch(\PDO::FETCH_ASSOC);
 
-            $dataarray = array();
-            $dataarray = $data;
+                $item['ordernum'] = $datatord['SalesOrderNumber'];
+                $result[] = $item;
+            }
 
-            $this->response = $dataarray;
-            return $this->response;
+            Logger::getInstance("bookingData.log")->debug(
+                'getdata',
+                ['line' => __LINE__, 'data' => $result]
+            );
+            return $result;
         } catch (\Exception $e) {
             Logger::getInstance("bookingData.log")->error(
                 'getdata',
-                [$e->getMessage()]
+                ['line' => __LINE__, $e->getMessage()]
             );
         }
 
-       // return [];
+        return [];
     }
 
     public function qualifying($id)
     {
-
         $sql = "exec commisionable ".$id;
-        $stmt = $this->sdb->prepare($sql);
-
-        echo $id;
         try {
-            $stmt->execute();
-
-
+            $stmt = $this->sdb->query($sql);
             $data = $stmt->fetch(\PDO::FETCH_ASSOC);
             $this->response = $data;
             return $this->response;
         } catch (\Exception $e) {
-            var_dump($e->getmessage());
+            Logger::getInstance("bookingData.log")->error(
+                'qualifying',
+                ['line' => __LINE__, $e->getMessage()]
+            );
         }
+
+        return [];
     }
-
-
     
     public function getareas()
     {
-  
         $areaquery = "select distinct area1 from Area";
         $stmt3 = $this->sdb->prepare($areaquery);
 
-
-
-       
         try {
             $stmt3->execute();
             $datarea = $stmt3->fetchall(\PDO::FETCH_ASSOC);
@@ -256,16 +258,20 @@ class Bookingdata extends AbstractModel
             $dataArray2 = $datarea;
             $this->response = $dataArray2;
             return $this->response;
-        } catch (\JsonException $e) {
-            var_dump($e->getmessage());
+        } catch (\Exception $e) {
+            Logger::getInstance("bookingData.log")->error(
+                'qualifying',
+                ['line' => __LINE__, $e->getMessage()]
+            );
         }
+
+        return [];
     }
 
 
     public function clean($string)
     {
         $string = str_replace('-', ' ', $string); // Replaces all spaces with hyphens.
-       
         return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
     }
 }

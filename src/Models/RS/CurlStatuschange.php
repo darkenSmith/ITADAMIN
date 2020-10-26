@@ -31,6 +31,10 @@ class CurlStatuschange extends AbstractModel
 
     public function updateAPI($req, $status)
     {
+
+        try{
+
+        
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $this->stoneApi['url'] . "stoneapp/collectionStatus/".$req."/".$status,
@@ -50,6 +54,13 @@ class CurlStatuschange extends AbstractModel
             'CurlStatuschange',
             [$output]
         );
+    }catch(Exception $e){
+        Logger::getInstance("responseAPI.log")->warning(
+            'confirmlist',
+            [$e->getMessage()]
+        );
+
+    }
 
         $this->response = $output;
         return $this->response;

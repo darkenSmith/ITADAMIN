@@ -32,6 +32,13 @@ class ItadEmails extends AbstractModel
 
     public function email()
     {
+        Logger::getInstance("itadEmail.log")->debug(
+            'email',
+            [
+                'line' => __LINE__,
+                'start' => 'true'
+            ]
+        );
         $emailadd = $_POST['emailaddress'];
         $lorrytype = $_POST['loorytype'];
         $rid = $_POST['reqid'];
@@ -197,9 +204,6 @@ class ItadEmails extends AbstractModel
          set survey_deadline = (select format(@date, 'dd-MM-yyyy hh:mm:ss') )
          where RequestID = '" . $rid . "'
          ";
-            $e = fopen($_SERVER["DOCUMENT_ROOT"] . "/emailbookup.txt", "a+");
-            fwrite($e, $upbooking . "\n");
-            fclose($e);
 
             Logger::getInstance("itadEmail.log")->debug(
                 'email',
@@ -236,7 +240,7 @@ class ItadEmails extends AbstractModel
         );
 
         $start = 1;
-
+        //??
         if ($start == 1) {
             $sendgridConfig = $this->emailConfig['sendgrid'];
             try {
@@ -1550,6 +1554,13 @@ class ItadEmails extends AbstractModel
                 );
             }
         }
+        Logger::getInstance("itadEmail.log")->debug(
+            'email',
+            [
+                'line' => __LINE__,
+                'end' => 'true'
+            ]
+        );
     }
 
     public function getEmailHead()

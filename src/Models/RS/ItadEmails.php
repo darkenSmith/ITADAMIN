@@ -152,7 +152,7 @@ class ItadEmails extends AbstractModel
                     'email',
                     [
                         'line' => $e->getLine(),
-                        'lorrytype' => $e->getMessage()
+                        'message' => $e->getMessage()
                     ]
                 );
             }
@@ -175,7 +175,7 @@ class ItadEmails extends AbstractModel
                     'email',
                     [
                         'line' => $e->getLine(),
-                        'lorrytype' => $e->getMessage()
+                        'message' => $e->getMessage()
                     ]
                 );
             }
@@ -217,7 +217,7 @@ class ItadEmails extends AbstractModel
                     'email',
                     [
                         'line' => $e->getLine(),
-                        'lorrytype' => $e->getMessage()
+                        'message' => $e->getMessage()
                     ]
                 );
             }
@@ -240,7 +240,7 @@ class ItadEmails extends AbstractModel
                 'email',
                 [
                     'line' => $e->getLine(),
-                    'lorrytype' => $e->getMessage()
+                    'message' => $e->getMessage()
                 ]
             );
         }
@@ -282,7 +282,7 @@ class ItadEmails extends AbstractModel
                     'email',
                     [
                         'line' => $e->getLine(),
-                        'lorrytype' => $e->getMessage()
+                        'message' => $e->getMessage()
                     ]
                 );
             }
@@ -320,10 +320,18 @@ class ItadEmails extends AbstractModel
                 $mail->setSubject("Booked collection confirmation - Request-ID:" . $rid);
 
                 foreach ($arry as $val) {
-                    $mail->addTo(rtrim($val));
+                    if (filter_var(rtrim($val), FILTER_VALIDATE_EMAIL)) {
+                        $mail->addTo(rtrim($val));
+                    }
                 }
-                $mail->addTo(rtrim($email_1));
-                $mail->addTo($_SESSION['user']['username']);
+
+                if (filter_var(rtrim($email_1), FILTER_VALIDATE_EMAIL)) {
+                    $mail->addTo(rtrim($email_1));
+                }
+
+                if (filter_var($_SESSION['user']['username'], FILTER_VALIDATE_EMAIL)) {
+                    $mail->addTo($_SESSION['user']['username']);
+                }
 
                 $att1 = new \SendGrid\Mail\Attachment();
                 $att1->setContent(file_get_contents($fullpath2));

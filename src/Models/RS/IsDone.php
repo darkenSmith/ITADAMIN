@@ -297,7 +297,7 @@ exec commisionable " . $value . "
 
 
                 $ordsql = "
- select replace(SalesOrderNumber, 'ord-', '') as ord from [greenoak].[we3recycler].[dbo].SalesOrders where CustomerPONumber like '%" . $value . "'
+ select replace(SalesOrderNumber, 'ord-', '') as ord from SalesOrders where CustomerPONumber like '%" . $value . "'
 
 ";
                 $ordstmt = $this->gdb->prepare($ordsql);
@@ -520,12 +520,12 @@ where CMP in ('" . $compstu['crmnumber'] . "')";
                         [$updatelog]
                     );
                     $stmtupdatecol = $this->sdb->prepare($updatelog);
-                    $insertResult = $stmtupdatecol->execute();
+                    $stmtupdatecol->execute();
 
 
                     Logger::getInstance("isDone.log")->debug(
                         'insertDone',
-                        [$insertResult]
+                        [$stmtupdatecol]
                     );
 
                     $sqlii = "UPDATE request SET done = 1 WHERE request_id =" . $value;

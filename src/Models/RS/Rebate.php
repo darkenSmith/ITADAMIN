@@ -69,11 +69,7 @@ rebateid as rid
 
             $ordernum = str_replace('ORD-', '', $ordernum);
             $ordernum = str_replace('ORD ', '', $ordernum);
-            $sql = "UPDATE Collections_Log
-                SET rebate = '" . $inv . "'
-                where replace(OrderNum, 'ORD-', '') = '" . $ordernum . "' ";
-            $update = $this->sdb->prepare($sql);
-            $update->execute();
+
 
             $sqlcheck = "select count(*) as c from rebate where ord like '" . $ordernum . "' ";
             $stmt = $this->sdb->prepare($sqlcheck);
@@ -83,6 +79,14 @@ rebateid as rid
             $boolrebate = $c['c'];
 
             if ($boolrebate == 0) {
+
+                $sql = "UPDATE Collections_Log
+                SET rebate = '" . $inv . "'
+                where replace(OrderNum, 'ORD-', '') = '" . $ordernum . "' ";
+                $update = $this->sdb->prepare($sql);
+                $update->execute();
+
+
                 $sql2 = "
                 select ord, Customer_name, Cmp_number, cl.rebate
                 from request as r
@@ -100,8 +104,20 @@ rebateid as rid
                 $insreb = $this->sdb->prepare($sqlin);
                 $insreb->execute();
 
+                $rebateexpire = "           update rebate
+                set ExpireDate = dateadd(month, c.RebateLife,r.[DateSent]) 
+                from rebate as r
+                join Companies as c on
+                c.cmp = r.CMP_Num where cmp like '".$greendata['Cmp_number']."'";
+                $rebexpire = $this->sdb->prepare($rebateexpire);
+                $rebexpire->execute();
 
-                $boostsql = "select 
+
+
+                $boostsql = "
+            
+                
+                select 
                 rebateid as 'rebateid', 
                 R.CMP_Num as 'cmp', 
                 R.ORD as 'ordn', 
@@ -124,6 +140,17 @@ rebateid as rid
                         $booststmt	= $this->sdb->prepare( $boostins );
                         $booststmt->execute(array(':rebid' => $boostdata->rebateid, ':cmp' => $boostdata->cmp, ':order' => $boostdata->ordn, ':val' => $boostdata->BoostValue,
                       ':status' => $boostdata->Status, ':req' => $boostdata->id));
+
+
+                      $updatetreessql = "exec populatetrees :cmp";
+                      $treestmt	= $this->sdb->prepare( $updatetreessql );
+                      $treestmt->execute(array(':cmp' => $boostdata->cmp));
+
+
+                      
+                     
+
+
     
     
             } else {

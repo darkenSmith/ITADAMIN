@@ -70,7 +70,7 @@ class UpdateDataDoc extends AbstractModel
         $address2 = $this->clean($_POST['address2']);
         $address3 = $this->clean($_POST['address3']);
         $tel = $this->clean($_POST['tel']);
-        $ordnum = $this->clean($_POST['ordnum']) ?? '';
+        $ordnum = $_POST['ordnum'];
         $twn = $this->clean($_POST['twn']);
         $postcode = $this->clean($_POST['postcode']);
         $statusnote = $this->clean($_POST['reqstat']);
@@ -155,7 +155,7 @@ class UpdateDataDoc extends AbstractModel
 
         // var_dump($name);
 
-        $ord = $_SESSION['ordnum'];
+
         $is_other = 0;
 
         $arr = json_decode(json_encode($_POST['reqlines']), true);
@@ -210,13 +210,15 @@ class UpdateDataDoc extends AbstractModel
           
           ";
 
-        Logger::getInstance("updateDataDoc.log")->debug(
+     
+
+        $restmt = $this->sdb->prepare($sqlhead);
+        $restmt->execute();  
+
+         Logger::getInstance("updateDataDoc.log")->debug(
             'requpdatesqloutput',
             [$sqlhead]
         );
-
-        $restmt = $this->sdb->prepare($sqlhead);
-        $restmt->execute();
 
         ///do a update for anddress and customer details
 

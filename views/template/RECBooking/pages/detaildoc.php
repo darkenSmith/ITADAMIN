@@ -146,7 +146,7 @@ ORD as  salo
   <thead>
   ";
 
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
 
     $sqlextra = "
@@ -201,7 +201,7 @@ asc
     }
     $stmt2->execute();
 
-    $data2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+    $data2 = $stmt2->fetchAll(\PDO::FETCH_ASSOC);
 
 
     foreach ($data as $row) {
@@ -241,7 +241,7 @@ order by isnull(replace(c.location, ' ', ''), 'null')
         die();
     }
     $stmtnote->execute();
-    $datanote = $stmtnote->fetchAll(PDO::FETCH_ASSOC);
+    $datanote = $stmtnote->fetchAll(\PDO::FETCH_ASSOC);
 
 
     //var_dump($sqlnotes);
@@ -254,7 +254,7 @@ order by isnull(replace(c.location, ' ', ''), 'null')
     }
     $stmttotal->execute();
 
-    $datar = $stmttotal->fetchAll(PDO::FETCH_ASSOC);
+    $datar = $stmttotal->fetchAll(\PDO::FETCH_ASSOC);
 
     ///// end of image upload///
 
@@ -371,7 +371,7 @@ and active = 1
     }
     $stmtadd->execute();
 
-    $adddata = $stmtadd->fetchAll(PDO::FETCH_ASSOC);
+    $adddata = $stmtadd->fetchAll(\PDO::FETCH_ASSOC);
 
     echo " 
 
@@ -947,7 +947,7 @@ and active = 1
     $stmtord = $gdb->prepare($sqlord);
 
     $stmtord->execute();
-    $dataord = $stmtord->fetch(PDO::FETCH_ASSOC);
+    $dataord = $stmtord->fetch(\PDO::FETCH_ASSOC);
     if (isset($dataord['ord'])) {
         $salesordernum = $dataord['ord'];
     }
@@ -974,7 +974,7 @@ and active = 1
         $portalcheck = "SELECT case when COUNT(*) > 0 then 'Customer has portal access' else 'Customer has no portal access' end AS usercheck FROM recyc_users WHERE username ='" . $row['email'] . "'";
         $portstmt = $rdb->prepare($portalcheck);
         $portstmt->execute();
-        $port = $portstmt->fetch(PDO::FETCH_ASSOC);
+        $port = $portstmt->fetch(\PDO::FETCH_ASSOC);
 
         echo "<h4 id='portalstat'>" . $port['usercheck'] . "</h4>  <button type='button' id='addport' class='portadd btn btn-success'>Add to portal </button><button type='button' id='subuser' class='portadd btn btn-success'>submit </button>
        
@@ -985,13 +985,13 @@ and active = 1
         $complist = "SELECT * FROM recyc_company_sync ";
         $compstmt = $rdb->prepare($complist);
         $compstmt->execute();
-        $companies = $compstmt->fetchall(PDO::FETCH_ASSOC);
+        $companies = $compstmt->fetchall(\PDO::FETCH_ASSOC);
 
 
         $permlist = "SELECT * FROM recyc_roles where id not in(1, 2, 7) ";
         $permstmt = $rdb->prepare($permlist);
         $permstmt->execute();
-        $perm = $permstmt->fetchall(PDO::FETCH_ASSOC);
+        $perm = $permstmt->fetchall(\PDO::FETCH_ASSOC);
 
         echo "<div id='compa'><label> assign company:</label><Select id='companies'>
           <option value=0 selected>Please select a Company</option>
@@ -1133,7 +1133,7 @@ and active = 1
             die();
         }
         $stmtowners->execute();
-        $dataoenrs = $stmtowners->fetchAll(PDO::FETCH_ASSOC);
+        $dataoenrs = $stmtowners->fetchAll(\PDO::FETCH_ASSOC);
 
         $menudet .= "<tr>
       <th> Owner </th>
@@ -1249,7 +1249,7 @@ and active = 1
     //echo $count;
 
 
-    $datanote = $stmtnote->fetchAll(PDO::FETCH_ASSOC);
+    $datanote = $stmtnote->fetchAll(\PDO::FETCH_ASSOC);
     foreach ($datanote as $row) {
         echo " <tr hidden>
         <th> notes</th>
@@ -1506,7 +1506,7 @@ and active = 1
             die("SQL query failed: " . $sqly);
         }
         $stmt6->execute();
-        $data = $stmt6->fetchAll(PDO::FETCH_ASSOC);
+        $data = $stmt6->fetchAll(\PDO::FETCH_ASSOC);
 
         $images = array();
         foreach ($data as $row) {
@@ -1594,7 +1594,7 @@ WHERE
         die("SQL query failed: " . $sqlaps);
     }
     $stmtaps->execute();
-    $data = $stmtaps->fetchAll(PDO::FETCH_ASSOC);
+    $data = $stmtaps->fetchAll(\PDO::FETCH_ASSOC);
 
     //make the rest varibles in detialData
 
@@ -1841,7 +1841,7 @@ WHERE
     // }
     // $stmttotal->execute();
 
-    // $datar = $stmttotal->fetchAll(PDO::FETCH_ASSOC);
+    // $datar = $stmttotal->fetchAll(\PDO::FETCH_ASSOC);
 
     // ///// end of image upload///
 
@@ -1859,7 +1859,7 @@ WHERE
     //             die("SQL query failed: ".$sql);
     //         }
     //         $stmtrest->execute();
-    //         $datarest = $stmtrest->fetchAll(PDO::FETCH_ASSOC);
+    //         $datarest = $stmtrest->fetchAll(\PDO::FETCH_ASSOC);
 
     //         foreach($datarest as $row) {
 
@@ -1897,7 +1897,7 @@ WHERE
     //         }
 
     //         $stmtbook->execute();
-    //         $r = $stmtbook->fetch(PDO::FETCH_ASSOC);
+    //         $r = $stmtbook->fetch(\PDO::FETCH_ASSOC);
 
     //         $_SESSION['ordnum'] =   $dataord['ord'];
     //         $trimo = substr($dataord['ord'], 4);
@@ -1928,7 +1928,7 @@ WHERE
     //         }
 
     //         $stmtbook2->execute();
-    //         $ec = $stmtbook2->fetch(PDO::FETCH_ASSOC);
+    //         $ec = $stmtbook2->fetch(\PDO::FETCH_ASSOC);
 
     //         // $stmtbook2 = sqlsrv_query( $sdb, $booksql2);
     //         // if( $stmtbook2 === false) {
@@ -1964,7 +1964,7 @@ WHERE
     //           echo "<p>Needs to be done first. make changes in achive.</p>";
     //         }
 
-    //         $rg = $stmtgreen->fetch(PDO::FETCH_ASSOC);
+    //         $rg = $stmtgreen->fetch(\PDO::FETCH_ASSOC);
 
     //         echo "
     //         <tr hidden>
@@ -2279,7 +2279,7 @@ WHERE
 
         $st = $sdb->prepare($CHECKIFTHERESQL);
         $st->execute();
-        $r = $st->fetch(PDO::FETCH_ASSOC);
+        $r = $st->fetch(\PDO::FETCH_ASSOC);
 
 
         //var_dump($CHECKIFTHERESQL);
@@ -2377,7 +2377,7 @@ WHERE
     }
     $stmttotal->execute();
 
-    $datar = $stmttotal->fetchAll(PDO::FETCH_ASSOC);
+    $datar = $stmttotal->fetchAll(\PDO::FETCH_ASSOC);
 
     ///// end of image upload///
 
@@ -2394,7 +2394,7 @@ WHERE
         die("SQL query failed: " . $sql);
     }
     $stmtrest->execute();
-    $datarest = $stmtrest->fetchAll(PDO::FETCH_ASSOC);
+    $datarest = $stmtrest->fetchAll(\PDO::FETCH_ASSOC);
 
     foreach ($datarest as $row) {
         echo "
@@ -2437,7 +2437,7 @@ WHERE
                 die("SQL query failed: " . $sqly);
             }
             $stmt6->execute();
-            $data = $stmt6->fetch(PDO::FETCH_ASSOC);
+            $data = $stmt6->fetch(\PDO::FETCH_ASSOC);
             $path = isset($data['fi']) ? $data['fi'] : ' ';
 
             $path = str_replace("/uploads//upload/", "/uploads/images/", $path);
@@ -2510,17 +2510,8 @@ WHERE
 </div>
 
 
-<?PHP
+<?php
 
-$booksql = "SELECT isnull(RIGHT(ORD, 7), 0000) AS ordsa FROM Booked_Collections WHERE RequestID LIKE '" . $justID . "'";
-$stmtbook = $sdb->prepare($booksql);
-
-if ($stmtbook === false) {
-    die("SQL query failed: " . $booksql);
-}
-
-$stmtbook->execute();
-$r = $stmtbook->fetch(PDO::FETCH_ASSOC);
 
 $_SESSION['ordnum'] = $dataord['ord'];
 $trimo = substr($dataord['ord'], 4);
@@ -2539,10 +2530,7 @@ $booksql2 = "SELECT
         FROM
           Collections_Log
         WHERE
-          ordernum LIKE '" . $dataord['ord'] . "'
-
-          SELECT RIGHT(ORD, 7) AS orr FROM Request JOIN Collections_Log ON RIGHT(ORD, 7) = OrderNum
-        ";
+          ordernum LIKE '" . $dataord['ord'] . "'";
 
 $stmtbook2 = $sdb->prepare($booksql2);
 
@@ -2551,7 +2539,8 @@ if ($stmtbook2 === false) {
 }
 
 $stmtbook2->execute();
-$ec = $stmtbook2->fetch(PDO::FETCH_ASSOC);
+$ec = $stmtbook2->fetch(\PDO::FETCH_ASSOC);
+$stmtbook2->closeCursor();
 
 // $stmtbook2 = sqlsrv_query( $sdb, $booksql2);
 // if( $stmtbook2 === false) {
@@ -2580,6 +2569,8 @@ $stmtgreen->execute();
 if ($stmtgreen === false) {
     die("SQL query failed: " . $sqlgreen);
 }
+$rg = $stmtgreen->fetch(\PDO::FETCH_ASSOC);
+
 
 if (isset($dataord['ord'])) {
     echo "<label>allowed</label>";
@@ -2587,7 +2578,6 @@ if (isset($dataord['ord'])) {
     echo "<p>Needs to be done first. make changes in achive.</p>";
 }
 
-$rg = $stmtgreen->fetch(PDO::FETCH_ASSOC);
 
 if (isset($rg['SiteCode'])) {
     $sitecode = $rg['SiteCode'];

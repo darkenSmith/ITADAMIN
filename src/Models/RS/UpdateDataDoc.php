@@ -70,7 +70,6 @@ class UpdateDataDoc extends AbstractModel
         $address2 = $this->clean($_POST['address2']);
         $address3 = $this->clean($_POST['address3']);
         $tel = $this->clean($_POST['tel']);
-        $ordnum = $_POST['ordnum'];
         $twn = $this->clean($_POST['twn']);
         $postcode = $this->clean($_POST['postcode']);
         $statusnote = $this->clean($_POST['reqstat']);

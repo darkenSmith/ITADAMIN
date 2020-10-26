@@ -5,6 +5,8 @@ namespace App\Models\RS;
 use App\Helpers\Database;
 use App\Helpers\Logger;
 use App\Models\AbstractModel;
+use App\Models\RS\CurlStatuschange;
+
 
 /**
  * Class ApprovData
@@ -75,14 +77,14 @@ class IsDone extends AbstractModel
 
                 $who = str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
 
-                $update_req = "
-  update request 
-  set done = 1,
-  laststatus = 'Done',
-  modifedby = '" . $who . "',
-  modifydate = getdate()
-  where request_id = '" . $value . "' 
-  ";
+                                $update_req = "
+                update request 
+                set done = 1,
+                laststatus = 'Done',
+                modifedby = '" . $who . "',
+                modifydate = getdate()
+                where request_id = '" . $value . "' 
+                ";
                 $stmtreq = $this->sdb->prepare($update_req);
                 $stmtreq->execute();
                 $apicall->updateAPI($value, 'Done');

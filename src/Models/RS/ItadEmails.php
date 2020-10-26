@@ -30,7 +30,7 @@ class ItadEmails extends AbstractModel
     }
 
 
-    public function email()
+    public function sendMail()
     {
         Logger::getInstance("itadEmail.log")->debug(
             'email',

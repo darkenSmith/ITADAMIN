@@ -171,7 +171,7 @@ class RSController extends AbstractController
     public function emailConf()
     {
         $emaildoc = new ItadEmails();
-        $emaildoc->email();
+        $emaildoc->sendMail();
     }
 
     public function testArc()

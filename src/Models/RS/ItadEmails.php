@@ -137,17 +137,48 @@ class ItadEmails extends AbstractModel
             WHERE
               RequestID ='" . $rid . "'";
             }
-            $stmtup2 = $this->sdb->prepare($sqal2);
-            $stmtup2->execute();
+
+            try {
+                $stmtup2 = $this->sdb->prepare($sqal2);
+                $stmtup2->execute();
+                Logger::getInstance("itadEmail.log")->info(
+                    'email',
+                    [
+                        'line' => __LINE__
+                    ]
+                );
+            } catch (\Exception $e) {
+                Logger::getInstance("itadEmail.log")->error(
+                    'email',
+                    [
+                        'line' => $e->getLine(),
+                        'lorrytype' => $e->getMessage()
+                    ]
+                );
+            }
         } else {
             $sqlcheck = "
           select  (case when [SurveySent] like '%yes%' then 'yes' else 'no' end) ss from Booked_Collections as rt where 
           [SurveySent] like 'yes%' and requestid =  '" . $rid . "'";
-
-            $stmtchk = $this->sdb->prepare($sqlcheck);
-            $stmtchk->execute();
-            $datack = $stmtchk->fetch(\PDO::FETCH_ASSOC);
-
+            try {
+                $stmtchk = $this->sdb->prepare($sqlcheck);
+                $stmtchk->execute();
+                $datack = $stmtchk->fetch(\PDO::FETCH_ASSOC);
+                Logger::getInstance("itadEmail.log")->info(
+                    'email',
+                    [
+                        'line' => __LINE__
+                    ]
+                );
+            } catch (\Exception $e) {
+                Logger::getInstance("itadEmail.log")->error(
+                    'email',
+                    [
+                        'line' => $e->getLine(),
+                        'lorrytype' => $e->getMessage()
+                    ]
+                );
+            }
             if ($datack['ss'] !== 'yes') {
                 $sqal = " UPDATE Booked_Collections
               SET LorryType = '" . $lorrytype . "',
@@ -178,17 +209,41 @@ class ItadEmails extends AbstractModel
             WHERE
               RequestID ='" . $rid . "'";
             }
-
-            $stmtup = $this->sdb->prepare($sqal);
-            $stmtup->execute();
+            try {
+                $stmtup = $this->sdb->prepare($sqal);
+                $stmtup->execute();
+            } catch (\Exception $e) {
+                Logger::getInstance("itadEmail.log")->error(
+                    'email',
+                    [
+                        'line' => $e->getLine(),
+                        'lorrytype' => $e->getMessage()
+                    ]
+                );
+            }
         }
 
         $sqaldead = "(select [dbo].[AddBusinessDays](BookedCollectDate, -4)   as survey_deadline  from Booked_Collections where
          RequestID ='" . $rid . "')";
-
-        $stmtdead = $this->sdb->prepare($sqaldead);
-        $stmtdead->execute();
-        $datatime = $stmtdead->fetch(\PDO::FETCH_ASSOC);
+        try {
+            $stmtdead = $this->sdb->prepare($sqaldead);
+            $stmtdead->execute();
+            $datatime = $stmtdead->fetch(\PDO::FETCH_ASSOC);
+            Logger::getInstance("itadEmail.log")->info(
+                'email',
+                [
+                    'line' => __LINE__
+                ]
+            );
+        } catch (\Exception $e) {
+            Logger::getInstance("itadEmail.log")->error(
+                'email',
+                [
+                    'line' => $e->getLine(),
+                    'lorrytype' => $e->getMessage()
+                ]
+            );
+        }
 
         if ($manual == 1) {
             $d = str_replace('-', '/', $manualtime);
@@ -213,8 +268,24 @@ class ItadEmails extends AbstractModel
                 ]
             );
 
-            $stmtbook = $this->sdb->prepare($upbooking);
-            $stmtbook->execute();
+            try {
+                $stmtbook = $this->sdb->prepare($upbooking);
+                $stmtbook->execute();
+                Logger::getInstance("itadEmail.log")->info(
+                    'email',
+                    [
+                        'line' => __LINE__
+                    ]
+                );
+            } catch (\Exception $e) {
+                Logger::getInstance("itadEmail.log")->error(
+                    'email',
+                    [
+                        'line' => $e->getLine(),
+                        'lorrytype' => $e->getMessage()
+                    ]
+                );
+            }
         } else {
             $datedead = $datatime['survey_deadline'];
             $newdeadtime = date("d/m/y h:i:s", strtotime($datedead));

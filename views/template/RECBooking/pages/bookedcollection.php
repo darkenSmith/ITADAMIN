@@ -523,7 +523,7 @@ $cust = "\"Request_id\"";
     <td hidden  ></td>
     <td  >" . date("d/m/Y", strtotime($b["requestdate"])) . "</td>
     <td  class='req'><a href='/RS/detialdoc?rowid=" . $b["id"] . "' target='_blank'><span class='reqnum'>" . $b["id"] . "</span></a></td>
-    <td  class='ordernum'>" . $b["ord"] . "</td>
+    <td  class='ordernum'>" . $b["ordern"] . "</td>
     <td  >" . $b["gdpr"] . "</td>
     <td hidden  class='crmnum'>" . $b["crm"] . "</td>
     <td  class='ordernumst'>" . $b["Stat"] . "</td>

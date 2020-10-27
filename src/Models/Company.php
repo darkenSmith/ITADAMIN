@@ -28,7 +28,7 @@ class Company extends AbstractModel
         }
 
         $this->sdb = Database::getInstance('sql01');
-        $this->gdb = Database::getInstance('greenoak');
+        $this->gdb = Database::getInstance('greenoak', false);
 
         parent::__construct();
     }
@@ -193,84 +193,163 @@ class Company extends AbstractModel
             $result->execute();
             $data = $result->fetchAll(\PDO::FETCH_OBJ);
 
-            Logger::getInstance("Company-refresh.log")->debug(
-                'refresh-first',
-                [$data]
+            Logger::getInstance("CompanyRefresh.log")->debug(
+                'data',
+                ['line' => __LINE__, $data]
             );
         } catch (\Exception $e) {
-            Logger::getInstance("Company-refresh.log")->error(
+            Logger::getInstance("CompanyRefresh.log")->error(
                 'refresh-exception',
-                [$e->getMessage()]
+                ['line' => __LINE__, $e->getMessage()]
             );
         }
 
         if (isset($data)) {
             foreach ($data as $webUser) {
-                $sql = "SELECT * from recyc_company_sync WHERE greenoak_id = :greenoak";
-                $result = $this->rdb->prepare($sql);
-                $result->execute(array(':greenoak' => $webUser->company_id));
-                $exists = $result->fetchAll(\PDO::FETCH_OBJ);
+                try {
+                    $sql = "SELECT * from recyc_company_sync WHERE greenoak_id = :greenoak";
+                    $result = $this->rdb->prepare($sql);
+                    $result->execute(array(':greenoak' => $webUser->company_id));
+                    $exists = $result->fetchAll(\PDO::FETCH_OBJ);
 
-                $sql2 = "SELECT * from companies WHERE CMP = :cmpnum";
-                $result2 = $this->sdb->prepare($sql2);
-                $result2->execute(array(':cmpnum' => $webUser->ccmp));
-                $exists2 = $result2->fetchall(\PDO::FETCH_OBJ);
+                    $sql2 = "SELECT * from companies WHERE CMP = :cmpnum";
+                    $result2 = $this->sdb->prepare($sql2);
+                    $result2->execute(array(':cmpnum' => $webUser->ccmp));
+                    $exists2 = $result2->fetchall(\PDO::FETCH_OBJ);
+
+                    Logger::getInstance("CompanyRefresh.log")->debug(
+                        'exists2',
+                        ['line' => __LINE__, 'exists' => $exists, 'exists2' => $exists2]
+                    );
+                } catch (\Exception $e) {
+                    Logger::getInstance("CompanyRefresh.log")->error(
+                        '2-select-errored',
+                        ['line' => __LINE__, $e->getMessage()]
+                    );
+                }
 
                 if (empty($exists2)) {
-                    Logger::getInstance("Company-refresh.log")->info(
-                        'shouldbeuploading',
-                        [$webUser->compname]
-                    );
+                    try {
+                        $sql3 = "INSERT into companies(CompanyName, Location, cmp, dateadded, Department, owner )
+                        VALUES (:name,:loc,:cmp, GETDATE(), 'new', 'new')";
+                        $result2 = $this->sdb->prepare($sql3);
+                        $result2->execute(
+                            [
+                                ':name' => $webUser->compname,
+                                ':loc' => $webUser->postcode,
+                                ':cmp' => $webUser->ccmp
+                            ]
+                        );
+                        Logger::getInstance("CompanyRefresh.log")->info(
+                            'insert',
+                            ['line' => __LINE__, 'sql' => $sql3]
+                        );
+                    } catch (\Exception $e) {
+                        Logger::getInstance("CompanyRefresh.log")->error(
+                            'insert',
+                            ['line' => __LINE__, $e->getMessage()]
+                        );
+                    }
 
-                    $sql3 = "INSERT into companies(CompanyName, Location, cmp, dateadded, Department, owner )
-					VALUES (:name,:loc,:cmp, GETDATE(), 'new', 'new')";
-                    $result2 = $this->sdb->prepare($sql3);
-                    $result2->execute(array(':name' => $webUser->compname, ':loc' => $webUser->postcode, ':cmp' => $webUser->ccmp));
-                    Logger::getInstance("Company-refresh.log")->info('getUnallocated', [$this->unallocated]);
-
-                    Logger::getInstance("Company-refresh.log")->info(
-                        'updatescomoanygreen',
-                        [$exists2]
-                    );
+                    Logger::getInstance("CompanyRefresh.log")->info('getUnallocated', [$this->unallocated]);
                 }
 
                 /**
                  * UPDATES CMP IN WEB DB
                  */
                 if (!empty($exists)) {
-                    $sql = "UPDATE recyc_company_sync
+                    try {
+                        $sql = "UPDATE recyc_company_sync
 					SET CMP = :cmp
 					WHERE greenoak_id = :greenoak";
-                    $result = $this->rdb->prepare($sql);
-                    $result->execute(array(':greenoak' => $webUser->company_id, ':cmp' => $webUser->ccmp));
+                        $result = $this->rdb->prepare($sql);
+                        $result->execute(array(':greenoak' => $webUser->company_id, ':cmp' => $webUser->ccmp));
+
+                        Logger::getInstance("CompanyRefresh.log")->info(
+                            'update',
+                            ['line' => __LINE__, 'sql' => $sql]
+                        );
+                    } catch (\Exception $e) {
+                        Logger::getInstance("CompanyRefresh.log")->error(
+                            'update errored below !empty($exists)',
+                            ['line' => __LINE__, $e->getMessage()]
+                        );
+                    }
                 }
 
                 if (empty($exists)) {
-                    Logger::getInstance("Company-refresh.log")->info('doesntmatchweb', [$exists]);
                     //get all the company data we need to set them up
-                    $sql = "SELECT CompanyName, PrimaryAddressLine1,PrimaryAddressLine2,PrimaryAddressLine3,PrimaryAddressLine4 ,PrimaryAddressTown, PrimaryAddressPostCode, Telephone, Email, SiteCode, SICCode, CRMNumber
-							FROM [dbo].[Company] WHERE [CompanyID] = :greenoak";
-                    $result = $this->gdb->prepare($sql);
-                    $result->execute(array(':greenoak' => $webUser->company_id));
-                    $data = $result->fetch(\PDO::FETCH_OBJ);
-                    Logger::getInstance("Company-refresh.log")->info('cmp', [$data]);
-
+                    try {
+                        $sql = "SELECT CompanyName, PrimaryAddressLine1,PrimaryAddressLine2,PrimaryAddressLine3,PrimaryAddressLine4 ,PrimaryAddressTown, PrimaryAddressPostCode, Telephone, Email, SiteCode, SICCode, CRMNumber
+                                FROM [dbo].[Company] WHERE [CompanyID] = :greenoak";
+                        $result = $this->gdb->prepare($sql);
+                        $result->execute(array(':greenoak' => $webUser->company_id));
+                        $data = $result->fetch(\PDO::FETCH_OBJ);
+                        Logger::getInstance("CompanyRefresh.log")->info(
+                            'select',
+                            ['line' => __LINE__, 'sql' => $sql]
+                        );
+                    } catch (\Exception $e) {
+                        Logger::getInstance("CompanyRefresh.log")->error(
+                            'select errored below empty($exists)',
+                            ['line' => __LINE__, $e->getMessage()]
+                        );
+                    }
                     if (isset($data)) {
                         //add first to company table, and then once we have the company ID add to the sync table.
-                        $sql = "INSERT INTO recyc_company_list (company_name, portal_requirement) VALUES (:company, 1)";
-                        $result = $this->rdb->prepare($sql);
-                        $result->execute(array(':company' => $data->CompanyName));
+                        try {
+                            $sql = "INSERT INTO recyc_company_list (company_name, portal_requirement) VALUES (:company, 1)";
+                            $result = $this->rdb->prepare($sql);
+                            $result->execute(array(':company' => $data->CompanyName));
 
-                        $comId = $this->rdb->lastInsertId();
-
+                            $comId = $this->rdb->lastInsertId();
+                            Logger::getInstance("CompanyRefresh.log")->info(
+                                'insert',
+                                ['line' => __LINE__, 'comId' => $comId, 'sql' => $sql]
+                            );
+                        } catch (\Exception $e) {
+                            Logger::getInstance("CompanyRefresh.log")->error(
+                                'insert errored below isset($data)',
+                                ['line' => __LINE__, $e->getMessage()]
+                            );
+                        }
                         if ($comId != 0) {
-                            $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
-                            $result = $this->rdb->prepare($sql);
-                            $result->execute(array(':recyc' => $comId, ':greenoak' => $webUser->company_id, ':company' => $data->CompanyName, ':cmp' => $data->CRMNumber));
+                            try {
+                                $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
+                                $result = $this->rdb->prepare($sql);
+                                $result->execute(
+                                    [
+                                        ':recyc' => $comId,
+                                        ':greenoak' => $webUser->company_id,
+                                        ':company' => $data->CompanyName,
+                                        ':cmp' => $data->CRMNumber
+                                    ]
+                                );
+                                Logger::getInstance("CompanyRefresh.log")->info(
+                                    'insert',
+                                    ['line' => __LINE__, 'comId' => $comId, 'sql' => $sql]
+                                );
+                            } catch (\Exception $e) {
+                                Logger::getInstance("CompanyRefresh.log")->error(
+                                    'insert 1 errored below comId != 0',
+                                    ['line' => __LINE__, $e->getMessage()]
+                                );
+                            }
+                            try {
+                                $sql = "INSERT INTO recyc_bdm_to_company (user_id,company_id) VALUES (1,:company)";
+                                $result = $this->rdb->prepare($sql);
+                                $result->execute(array(':company' => $comId));
 
-                            $sql = "INSERT INTO recyc_bdm_to_company (user_id,company_id) VALUES (1,:company)";
-                            $result = $this->rdb->prepare($sql);
-                            $result->execute(array(':company' => $comId));
+                                Logger::getInstance("CompanyRefresh.log")->info(
+                                    'insert',
+                                    ['line' => __LINE__, 'comId' => $comId, 'sql' => $sql]
+                                );
+                            } catch (\Exception $e) {
+                                Logger::getInstance("CompanyRefresh.log")->error(
+                                    'insert 2 errored below comId != 0',
+                                    ['line' => __LINE__, $e->getMessage()]
+                                );
+                            }
 
                             $owner = $webUser->CompanyDescription;
                             $parts = explode('#', $owner);
@@ -282,24 +361,46 @@ class Company extends AbstractModel
                                 $ownerId = $result->fetch(\PDO::FETCH_COLUMN);
 
                                 if (isset($ownerId)) {
-                                    $sql = "INSERT INTO recyc_bdm_to_company (user_id,company_id) VALUES (:owner,:company)";
-                                    $result = $this->rdb->prepare($sql);
-                                    $result->execute(array(':company' => $comId, ':owner' => $ownerId));
+                                    try {
+                                        $sql = "INSERT INTO recyc_bdm_to_company (user_id,company_id) VALUES (:owner,:company)";
+                                        $result = $this->rdb->prepare($sql);
+                                        $result->execute([':company' => $comId, ':owner' => $ownerId]);
+                                        Logger::getInstance("CompanyRefresh.log")->info(
+                                            'insert',
+                                            ['line' => __LINE__, 'company' => $comId, 'owner' => $ownerId, 'sql' => $sql]
+                                        );
+                                    } catch (\Exception $e) {
+                                        Logger::getInstance("CompanyRefresh.log")->error(
+                                            'insert errored below isset($ownerId)',
+                                            ['line' => __LINE__, $e->getMessage()]
+                                        );
+                                    }
                                 }
                             }
 
                             $count++;
                         } else {
+                            Logger::getInstance("CompanyRefresh.log")->error(
+                                'error adding',
+                                ['line' => __LINE__, $data->CompanyName]
+                            );
                             echo 'error adding ' . $data->CompanyName . '<br>';
                         }
                     }
                 } else {
-//                  echo $webUser->CompanyName.' exists<br>';
+                    Logger::getInstance("CompanyRefresh.log")->error(
+                        'error adding',
+                        ['line' => __LINE__, $webUser->CompanyName . ' exists']
+                    );
                 }
             }
         }
         if ($return) {
             echo $count . ' New Companies created<br>';
+            Logger::getInstance("CompanyRefresh.log")->error(
+                'NEW COMPANY CREATED',
+                ['line' => __LINE__, 'count' => $count]
+            );
         }
     }
 }

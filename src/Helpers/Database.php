@@ -14,10 +14,12 @@ class Database
 
     /**
      * @param string|null $type
+     * @param bool $multi
      * @return PDO|null
      */
-    public static function getInstance(?string $type = null)
+    public static function getInstance(?string $type = null, $multi = true)
     {
+        //if you get sqlserver error try multi false/true
         try {
             $databaseConfig = Config::getInstance()->get('database');
 
@@ -33,7 +35,7 @@ class Database
 
             if ($database['driver'] === 'sqlsrv') {
                 $driver = sprintf('%s:%s', $database['driver'], 'Server');
-                $dbName = sprintf('%s=%s;%s', 'Database', $database['dbname'], 'MultipleActiveResultSets=true');
+                $dbName = sprintf('%s=%s;%s', 'Database', $database['dbname'], 'MultipleActiveResultSets='. $multi);
 
                 $database['host'] .= ',' . $database['port'];
                 $port = '';

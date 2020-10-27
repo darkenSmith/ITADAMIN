@@ -18,7 +18,7 @@ class Confirm extends AbstractModel
     public $id;
 
     /**
-     * ApprovData constructor.
+     * Confirm constructor.
      */
     public function __construct()
     {
@@ -33,27 +33,25 @@ class Confirm extends AbstractModel
 
         $who = str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
         foreach ($stuff as $value) {
-            $colupdate = "
-
-update request
-set confirmed = 1,
-laststatus = 'Confirmed',
-modifedby = '" . $who . "'
-where Request_ID =" . $value . "
-
-  
-update Booked_Collections
-set booking_status = 'confirmed'
-where RequestID ='" . $value . "'";
-
-            $stmtu = $this->sdb->prepare($colupdate);
-            $apicall->updateAPI($value, 'Confirmed');
+            $colupdate = "update request
+                        set confirmed = 1,
+                        laststatus = 'Confirmed',
+                        modifedby = '" . $who . "'
+                        where Request_ID =" . $value . "
+                        update Booked_Collections
+                        set booking_status = 'confirmed'
+                        where RequestID ='" . $value . "'";
             try {
+                $stmtu = $this->sdb->prepare($colupdate);
+                $apicall->updateAPI($value, 'Confirmed');
                 $stmtu->execute();
             } catch (Exception $e) {
                 Logger::getInstance("Confirm.log")->warning(
                     'confirmlist',
-                    [$e->getMessage()]
+                    [
+                        'line' => $e->getLine(),
+                        'error' => $e->getMessage()
+                    ]
                 );
             }
         }

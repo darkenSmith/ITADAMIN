@@ -106,7 +106,7 @@ class Pdfmaker extends AbstractModel
                     ]
                 );
 
-                $wtnquery = "SELECT d.WasteTransferNumber as WTN FROM [greenoak].[we3recycler].[dbo].Delivery AS d  JOIN [greenoak].[we3recycler].[dbo].SalesOrders AS s ON d.SalesOrderID = s.SalesOrderID WHERE CustomerPONumber LIKE ".$val;
+                $wtnquery = "SELECT d.WasteTransferNumber as WTN FROM [greenoak].[we3recycler].[dbo].Delivery AS d  JOIN [greenoak].[we3recycler].[dbo].SalesOrders AS s ON d.SalesOrderID = s.SalesOrderID WHERE CustomerPONumber LIKE '%".$val."'";
                 $stmtwtn = $this->gdb->prepare($wtnquery);
                 $wtndata = $stmtwtn->fetch(\PDO::FETCH_ASSOC);
 

@@ -49,7 +49,7 @@ class UnBook extends AbstractModel
 
             $stmtu = $this->sdb->prepare($colupdate);
             $stmtu->execute();
-            $apicall->updateAPI($value, 'Unbook');
+            $apicall->updateAPI($value, 'Cancelled');
         }
 
         return true;

@@ -19,7 +19,7 @@ class Companynotes extends AbstractModel
      */
     public function __construct()
     {
-        $this->sdb =  Database::getInstance('sql01');
+        $this->sdb =  Database::getInstance('sql01', false);
         parent::__construct();
     }
 

@@ -28,7 +28,7 @@ class Company extends AbstractModel
         }
 
         $this->sdb = Database::getInstance('sql01');
-        $this->gdb = Database::getInstance('greenoak');
+        $this->gdb = Database::getInstance('greenoak', false);
 
         parent::__construct();
     }

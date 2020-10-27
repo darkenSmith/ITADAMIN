@@ -19,6 +19,7 @@ class Database
      */
     public static function getInstance(?string $type = null, $multi = true)
     {
+        //if you get sqlserver error try multi false/true
         try {
             $databaseConfig = Config::getInstance()->get('database');
 

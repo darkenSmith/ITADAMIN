@@ -3,7 +3,6 @@
 $path = '/var/www/html/itadadmin.stonegroup.co.uk';
 require_once $path . '/cron.php';
 
-use App\Models\Company;
 use App\Models\OrderSync;
 use App\Helpers\Logger;
 
@@ -12,15 +11,6 @@ Logger::getInstance("Cron.log")->debug('orderSync', [$argv]);
 
 if (!empty($argv[1]) && $argv[1] === 'sync') {
     Logger::getInstance("Cron.log")->info('orderSync', ['sync']);
-
-    try {
-        $companies = new Company();
-        $companies->refresh(false);
-        Logger::getInstance("Cron.log")->info('orderSync', ['executed - company']);
-    } catch (\Exception $e) {
-        Logger::getInstance("Cron.log")->error('orderSync - company - refresh', [$e->getMessage()]);
-    }
-
     try {
         $sync = new OrderSync();
         $sync->start();

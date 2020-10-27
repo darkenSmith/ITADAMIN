@@ -47,7 +47,7 @@ class OnHold extends AbstractModel
             $stmtu->execute();
 
         // out for now cant connect while vpn
-        $apicall->updateAPI($value, 'OnHold');
+        $apicall->updateAPI($value, 'On-Hold');
         }
     }
 }

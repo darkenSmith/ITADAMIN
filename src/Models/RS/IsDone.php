@@ -87,7 +87,7 @@ class IsDone extends AbstractModel
                 ";
                 $stmtreq = $this->sdb->prepare($update_req);
                 $stmtreq->execute();
-                $apicall->updateAPI($value, 'Complete');
+                $apicall->updateAPI($value, 'Done');
 
 
                 $newsql = " 

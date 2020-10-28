@@ -223,11 +223,11 @@ class Company extends AbstractModel
                             'line' => __LINE__,
                             [
                                 ':greenoak' => $webUser->company_id
-                              
+
                             ],
                             [
                                 ':cmpnum' => $webUser->ccmp
-                              
+
                             ]
                         ]
                     );
@@ -430,54 +430,57 @@ class Company extends AbstractModel
         }
     }
 
-
-    public function company_sync(){
-
-        $count = 0;
+    /**
+     * @return bool
+     */
+    public function company_sync()
+    {
         try {
             $sql = "SELECT g.company_number, s.company_id from recyc_company_sync as s
             join company_greenoak_links as g on
            s.company_id = g.company_id where s.greenoak_id = 'AWAITING UPDATE'";
             $result = $this->rdb->query($sql);
             $data = $result->fetchAll(\PDO::FETCH_OBJ);
+
             $cNumber = [];
-            $q ='';
-            foreach($data as $company){
+            $q = '';
+            foreach ($data as $company) {
                 $cNumber[$company->company_number] = $company->company_id;
-                $q .= "'" . $company->company_number . "',";  
+                $q .= "'" . $company->company_number . "',";
             }
-            $q  = rtrim($q,',');
-            $sql = "SELECT convert(varchar(255),[CompanyID]) as 'company_id', CompanyName as 'compname', CompanyDescription, CRMNumber as 'cmp', InvoiceAddressPostCode as 'postcode', CompanyRegNo  as 'companynum' FROM [dbo].[Company] WHERE CompanyRegNo IN (".$q.")";
+
+            $q = rtrim($q, ',');
+            $sql = "SELECT convert(varchar(255),[CompanyID]) as 'company_id', CompanyName as 'compname', CompanyDescription, CRMNumber as 'cmp', InvoiceAddressPostCode as 'postcode', CompanyRegNo  as 'companynum' FROM [dbo].[Company] WHERE CompanyRegNo IN (" . $q . ")";
             $result = $this->gdb->query($sql);
             $data2 = $result->fetchAll(\PDO::FETCH_OBJ);
 
-            foreach($data2 as $greencompany){
+            foreach ($data2 as $greenCompany) {
+                $company_id = $cNumber[$greenCompany->companynum];
 
-                $company_id = $cNumber[$greencompany->companynum];
-            
-                    $sql = " UPDATE recyc_company_sync
+                $sql = " UPDATE recyc_company_sync
 					SET CMP = :cmp,
                     greenoak_id = :greenoak_id
 					WHERE company_id = :company_id";
-                    $result = $this->rdb->prepare($sql);
-                    $result->execute([
-                        ':company_id' => $company_id,
-                        ':greenoak_id' => $greencompany->company_id,
-                        ':cmp' => $greencompany->cmp
-                    ]);
+                $result = $this->rdb->prepare($sql);
+                $result->execute([
+                    ':company_id' => $company_id,
+                    ':greenoak_id' => $greenCompany->company_id,
+                    ':cmp' => $greenCompany->cmp
+                ]);
             }
+
             Logger::getInstance("CompanySync.log")->error(
-                'Update COMPANY CREATED',
+                'Company Synced',
                 ['line' => __LINE__, count($data2)]
             );
-        }catch(Exception $e){
-            
+
+            return true;
+        } catch (Exception $e) {
             Logger::getInstance("CompanySync.log")->error(
-                'Update COMPANY CREATED',
+                'Update Failed',
                 ['line' => __LINE__, $e->getMessage()]
             );
         }
-
-
+        return false;
     }
 }

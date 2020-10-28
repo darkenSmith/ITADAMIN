@@ -2,7 +2,7 @@
 
 use App\Helpers\Database;
 use App\Models\RS\CurlStatuschange;
-use App\Models\RS\BookedAPIupdate;
+use App\Models\RS\APIbookingupdate;
 
 
 $sdb = Database::getInstance('sql01');
@@ -2309,8 +2309,8 @@ WHERE
 
         $stmtp = $sdb->prepare($sqlUpdate);
         $stmtp->execute();
-    // $apibooked = new BookedAPIupdate();
-    //    $apibooked->updatebookdateAPI($_GET["rowid"], $timin);
+        $apibooked = new APIbookingupdate();
+        $apibooked->updatebookdateAPI($_GET["rowid"], $timin);
 
 
         $CHECKIFTHERESQL = "

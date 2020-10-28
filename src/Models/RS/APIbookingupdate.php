@@ -2,27 +2,42 @@
 
 namespace App\Models\RS;
 
+use App\Helpers\Config;
+use App\Helpers\Database;
+use App\Helpers\Logger;
+use App\Models\AbstractModel;
+use Exception;
 
 /**
  * Class BookedAPIupdate
  * @package App\Models\RS
  */
-class BookedAPIupdate
+class BookedAPIupdate extends AbstractModel
 {
-    // public $response;
-    // public $id;
-    // private $stoneApi;
+  public $response;
+  public $id;
+  private $stoneApi;
 
     /**
      * BookedAPIupdate constructor.
      */
     public function __construct()
     {
-
+      $this->stoneApi = Config::getInstance()->get('stone_api');
+        parent::__construct();
     }
 
     public function updatebookdateAPI($req, $bookdate)
     {
+
+      Logger::getInstance("responseAPIdate.log")->debug(
+        'BookedAPIupdate',
+        [__LINE__]
+    );
+      try{
+
+
+      
         $curl = curl_init();
         curl_setopt_array($curl, array(
           CURLOPT_URL => $this->stoneApi['url'] . "stoneapp/updateDate/".$req."/".$bookdate,
@@ -38,12 +53,18 @@ class BookedAPIupdate
         ));
         $output = curl_exec($curl);
 
-        // Logger::getInstance("responseAPIdate.log")->debug(
-        //     'BookedAPIupdate',
-        //     [$output]
-        // );
+
 
         $this->response = $output;
         return $this->response;
+        
+      }catch(Exception $e){
+
+        Logger::getInstance("responseAPIdateerr.log")->debug(
+          'BookedAPIupdate',
+          [$e->getMessage()]
+      );
+
+      }
     }
 }

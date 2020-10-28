@@ -25,44 +25,52 @@ class CurlStatuschange extends AbstractModel
     {
         $this->stoneApi = Config::getInstance()->get('stone_api');
 
-        $this->sdb =  Database::getInstance('sql01');
+        $this->sdb = Database::getInstance('sql01');
         parent::__construct();
     }
 
     public function updateAPI($req, $status)
     {
+        try {
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $this->stoneApi['url'] . "stoneapp/collectionStatus/" . $req . "/" . $status,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_HTTPHEADER => array(),
+            ));
+            $output = curl_exec($curl);
 
-        try{
+            Logger::getInstance("responseAPI.log")->debug(
+                'CurlStatuschange',
+                [
+                    'route' => 'stoneapp/collectionStatus',
+                    'req' => $req,
+                    'status' => $status,
+                    'output' => $output
+                ]
+            );
+            $this->response = $output;
+            return $this->response;
+        } catch (Exception $e) {
+            Logger::getInstance("responseAPI.log")->warning(
+                'confirmlist',
+                [
+                    'route' => 'stoneapp/collectionStatus',
+                    'req' => $req,
+                    'status' => $status,
+                    'line' => $e->getLine(),
+                    'error' => $e->getMessage()
+                ]
+            );
+        }
 
-        
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-          CURLOPT_URL => $this->stoneApi['url'] . "stoneapp/collectionStatus/".$req."/".$status,
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => "",
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => "POST",
-          CURLOPT_SSL_VERIFYPEER  => false,
-          CURLOPT_HTTPHEADER => array(),
-        ));
-        $output = curl_exec($curl);
-
-        Logger::getInstance("responseAPI.log")->debug(
-            'CurlStatuschange',
-            [$output]
-        );
-    }catch(Exception $e){
-        Logger::getInstance("responseAPI.log")->warning(
-            'confirmlist',
-            [$e->getMessage()]
-        );
-
-    }
-
-        $this->response = $output;
-        return $this->response;
+        return [];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models\Conf;
 
 use App\Helpers\Database;
+use App\Helpers\Logger;
 use App\Models\AbstractModel;
 use App\Models\RS\CurlStatuschange;
 
@@ -16,7 +17,7 @@ class UnConf extends AbstractModel
     public $id;
 
     /**
-     * UnConfirm constructor.
+     * UnConf constructor.
      */
     public function __construct()
     {
@@ -31,10 +32,8 @@ class UnConf extends AbstractModel
         $dell = 0;
         $who =  str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);
 
-
         foreach ($stuff as $value) {
             $colupdate ="
-
             update request
             set confirmed = ".$dell.",
             laststatus = 'Booked',
@@ -45,10 +44,19 @@ class UnConf extends AbstractModel
             set booking_status = 'Unconfimed'
             where RequestID ='".$value."'
             ";
-
-            $stmtu = $this->sdb->prepare($colupdate);
-            $stmtu->execute();
-            $apicall->updateAPI($value, 'Booked');
+            try {
+                $stmtu = $this->sdb->prepare($colupdate);
+                $stmtu->execute();
+                $apicall->updateAPI($value, 'Booked');
+            } catch (\Exception $e) {
+                Logger::getInstance("UnConf.log")->warning(
+                    'unconfirmlist',
+                    [
+                        'line' => $e->getLine(),
+                        'error' => $e->getMessage()
+                    ]
+                );
+            }
         }
     }
 }

@@ -189,13 +189,12 @@ class Company extends AbstractModel
         $count = 0;
         try {
             $sql = "SELECT convert(varchar(255),[CompanyID]) as 'company_id', CompanyName as 'compname', CompanyDescription, CRMNumber as 'ccmp', InvoiceAddressPostCode as 'postcode' FROM [dbo].[Company]";
-            $result = $this->gdb->prepare($sql);
-            $result->execute();
+            $result = $this->gdb->query($sql);
             $data = $result->fetchAll(\PDO::FETCH_OBJ);
 
             Logger::getInstance("CompanyRefresh.log")->debug(
                 'data',
-                ['line' => __LINE__, $data]
+                ['line' => __LINE__, count($data)]
             );
         } catch (\Exception $e) {
             Logger::getInstance("CompanyRefresh.log")->error(
@@ -219,7 +218,17 @@ class Company extends AbstractModel
 
                     Logger::getInstance("CompanyRefresh.log")->debug(
                         'exists2',
-                        ['line' => __LINE__, 'exists' => $exists, 'exists2' => $exists2]
+                        [
+                            'line' => __LINE__,
+                            [
+                                ':greenoak' => $webUser->company_id,
+                                'exists' => $exists
+                            ],
+                            [
+                                ':cmpnum' => $webUser->ccmp,
+                                'exists2' => $exists2
+                            ]
+                        ]
                     );
                 } catch (\Exception $e) {
                     Logger::getInstance("CompanyRefresh.log")->error(
@@ -267,7 +276,10 @@ class Company extends AbstractModel
 
                         Logger::getInstance("CompanyRefresh.log")->info(
                             'update',
-                            ['line' => __LINE__, 'sql' => $sql]
+                            ['line' => __LINE__,
+                                [':greenoak' => $webUser->company_id, ':cmp' => $webUser->ccmp],
+                                'sql' => $sql
+                            ]
                         );
                     } catch (\Exception $e) {
                         Logger::getInstance("CompanyRefresh.log")->error(
@@ -287,7 +299,12 @@ class Company extends AbstractModel
                         $data = $result->fetch(\PDO::FETCH_OBJ);
                         Logger::getInstance("CompanyRefresh.log")->info(
                             'select',
-                            ['line' => __LINE__, 'sql' => $sql]
+                            [
+                                'line' => __LINE__,
+                                [':greenoak' => $webUser->company_id],
+                                'sql' => $sql,
+                                count($data)
+                            ]
                         );
                     } catch (\Exception $e) {
                         Logger::getInstance("CompanyRefresh.log")->error(
@@ -295,6 +312,7 @@ class Company extends AbstractModel
                             ['line' => __LINE__, $e->getMessage()]
                         );
                     }
+
                     if (isset($data)) {
                         //add first to company table, and then once we have the company ID add to the sync table.
                         try {
@@ -305,7 +323,11 @@ class Company extends AbstractModel
                             $comId = $this->rdb->lastInsertId();
                             Logger::getInstance("CompanyRefresh.log")->info(
                                 'insert',
-                                ['line' => __LINE__, 'comId' => $comId, 'sql' => $sql]
+                                ['line' => __LINE__,
+                                    'comId' => $comId,
+                                    [':company' => $data->CompanyName],
+                                    'sql' => $sql
+                                ]
                             );
                         } catch (\Exception $e) {
                             Logger::getInstance("CompanyRefresh.log")->error(
@@ -317,17 +339,16 @@ class Company extends AbstractModel
                             try {
                                 $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
                                 $result = $this->rdb->prepare($sql);
-                                $result->execute(
-                                    [
-                                        ':recyc' => $comId,
-                                        ':greenoak' => $webUser->company_id,
-                                        ':company' => $data->CompanyName,
-                                        ':cmp' => $data->CRMNumber
-                                    ]
-                                );
+                                $execute = [
+                                    ':recyc' => $comId,
+                                    ':greenoak' => $webUser->company_id,
+                                    ':company' => $data->CompanyName,
+                                    ':cmp' => $data->CRMNumber
+                                ];
+                                $result->execute($execute);
                                 Logger::getInstance("CompanyRefresh.log")->info(
                                     'insert',
-                                    ['line' => __LINE__, 'comId' => $comId, 'sql' => $sql]
+                                    ['line' => __LINE__, 'comId' => $comId, $execute, 'sql' => $sql]
                                 );
                             } catch (\Exception $e) {
                                 Logger::getInstance("CompanyRefresh.log")->error(
@@ -342,7 +363,7 @@ class Company extends AbstractModel
 
                                 Logger::getInstance("CompanyRefresh.log")->info(
                                     'insert',
-                                    ['line' => __LINE__, 'comId' => $comId, 'sql' => $sql]
+                                    ['line' => __LINE__, 'comId' => $comId, array(':company' => $comId), 'sql' => $sql]
                                 );
                             } catch (\Exception $e) {
                                 Logger::getInstance("CompanyRefresh.log")->error(
@@ -367,7 +388,11 @@ class Company extends AbstractModel
                                         $result->execute([':company' => $comId, ':owner' => $ownerId]);
                                         Logger::getInstance("CompanyRefresh.log")->info(
                                             'insert',
-                                            ['line' => __LINE__, 'company' => $comId, 'owner' => $ownerId, 'sql' => $sql]
+                                            [
+                                                'line' => __LINE__,
+                                                [':company' => $comId, ':owner' => $ownerId],
+                                                'sql' => $sql
+                                            ]
                                         );
                                     } catch (\Exception $e) {
                                         Logger::getInstance("CompanyRefresh.log")->error(

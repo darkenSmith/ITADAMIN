@@ -469,9 +469,13 @@ class Company extends AbstractModel
                 ]);
             }
 
-            Logger::getInstance("CompanySync.log")->error(
+            Logger::getInstance("CompanySync.log")->debug(
                 'Company Synced',
-                ['line' => __LINE__, count($data2)]
+                [
+                    'line' => __LINE__,
+                    'data' => count($data),
+                    'data2' => count($data2)
+                ]
             );
 
             return true;

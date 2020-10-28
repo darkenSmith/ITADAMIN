@@ -51,7 +51,7 @@ class ItadEmails extends AbstractModel
         $arry = explode(" ", $emailadd);
         $fullpath2 = PROJECT_DIR . "assets/attachments/ITADCOVID19terms.pdf";
         $yes = 'Yes';
-        $path2 = 'https://itadadmin.stonegroup.co.uk/Conf/thankyoucust/' . $rid;
+        $path2 = 'https://itadsystem.stonegroup.co.uk/Conf/thankyoucust/' . $rid;
         $sTime = '';
         $test = strtotime(str_replace('/', '-', $datestuff));
         $name = str_replace('@stonegroup.co.uk', '', $_SESSION['user']['username']);

@@ -295,7 +295,7 @@ class RSController extends AbstractController
 
     public function updateRebate()
     {
-        $updatereb = new Rebate();
+        $updatereb = new updateRebate();
         $updatereb->update();
     }
 

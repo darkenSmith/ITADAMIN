@@ -14,6 +14,7 @@ if (!empty($argv[1]) && $argv[1] === 'refresh') {
     Logger::getInstance("Cron.log")->info('company', ['refresh']);
     try {
         $companies = new Company();
+        $companies->company_sync();
         $companies->refresh(false);
         Logger::getInstance("Cron.log")->info('company', ['executed']);
     } catch (\Exception $e) {

@@ -1,6 +1,9 @@
 <?php
 
 use App\Helpers\Database;
+use App\Models\RS\CurlStatuschange;
+use App\Models\RS\BookedAPIupdate;
+
 
 $sdb = Database::getInstance('sql01');
 $gdb = Database::getInstance('greenoak');
@@ -61,7 +64,7 @@ $rdb = Database::getInstance('recycling');
 
 
     $totalswu = "
-select 
+select
 
 SUM(qty) as totalunits,
 sum(qty * convert(DECIMAL(9 , 2),typicalweight)) as totalweight,
@@ -71,11 +74,11 @@ convert(int, sum(qty * convert(DECIMAL(9 , 2),typicalweight))) as totalweightint
 join Req_Detail as rr on
 r.request_id = rr.req_id
 join productlist as p on
-p.product_ID = rr.prod_id 
+p.product_ID = rr.prod_id
 where request_id = " . $justID . "
 
 group by
- 
+
 r.request_id
 
 order by r.request_id
@@ -84,7 +87,7 @@ order by r.request_id
 
     $sql = "
 select
- 
+
 
 Request_ID as id,
 dbo.[zzfnRemoveNonNumericCharacters](ORD) as ordnum,
@@ -110,7 +113,7 @@ add2 as address2,
 add3 as address3,
 GDPRconf as gdprcon,
 lift,
- ground, 
+ ground,
  steps,
   twoman,
 postcode as  postcode,
@@ -150,8 +153,8 @@ ORD as  salo
 
 
     $sqlextra = "
-  select 
-  p.Product as prodname, 
+  select
+  p.Product as prodname,
    r.prod_id as prodid,
     QTY as w,
      wipe as wip,
@@ -169,12 +172,12 @@ ORD as  salo
 join Req_Detail as r on
 rt.request_id = r.req_id
 join productlist as p on
-p.product_ID = r.prod_id 
+p.product_ID = r.prod_id
 where rt.request_id = " . $justID . "
 
 group by
-p.Product, 
-rt.request_id, 
+p.Product,
+rt.request_id,
  r.prod_id,
  qty,
       wipe,
@@ -214,13 +217,13 @@ set @postcode='" . $row['postcode'] . "'";
 
 
     $sqlnotes .= "select top 1
-C.gdpr as gdpr, 
+C.gdpr as gdpr,
 c.is_AMR as amrc,
-isnull(replace(c.location, ' ', ''), 'null'), 
+isnull(replace(c.location, ' ', ''), 'null'),
 isnull(max(c.notes), 'no notes') as notes
 from request as rt2
 full join companies as c on
- Location = @postcode and 
+ Location = @postcode and
  Customer_name = [CompanyName]
 
  where  Location = '" . $row['name'] . "'+@postcode
@@ -341,7 +344,7 @@ order by isnull(replace(c.location, ' ', ''), 'null')
         $pl[] = $row['prodid'];
     }
 
-    echo " 
+    echo "
   </tbody>
   </table>
 </div>
@@ -373,7 +376,7 @@ and active = 1
 
     $adddata = $stmtadd->fetchAll(\PDO::FETCH_ASSOC);
 
-    echo " 
+    echo "
 
 <div id ='newlinedata'>
 
@@ -390,7 +393,7 @@ and active = 1
 ";
     }
 
-    echo " 
+    echo "
 </select>
 <input type='number' id='newwork' min=0 value='' placeholder='Working Qty'>
 <input type='text' id='othername' value='' placeholder='Part Name'>
@@ -925,6 +928,23 @@ and active = 1
 
     $postcode = '';
     $salesordernum = '';
+    $name = '';
+    $email = '';
+    $contact ='';
+    $phone ='';
+    $twn = '';
+    $postcode = '';
+    $prefix = '';
+    $area1= '';
+    $reqadded = '';
+    $own ='';
+    $typ = '';
+    $prev = '';
+    $colinst = '';
+    $coldate = '';
+    $approved = '';
+    $p = '';
+
 
     $stmtnote = $sdb->prepare($sqlnotes);
     if (!$stmtnote) {
@@ -971,13 +991,34 @@ and active = 1
 
     // while($row = sqlsrv_fetch_array($stmt)){
     foreach ($data as $row) {
+
+        $name = $row['name'];
+        $email = $row['email'];
+        $contact =$row['contact'];
+        $phone = $row['cphone'];
+        $twn =  $row['twn'];
+        $postcode = $row['postcode'];
+        $prefix = $row['prefix'] ;
+        $area1= $row['twn'];
+        $reqadded = $row['reqadd'];
+        $own =$row['ownerreq'];
+        $typ = $row['typ'];
+        $prev =  $row['prev'] ;
+        $colinst = $row['CollectionInstruction'];
+        $coldate = $row['CollectionDate'] ;
+        $approved = $row['approved'];
+        $p = $row['process'] ;
+
+
+
+
         $portalcheck = "SELECT case when COUNT(*) > 0 then 'Customer has portal access' else 'Customer has no portal access' end AS usercheck FROM recyc_users WHERE username ='" . $row['email'] . "'";
         $portstmt = $rdb->prepare($portalcheck);
         $portstmt->execute();
         $port = $portstmt->fetch(\PDO::FETCH_ASSOC);
 
         echo "<h4 id='portalstat'>" . $port['usercheck'] . "</h4>  <button type='button' id='addport' class='portadd btn btn-success'>Add to portal </button><button type='button' id='subuser' class='portadd btn btn-success'>submit </button>
-       
+
           <div class= 'adduser'>
           <hr> ";
 
@@ -1060,6 +1101,8 @@ and active = 1
         $_SESSION['newdeadline'] = $DEADtime;
 
 
+
+
         echo "<table cellpadding='1' cellspacing ='1' class='table'>";
         $menudet = "
           <tr hidden>
@@ -1070,7 +1113,7 @@ and active = 1
 
           <tr>
           <th >GDPR</th>
-          <td>        
+          <td>
             <select id='gdpr-select'  class='group1'>
           <option value='" . $row['gdprcon'] . "' selected>" . $geprstring . "</option>
           <option value='0' >No</option>
@@ -1138,14 +1181,14 @@ and active = 1
         $menudet .= "<tr>
       <th> Owner </th>
       <td>
-      
+
       <select id='reqown_ed' class='group1' disabled>
       <option selected>" . $row['ownerreq'] . " </option>";
 
         foreach ($dataoenrs as $owners) {
             $menudet .= " <option>
           " . $owners['name'] . "
-          
+
       </option>";
         }
 
@@ -1191,23 +1234,23 @@ and active = 1
 <th> Availability  </th>
 <td><input type='text' size='150' id='coldate_ed' class='group1' value='" . $row['CollectionDate'] . "' disabled></td>
 </tr>
-<tr> 
+<tr>
 <th>  Help On-Site</th>
 <td><input type='text' id='help_on' class='group1' value='" . $help . "' disabled></td>
 </tr>
-<tr> 
+<tr>
 <th>  Two-Man</th>
 <td><input type='text' id='twoman' class='group1' value='" . $twoman . "' disabled></td>
 </tr>
-<tr> 
+<tr>
 <th>  Steps </th>
 <td><input type='text' id='steps' class='group1' value='" . $steps . "' disabled></td>
 </tr>
-<tr> 
+<tr>
 <th>  Ground Floor </th>
 <td><input type='text' id='ground' class='group1' value='" . $ground . "' disabled></td>
 </tr>
-<tr> 
+<tr>
 <th>  Lift  </th>
 <td><input type='text' id='lift' class='group1' value='" . $lift . "' disabled></td>
 </tr>
@@ -1264,7 +1307,7 @@ and active = 1
         <th> Company AMR status </th>
         <td> " . $row['amrc'] . " </td>
 </tr>
-        
+
         </table>";
     }
 
@@ -1577,7 +1620,7 @@ isnull([ContractNotes], 'empty') as cnote,
 isnull([DriverName], 'not set') as dnam,
 isnull([VehicleReg], 'not set') as vreg,
 booking_status as stat,
-[is_canceled] as can, 
+[is_canceled] as can,
 datediff(day, surveysnet_date, survey_deadline) as deaddays,
 survey_deadline as deadline,
 isnull([email_sent], 'No') as email_sent,
@@ -1654,7 +1697,7 @@ WHERE
  <td><input type='text' id='constat' class='group2' value='" . $arow['cstat'] . "' disabled></td>
 </tr>
  <tr hidden>
-<th>Contract Notes:</th> 
+<th>Contract Notes:</th>
 <td><textarea disabled id='conote' class='group2'>" . $arow['cnote'] . " </textarea> <br><br><hr></td>
 </tr>
 
@@ -1669,7 +1712,7 @@ WHERE
 <th> email sent?:</th>
 <td>  <input type='text' id='conf' class='group2' value='" . $arow['email_sent'] . "' disabled><br/></td>
 </tr>
-<tr> 
+<tr>
 <th> Email info</th>
 <td hidden><input type='checkbox' id='lorry' " . $loc . "> lorry needed?</td>
 <td id='lorryty' ><input type='text' id='lorrytttt' value='" . $arow['lotype'] . "' disabled></td>
@@ -1736,7 +1779,7 @@ WHERE
    <td><input type='text' id='emalconf' class='group2'  value='" . $arow['cone'] . "' disabled> <br><br></td>
   </tr>
   <tr>
- 
+
   <td hidden><input type='text' id='SurveySent' class='group2' value='" . $arow['sysent'] . "' disabled><br> <br></td>
   </tr>
   <tr>
@@ -1810,7 +1853,7 @@ WHERE
   <tr>
     <Td> <input type='text' id='jn_up' class='group2' value='" . $arow['jn'] . "' disabled> </td>
     <Td> <input type='text' id='acc_up' class='group2' value='" . $arow['accn'] . "' disabled> </td>
- 
+
 
   </tr>
   </table>
@@ -2238,6 +2281,7 @@ WHERE
 
 
     <?php
+    $apicall = new CurlStatuschange();
 
     if (isset($_GET['btn'])) {
         $test = strtotime(str_replace('/', '-', $_GET['pd']));
@@ -2255,7 +2299,9 @@ WHERE
               request
             SET
             collection_date ='" . $timin . "',
-            been_collected = 1
+            been_collected = 1,
+             confirmed = '0',
+            laststatus = 'booked'
             WHERE
               Request_ID LIKE " . $_GET["rowid"];
 
@@ -2263,16 +2309,20 @@ WHERE
 
         $stmtp = $sdb->prepare($sqlUpdate);
         $stmtp->execute();
+    // $apibooked = new BookedAPIupdate();
+    //    $apibooked->updatebookdateAPI($_GET["rowid"], $timin);
 
 
         $CHECKIFTHERESQL = "
-              set nocount on
-              declare @test varchar(max)
-              declare @name varchar(50)
-              set @test = '" . $_GET["rowid"] . "'
-              set @name = '" . $row['name'] . "'
-              select  isnull((case when Customer like @name then 'There all ready' else 'new record' end),'new rec') as Checker from Booked_Collections where RequestID like @test
-              group by Customer
+
+
+        set nocount on
+        declare @test varchar(max)
+        declare @name varchar(50)
+        set @test ='".$_GET["rowid"]."'
+			select case when count(*) < 1 then 'new record' else 'There all ready' end as checker from Booked_Collections where RequestID like @test
+
+
 
               ";
 
@@ -2290,7 +2340,7 @@ WHERE
 
         $cenvertedTime = date('Y-m-d H:i:s', strtotime('+16 hour', strtotime($datediff)));
 
-        if (!$r['Checker'] == 'There all ready') {
+        if ($r['checker'] == 'new record') {
             $userint = get_current_user();
 
             $result = strtoupper(substr($userint, 0, 2));
@@ -2313,32 +2363,32 @@ WHERE
 
             insert into Booked_Collections( RequestID, Customer, Email, Contact, Phone,
              Town, PostCode, Prefix, Area1, EstWeight,[Est Total Units], SubmitDate, BookedCollectDate, [is_canceled], booking_status, [sentby], owner, [deliveryType], prev_date, ORD, [Job_notes], [Access_Notes], [APS_notes], A, P)
-            
-            values('" . $_GET["rowid"] . "', '" . $row['name'] . "', '" . $row['email'] . "', '" . $row['contact'] . "', '" . $row['cphone'] . "', '" . $row['twn'] . "', '" . $row['postcode'] . "', '" . $row['prefix'] . "', '" . $row['twn'] . "',
-            " . $roww['totalweightint'] . ", " . $roww['totalunits'] . ", '" . $row['reqadd'] . "', '" . $timin . "', 0, 'Date Set', '" . $result . "', '" . $row['ownerreq'] . "', '" . $row['typ'] . "', '" . $row['prev'] . "', '" . $ord . "', '" . $row['CollectionInstruction'] . "', '" . $row['CollectionDate'] . "', '" . $row['approved'] . "  " . $row['process'] . "', '" . $row['approved'] . "', '" . $row['process'] . "')
-            
-            set nocount on
-            update request
-            set confirmed = '0',
-            laststatus = 'booked'
-            where Request_ID ='" . $_GET["rowid"] . "'";
+
+            values('" . $_GET["rowid"] . "', '" . $name . "', '" . $email . "', '" .$contact. "', '" . $phone . "', '" .$twn . "', '" . $postcode . "', '" . $prefix . "', '" . $twn . "',
+            " . $roww['totalweightint'] . ", " . $roww['totalunits'] . ", '" . $reqadded . "', '" . $timin . "', 0, 'Date Set', '" . $result . "', '" . $own . "', '" . $typ . "', '" . $prev . "', '" . $ord . "', '" . $colinst. "', '" . $coldate . "', '" . $approved . "  " . $p . "', '" . $approved. "', '" . $p . "')
+  ";
+
+
 
 
             $stmt = $sdb->prepare($bookrecord);
             $stmt->execute();
+            $apicall->updateAPI($_GET["rowid"], 'Booked');
 
 
             echo "<meta http-equiv='refresh' content='0'>";
         } else {
             echo "<p>in booked collections log</p>";
-            $sqlbookup = "     
+            $sqlbookup = "
               update Booked_Collections
-              set BookedCollectDate = '" . $timin . "'
-              where RequestID ='" . $_GET["rowid"] . "'
-              
+              set BookedCollectDate = '".$timin."'
+              where RequestID ='".$_GET["rowid"]."'
+
               ";
             $bookupstmt = $sdb->prepare($sqlbookup);
             $bookupstmt->execute();
+
+            $apicall->updateAPI($_GET["rowid"], 'Booked');
         }
         if ($stmtp === false) {
             // failed
@@ -2398,8 +2448,8 @@ WHERE
 
     foreach ($datarest as $row) {
         echo "
-  
-    
+
+
           <tr>
             <th> Request Done Date  </th>
             <td>" . $row['RequestDoneDate'] . "</td>
@@ -2418,8 +2468,8 @@ WHERE
           </tr>
           </table><br>
 
-       
-          
+
+
           ";
     }
 
@@ -2611,7 +2661,7 @@ echo "
         </tr>
       </table>
       <br>
-   
+
       ";
 
 

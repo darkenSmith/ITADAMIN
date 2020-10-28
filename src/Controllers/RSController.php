@@ -30,6 +30,7 @@ use App\Models\RS\ItadEmails;
 use App\Models\RS\UploadImage;
 use App\Models\RS\UnDone;
 use App\Models\RS\ARCUpdates;
+use App\Models\RS\Updaterebate;
 use App\Models\User;
 
 /**
@@ -294,7 +295,8 @@ class RSController extends AbstractController
 
     public function updateRebate()
     {
-        echo (new Rebate())->create();
+        $updatereb = new updateRebate();
+        $updatereb->update();
     }
 
     public function createBER()

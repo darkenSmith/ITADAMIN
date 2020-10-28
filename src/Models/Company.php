@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Helpers\Database;
 use App\Helpers\Logger;
+use Exception;
 
 /**
  * Class Company
@@ -221,12 +222,12 @@ class Company extends AbstractModel
                         [
                             'line' => __LINE__,
                             [
-                                ':greenoak' => $webUser->company_id,
-                                'exists' => $exists
+                                ':greenoak' => $webUser->company_id
+                              
                             ],
                             [
-                                ':cmpnum' => $webUser->ccmp,
-                                'exists2' => $exists2
+                                ':cmpnum' => $webUser->ccmp
+                              
                             ]
                         ]
                     );
@@ -427,5 +428,56 @@ class Company extends AbstractModel
                 ['line' => __LINE__, 'count' => $count]
             );
         }
+    }
+
+
+    public function company_sync(){
+
+        $count = 0;
+        try {
+            $sql = "SELECT g.company_number, s.company_id from recyc_company_sync as s
+            join company_greenoak_links as g on
+           s.company_id = g.company_id where s.greenoak_id = 'AWAITING UPDATE'";
+            $result = $this->rdb->query($sql);
+            $data = $result->fetchAll(\PDO::FETCH_OBJ);
+            $cNumber = [];
+            $q ='';
+            foreach($data as $company){
+                $cNumber[$company->company_number] = $company->company_id;
+                $q .= "'" . $company->company_number . "',";  
+            }
+            $q  = rtrim($q,',');
+            $sql = "SELECT convert(varchar(255),[CompanyID]) as 'company_id', CompanyName as 'compname', CompanyDescription, CRMNumber as 'cmp', InvoiceAddressPostCode as 'postcode', CompanyRegNo  as 'companynum' FROM [dbo].[Company] WHERE CompanyRegNo IN (".$q.")";
+            $result = $this->gdb->query($sql);
+            $data2 = $result->fetchAll(\PDO::FETCH_OBJ);
+
+            foreach($data2 as $greencompany){
+
+                $company_id = $cNumber[$greencompany->companynum];
+            
+                    $sql = " UPDATE recyc_company_sync
+					SET CMP = :cmp,
+                    greenoak_id = :greenoak_id
+					WHERE company_id = :company_id";
+                    $result = $this->rdb->prepare($sql);
+                    $result->execute([
+                        ':company_id' => $company_id,
+                        ':greenoak_id' => $greencompany->company_id,
+                        ':cmp' => $greencompany->cmp
+                    ]);
+            }
+            Logger::getInstance("CompanySync.log")->error(
+                'Update COMPANY CREATED',
+                ['line' => __LINE__, count($data2)]
+            );
+        }catch(Exception $e){
+            
+            Logger::getInstance("CompanySync.log")->error(
+                'Update COMPANY CREATED',
+                ['line' => __LINE__, $e->getMessage()]
+            );
+        }
+
+
     }
 }

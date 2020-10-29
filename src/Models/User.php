@@ -228,6 +228,20 @@ class User extends AbstractModel
                         $statement = $this->rdb->prepare($sql);
                         $values = array(':id' => $id, ':customer_id' => $customer_id);
                         $statement->execute($values);
+
+                        $company = $this->getCompanyById($customer_id);
+                        if ($company) {
+                            $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
+                            $result = $this->rdb->prepare($sql);
+                            $result->execute(
+                                [
+                                    ':recyc' => $company->id,
+                                    ':greenoak' => 'AWAITING UPDATE',
+                                    ':company' => $company->company_name,
+                                    ':cmp' => null
+                                ]
+                            );
+                        }
                     }
                 }
             }
@@ -375,14 +389,14 @@ class User extends AbstractModel
 
                             Logger::getInstance("User.log")->debug(
                                 'insert-recyc_customer_links_to_company',
-                                [$sql,$values, $_POST["customer_id"], $customerId]
+                                [$sql, $values, $_POST["customer_id"], $customerId]
                             );
 
                             $statement = $this->rdb->prepare($sql);
                             $statement->execute($values);
 
                             $company = $this->getCompanyById($customerId);
-                            if($company) {
+                            if ($company) {
                                 $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
                                 $result = $this->rdb->prepare($sql);
                                 $result->execute(

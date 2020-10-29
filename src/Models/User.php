@@ -321,6 +321,21 @@ class User extends AbstractModel
         }
     }
 
+    public function getCompanyById($companyId)
+    {
+        $sql = 'SELECT id, company_name FROM `recyc_company_list` WHERE id = :companyId';
+        $result = $this->rdb->prepare($sql);
+        $result->execute(array(':companyId' => $companyId));
+        $company = $result->fetch(\PDO::FETCH_OBJ);
+
+
+        if (!empty($company->id)) {
+            return $company;
+        }
+
+        return false;
+    }
+
     // Called by: controllers/login_controller.php -> reset()
 
     public function addUser()
@@ -365,6 +380,20 @@ class User extends AbstractModel
 
                             $statement = $this->rdb->prepare($sql);
                             $statement->execute($values);
+
+                            $company = $this->getCompanyById($customerId);
+                            if($company) {
+                                $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
+                                $result = $this->rdb->prepare($sql);
+                                $result->execute(
+                                    [
+                                        ':recyc' => $company->id,
+                                        ':greenoak' => 'AWAITING UPDATE',
+                                        ':company' => $company->company_name,
+                                        ':cmp' => null
+                                    ]
+                                );
+                            }
                         }
                     }
                     // End change tag addCustomer

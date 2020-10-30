@@ -53,6 +53,44 @@ class Company extends AbstractModel
         unset($this->rdb);
     }
 
+
+    public function updateCmps(){
+
+        $sql = 'select ordernum from Collections_Log';
+        $result = $this->sdb->prepare($sql);
+        $result->execute();
+        $this->ordernumbers = $result->fetchAll(\PDO::FETCH_OBJ);
+
+        foreach($this->ordernumbers as $orders){
+
+            $sql = "select crmnumber as cmp  from [greenoak].[we3recycler].[dbo].SalesOrders as so with(nolock)  
+            join [greenoak].[we3recycler].[dbo].company as c on 
+            c.companyid = so.companyid where replace(so.salesordernumber, 'ORD-', '') =:ord";
+            $result = $this->gdb->prepare($sql);
+            $result->execute(array(':ord' => $orders->ordernum));
+            $cmpnumbers = $result->fetch(\PDO::FETCH_OBJ);
+
+            if($cmpnumbers){
+                        $sql = "update Collections_Log
+                        set cmp_num = '".$cmpnumbers->cmp."'
+                        where ordernum = :ord";
+                        $result = $this->sdb->prepare($sql);
+                        $result->execute(array(
+                            ':cmp' => $cmpnumbers->cmp,
+                            ':ord' => $orders->ordernum
+                         ));
+            }else{
+                    $sql = "update Collections_Log
+                    set cmp_num = 'NOT FOUND'
+                    where ordernum =".$orders->ordernum;
+                    $result = $this->sdb->prepare($sql);
+                    $result->execute();
+            }
+ 
+        }
+
+    }
+
     public function loadById($id, $return = false)
     {
         $results = new \stdClass();

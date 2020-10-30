@@ -173,7 +173,7 @@ class Company extends AbstractModel
                 $result->execute(array(':ord' => $collectionLog->ordernum));
                 $cmpNumber = $result->fetch(\PDO::FETCH_OBJ);
 
-                if ($cmpNumber) {
+                if (!empty($cmpNumber->cmp)) {
                     $sql = "update Collections_Log
                         set cmp_num = :cmp_number
                         where ordernum = :order_number";
@@ -185,7 +185,7 @@ class Company extends AbstractModel
                     $result->execute($executeData);
 
                     $response['each']['execute'][] = $executeData;
-                } else {
+                } elseif (empty($cmpNumber->cmp) && !empty($collectionLog->ordernum)) {
                     $sql = "update Collections_Log
                     set cmp_num = 'NOT FOUND'
                     where ordernum = :order_number";
@@ -195,6 +195,8 @@ class Company extends AbstractModel
                     ];
                     $result->execute($executeData);
                     $response['each']['execute'][] = $executeData;
+                } else {
+                    $response['each']['execute'][] = [];
                 }
             }
         } catch (Exception $e) {

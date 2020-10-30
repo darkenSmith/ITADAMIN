@@ -53,44 +53,6 @@ class Company extends AbstractModel
         unset($this->rdb);
     }
 
-
-    public function updateCmps(){
-
-        $sql = 'select ordernum from Collections_Log';
-        $result = $this->sdb->prepare($sql);
-        $result->execute();
-        $this->ordernumbers = $result->fetchAll(\PDO::FETCH_OBJ);
-
-        foreach($this->ordernumbers as $orders){
-
-            $sql = "select crmnumber as cmp  from [greenoak].[we3recycler].[dbo].SalesOrders as so with(nolock)  
-            join [greenoak].[we3recycler].[dbo].company as c on 
-            c.companyid = so.companyid where replace(so.salesordernumber, 'ORD-', '') =:ord";
-            $result = $this->gdb->prepare($sql);
-            $result->execute(array(':ord' => $orders->ordernum));
-            $cmpnumbers = $result->fetch(\PDO::FETCH_OBJ);
-
-            if($cmpnumbers){
-                        $sql = "update Collections_Log
-                        set cmp_num = '".$cmpnumbers->cmp."'
-                        where ordernum = :ord";
-                        $result = $this->sdb->prepare($sql);
-                        $result->execute(array(
-                            ':cmp' => $cmpnumbers->cmp,
-                            ':ord' => $orders->ordernum
-                         ));
-            }else{
-                    $sql = "update Collections_Log
-                    set cmp_num = 'NOT FOUND'
-                    where ordernum =".$orders->ordernum;
-                    $result = $this->sdb->prepare($sql);
-                    $result->execute();
-            }
- 
-        }
-
-    }
-
     public function loadById($id, $return = false)
     {
         $results = new \stdClass();
@@ -189,6 +151,69 @@ class Company extends AbstractModel
             }
             $e = 123;
         }
+    }
+
+
+    public function updateCmp()
+    {
+        $sql = 'select ordernum from Collections_Log WHERE cmp_num IS NULL';
+        $result = $this->sdb->query($sql);
+        $collectionLogs = $result->fetchAll(\PDO::FETCH_OBJ);
+
+        $response = [
+            'totalCollectionLogs' => count($collectionLogs)
+        ];
+
+        try {
+            foreach ($collectionLogs as $collectionLog) {
+                $sql = "select crmnumber as cmp  from [greenoak].[we3recycler].[dbo].SalesOrders as so with(nolock)  
+            join [greenoak].[we3recycler].[dbo].company as c on 
+            c.companyid = so.companyid where replace(so.salesordernumber, 'ORD-', '') =:ord";
+                $result = $this->gdb->prepare($sql);
+                $result->execute(array(':ord' => $collectionLog->ordernum));
+                $cmpNumber = $result->fetch(\PDO::FETCH_OBJ);
+
+                if ($cmpNumber) {
+                    $sql = "update Collections_Log
+                        set cmp_num = :cmp_number
+                        where ordernum = :order_number";
+                    $result = $this->sdb->prepare($sql);
+                    $executeData = [
+                        ':cmp_number' => $cmpNumber->cmp,
+                        ':order_number' => $collectionLog->ordernum
+                    ];
+                    $result->execute($executeData);
+
+                    $response['each']['execute'][] = $executeData;
+                } else {
+                    $sql = "update Collections_Log
+                    set cmp_num = 'NOT FOUND'
+                    where ordernum = :order_number";
+                    $result = $this->sdb->prepare($sql);
+                    $executeData = [
+                        ':order_number' => $collectionLog->ordernum
+                    ];
+                    $result->execute($executeData);
+                    $response['each']['execute'][] = $executeData;
+                }
+            }
+        } catch (Exception $e) {
+            Logger::getInstance("CompanyUpdateCmp.log")->error(
+                'errored',
+                ['line' => $e->getLine(), $response, $e->getMessage()]
+            );
+            return false;
+        }
+
+        Logger::getInstance("CompanyUpdateCmp.log")->debug(
+            'success',
+            [
+                'line' => __LINE__,
+                $response
+            ]
+        );
+
+        return true;
     }
 
     public function getCustomers()

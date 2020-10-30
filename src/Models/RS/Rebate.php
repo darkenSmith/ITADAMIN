@@ -65,10 +65,8 @@ rebateid as rid
         $inv = $_POST['message'];
 
         foreach ($ord as $o) {
-            $ordernum = str_replace('ORD-', '', $o);
+            $ordernum = str_replace('ORD ','',str_replace('ORD-', '', $o));
 
-            $ordernum = str_replace('ORD-', '', $ordernum);
-            $ordernum = str_replace('ORD ', '', $ordernum);
 
 
             $sqlcheck = "select count(*) as c from rebate where ord like '" . $ordernum . "' ";
@@ -82,7 +80,7 @@ rebateid as rid
 
                 $sql = "UPDATE Collections_Log
                 SET rebate = '" . $inv . "'
-                where replace(OrderNum, 'ORD-', '') = '" . $ordernum . "' ";
+                where replace(OrderNum, 'ORD-', '') = '" .$ordernum. "' ";
                 $update = $this->sdb->prepare($sql);
                 $update->execute();
 
@@ -117,17 +115,18 @@ rebateid as rid
                 $boostsql = "
             
                 
-                select 
-                rebateid as 'rebateid', 
+                select rebateid as 'rebateid', 
                 R.CMP_Num as 'cmp', 
-                R.ORD as 'ordn', 
-                R.ValueExclVAT * (SELECT Value FROM stone360config  WHERE Name = 'Boost_Ratio')as 'BoostValue',
-                GETDATE() as 'BoostedDate',
-                (select request_id from request as rr where replace(Rr.ORD, 'ORD-', '') like c.OrderNum) as 'id',
+                replace(replace(r.ord, 'ORD-', ''), 'ORD ', '') as 'ordn', 
+                 R.ValueExclVAT * (SELECT Value FROM stone360config  WHERE Name = 'Boost_Ratio')as 'BoostValue',
+                 GETDATE() as 'BoostedDate',
+                 (select request_id from request as rr where replace(replace(rr.ord, 'ORD-', ''), 'ORD ', '') = replace(replace(c.ordernum, 'ORD-', ''), 'ORD ', '')) as 'id',
                 'Awaiting' as 'Status'
-                 from collections_log as c
-                join rebate as r on 
-                r.ORD like c.OrderNum  where c.OrderNum like :ord";
+                from collections_log as c
+                                
+                left join rebate as r on 
+                replace(replace(r.ord, 'ORD-', ''), 'ORD ', '') = replace(replace(c.ordernum, 'ORD-', ''), 'ORD ', '')
+                where replace(replace(c.ordernum, 'ORD-', ''), 'ORD ', '') like :ord";
                 $booststmt	= $this->sdb->prepare( $boostsql );
                 $booststmt->execute(array(':ord' => $ordernum));
     

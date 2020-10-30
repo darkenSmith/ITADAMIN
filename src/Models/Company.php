@@ -156,7 +156,7 @@ class Company extends AbstractModel
 
     public function updateCmp()
     {
-        $sql = 'select ordernum from Collections_Log WHERE cmp_num IS NULL';
+        $sql = 'select ordernum from Collections_Log WHERE cmp_num IS NULL AND ordernum IS NOT NULL';
         $result = $this->sdb->query($sql);
         $collectionLogs = $result->fetchAll(\PDO::FETCH_OBJ);
 
@@ -195,8 +195,6 @@ class Company extends AbstractModel
                     ];
                     $result->execute($executeData);
                     $response['each']['execute'][] = $executeData;
-                } else {
-                    $response['each']['execute'][] = [];
                 }
             }
         } catch (Exception $e) {

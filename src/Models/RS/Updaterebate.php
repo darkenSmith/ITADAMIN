@@ -41,44 +41,16 @@ $cinn = $_POST['cinn'];
 $status = $_POST['status'];
 
 
-
-function clean_data($value,$type) {
-    if ($type == "text") {
-                    $value = preg_replace("/[^a-zA-Z0-9\-\_\ go]/","",$value);
-    }
-    if ($type == "email") {
-                    $value = preg_replace("/[^a-zA-Z0-9\-\.\@]/","",$value);
-    }
-    if ($type == "date") {
-                    $value = preg_replace("/[^a-zA-Z0-9\-\.\@\\\/]/","",$value);
-    }
-    if ($type == "password") {
-                    $value = preg_replace("/[\'\"\;]/","",$value);      
-    }
-    if ($type == "number") {
-                    $value = preg_replace("/![0-9]/","",$value);        
-    } 
-    if ($type == "array") {
-                    $value = preg_replace("/[^a-zA-Z0-9\,]/","",$value);                        
-    }              
-    if ($type == "mac") {
-                    $value = preg_replace("/[^a-zA-Z0-9\,\:]/","",$value);                     
-    }              
-    return $value;
-}
-
-
-
-$safeord = clean_data($ord ,"text");
-$safemon= clean_data($mon ,"text");
+$safeord = $this->clean_data($ord ,"text");
+$safemon= $this->clean_data($mon ,"text");
 //$safedatee= clean_data($datee ,"date");
-$safename = clean_data($name ,"text");
-$safeval1 = clean_data($val1  ,"number");
-$safeval2 = clean_data($val2  ,"number");
-$safeval3 = clean_data($val3  ,"number");
+$safename = $this->clean_data($name ,"text");
+$safeval1 = $this->clean_data($val1  ,"number");
+$safeval2 = $this->clean_data($val2  ,"number");
+$safeval3 = $this->clean_data($val3  ,"number");
 //$safeinvdate= clean_data($invdate ,"date");
-$safecinn = clean_data($cinn ,"text");
-$safestatus = clean_data($status ,"text");
+$safecinn = $this->clean_data($cinn ,"text");
+$safestatus = $this->clean_data($status ,"text");
 
 if($datee == ''){
 
@@ -111,10 +83,6 @@ where RebateID = '".$id."'
 
 ";
 
-
-
-
-
 $stmt = $this->sdb->prepare($sql);
 if (!$stmt) {
   // echo "\nPDO::errorInfo():\n";
@@ -137,10 +105,89 @@ $stmtcheck->execute();
     }
 
 
+    public function Boosted(){
+             
+
+$ord = $_POST['ord'];
+$cinn = $_POST['cinn'];
+
+
+
+
+$safeord = $this->clean_data($ord ,"text");
+$user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
+$ordernum = $safeord;
+
+$sqlup = "
+      UPDATE rebate 
+        set 
+        InvValueExclVAT = ValueExclVAT,
+        updateby = '" . $user . "',
+        status = 'Claimed', 
+        CommentsInvNumber = '".$cinn.":BOOST',
+        DiffExclVAT = 0,
+        DateInvReceived = GETDATE(),
+        CommentsInvNumber = '".$cinn."',
+        WHERE replace(ORD, 'ORD-', '') = replace('" . $ordernum. "','ORD-', '') ";
+    $dataof = $this->sdb->prepare($sqlup);
+    $dataof->execute();
+
+    $sqp = "update Collections_Log
+            SET  invoiceAmt = ValueExclVAT,
+            invoicedate = getdate()
+            FROM REBATE as r with(nolock)
+            join collections_log as cl with(nolock) on
+            cl.OrderNum = r.ord
+            where  replace(ORD, 'ORD-', '') = replace('" . $ordernum . "','ORD-', '')
+          ";
+    $dataof2 = $this->sdb->prepare($sqp);
+    $dataof2->execute();
+
+          $sboostup = "update boosts
+          set Status = 'Claimed'
+          replace(b.ORD, 'ord-', '') = replace($ordernum, 'ord-', '')
+        ";
+          $dataof3 = $this->sdb->prepare($sboostup);
+          $dataof3->execute();
+
+          return "boosted";
+
+
+
+
+
+    }
+
+
     public function clean($string)
     {
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
          
         return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string)); // Removes special chars.
     }
+
+    public function clean_data($value,$type) {
+      if ($type == "text") {
+                      $value = preg_replace("/[^a-zA-Z0-9\-\_\ go]/","",$value);
+      }
+      if ($type == "email") {
+                      $value = preg_replace("/[^a-zA-Z0-9\-\.\@]/","",$value);
+      }
+      if ($type == "date") {
+                      $value = preg_replace("/[^a-zA-Z0-9\-\.\@\\\/]/","",$value);
+      }
+      if ($type == "password") {
+                      $value = preg_replace("/[\'\"\;]/","",$value);      
+      }
+      if ($type == "number") {
+                      $value = preg_replace("/![0-9]/","",$value);        
+      } 
+      if ($type == "array") {
+                      $value = preg_replace("/[^a-zA-Z0-9\,]/","",$value);                        
+      }              
+      if ($type == "mac") {
+                      $value = preg_replace("/[^a-zA-Z0-9\,\:]/","",$value);                     
+      }              
+      return $value;
+  }
 }

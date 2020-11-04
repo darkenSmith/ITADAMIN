@@ -117,6 +117,7 @@ $user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
             $("#company .trstuff #btnns #edi").prop("disabled", true);
             $(this).closest("tr").find(".editgroup").prop("disabled", false);
             $(this).closest("tr").find("#btnns #sav").css('visibility', 'visible');
+            $(this).closest("tr").find("#btnns #boostbtn").css('visibility', 'visible');
             $(this).hide();
         });
 
@@ -179,9 +180,66 @@ $user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
             location.reload(true);
         });
 
+                $("#company .trstuff #btnns #boostbtn").click(function () {
+            $(this).closest("tr").find("#btnns #sav").css('visibility', 'hidden');
+            $(this).closest("tr").find("#btnns #boostbtn").css('visibility', 'hidden');
+            $(this).closest("tr").find("#btnns #edi").show();
+
+            $("#company .trstuff #btnns #edi").prop("disabled", false);
+            $(this).closest("tr").find(".editgroup").prop("disabled", true);
+
+            let id = $(this).closest("tr").find("#idnum").val();
+            let ord = $(this).closest("tr").find("#ordnum").val();
+            let mon = $(this).closest("tr").find("#month").val();
+            let datee = $(this).closest("tr").find("#datee").val();
+            let name = $(this).closest("tr").find("#name").val();
+            let val1 = $(this).closest("tr").find("#vat1").val();
+            let val2 = $(this).closest("tr").find("#vat2").val();
+            let val3 = $(this).closest("tr").find("#vat3").val();
+            let invdate = $(this).closest("tr").find("#invdate").val();
+            let cinn = $(this).closest("tr").find("#cinn").val();
+            let status = $(this).closest("tr").find("#status option:selected").text();
+            let message = "Boost";
+
+            if (val1 == '') {
+                val1 = 0;
+            }
+            if (val2 == '') {
+                val2 = 0;
+
+            }
+            if (val3 == '') {
+                val3 = 0;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/RS/updaterebate/",
+                data: {
+                    id: id,
+                    ord: ord,
+                    mon: mon,
+                    datee: datee,
+                    name: name,
+                    val1: val1,
+                    val2: val2,
+                    val3: val3,
+                    invdate: invdate,
+                    cinn: cinn,
+                    status: status,
+                    message : message
+                },
+                success: function (data) {
+                }
+            });
+
+            location.reload(true);
+        });
+
 
         $("#company .trstuff #btnns #sav").click(function () {
             $(this).closest("tr").find("#btnns #sav").css('visibility', 'hidden');
+            $(this).closest("tr").find("#btnns #boostbtn").css('visibility', 'hidden');
             $(this).closest("tr").find("#btnns #edi").show();
 
             $("#company .trstuff #btnns #edi").prop("disabled", false);
@@ -339,6 +397,7 @@ $user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
 <div id="btn-group">
     <button type='submit' id='sub' CLASS="btn btn-primary"> Add new </button>
     <button type='submit' id='ref' CLASS="btn btn-secondary"> Refresh </button>
+    <button type='submit' id='boost' CLASS="btn btn-secondary"> Claim Boost </button>
 </div>
 
 <div id='addnew' class='hidden'>

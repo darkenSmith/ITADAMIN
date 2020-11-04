@@ -58,17 +58,14 @@ rebateid as rid
         return str_replace("-", " ", preg_replace('/[;:*^]/', '', $string));
     }
 
-    public function add()
-    {
+    public function add(){
+
         $user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
         $ord = $_POST['arr2'];
         $inv = $_POST['message'];
 
         foreach ($ord as $o) {
             $ordernum = str_replace('ORD ','',str_replace('ORD-', '', $o));
-
-
-
             $sqlcheck = "select count(*) as c from rebate where ord like '" . $ordernum . "' ";
             $stmt = $this->sdb->prepare($sqlcheck);
             $stmt->execute();
@@ -313,7 +310,8 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
             $dataof->execute();
 
             $sqp = "update Collections_Log
-        SET  invoiceAmt = ValueExclVAT
+        SET  invoiceAmt = ValueExclVAT,
+        invoiceDate = GETDATE(),
 		FROM REBATE as r with(nolock)
 		join collections_log as cl with(nolock) on
 		cl.OrderNum = r.ord
@@ -321,6 +319,14 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
                   ";
             $dataof2 = $this->sdb->prepare($sqp);
             $dataof2->execute();
+
+            $sqp = "update boosts 
+            set status = 'claimed'
+            where ord like replace('" . $ordernum . "','ORD-', '')
+                      ";
+                $dataof2 = $this->sdb->prepare($sqp);
+                $dataof2->execute();
+    
 
          
         }

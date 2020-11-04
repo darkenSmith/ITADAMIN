@@ -294,9 +294,15 @@ class RSController extends AbstractController
     }
 
     public function updateRebate()
-    {
+    {   $message = $_POST['message'];
         $updatereb = new updateRebate();
-        $updatereb->update();
+        if($message != 'Boost'){
+            $updatereb->update();
+        }else{
+            $updatereb->Boosted();
+        }
+        
+        
     }
 
     public function createBER()

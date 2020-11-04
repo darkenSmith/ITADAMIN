@@ -397,7 +397,7 @@ $user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
 <div id="btn-group">
     <button type='submit' id='sub' CLASS="btn btn-primary"> Add new </button>
     <button type='submit' id='ref' CLASS="btn btn-secondary"> Refresh </button>
-    <button type='submit' id='boost' CLASS="btn btn-secondary"> Claim Boost </button>
+
 </div>
 
 <div id='addnew' class='hidden'>

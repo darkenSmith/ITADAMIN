@@ -4,6 +4,7 @@ namespace App\Models\RS;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
+use App\Helpers\Logger;
 use Exception;
 
 /**
@@ -112,6 +113,10 @@ $ord = $_POST['ord'];
 $cinn = $_POST['cinn'];
 
 
+Logger::getInstance("BOOSTMANUAL.log")->debug(
+  'process - start'
+);
+
 
 
 $safeord = $this->clean_data($ord ,"text");
@@ -126,8 +131,7 @@ $sqlup = "
         status = 'Claimed', 
         CommentsInvNumber = '".$cinn.":BOOST',
         DiffExclVAT = 0,
-        DateInvReceived = GETDATE(),
-        CommentsInvNumber = '".$cinn."',
+        DateInvReceived = GETDATE()
         WHERE replace(ORD, 'ORD-', '') = replace('" . $ordernum. "','ORD-', '') ";
     $dataof = $this->sdb->prepare($sqlup);
     $dataof->execute();
@@ -138,14 +142,14 @@ $sqlup = "
             FROM REBATE as r with(nolock)
             join collections_log as cl with(nolock) on
             cl.OrderNum = r.ord
-            where  replace(ORD, 'ORD-', '') = replace('" . $ordernum . "','ORD-', '')
+            where  replace(ORD, 'ORD-', '') = replace('".$ordernum ."','ORD-', '')
           ";
     $dataof2 = $this->sdb->prepare($sqp);
     $dataof2->execute();
 
-          $sboostup = "update boosts
-          set Status = 'Claimed'
-          replace(b.ORD, 'ord-', '') = replace($ordernum, 'ord-', '')
+          $sboostup = "UPDATE boosts
+          SET Status = 'Claimed'
+          WHERE replace(ORD, 'ord-', '') = replace($ordernum, 'ord-', '')
         ";
           $dataof3 = $this->sdb->prepare($sboostup);
           $dataof3->execute();

@@ -4,6 +4,7 @@ namespace App\Models\RS;
 
 use App\Helpers\Database;
 use App\Models\AbstractModel;
+use App\Helpers\Logger;
 
 class Rebate extends AbstractModel
 {
@@ -65,7 +66,7 @@ rebateid as rid
         $inv = $_POST['message'];
 
         foreach ($ord as $o) {
-            $ordernum = str_replace('ORD ','',str_replace('ORD-', '', $o));
+            $ordernum = str_replace('ORD-', '', $o);
             $sqlcheck = "select count(*) as c from rebate where ord like '" . $ordernum . "' ";
             $stmt = $this->sdb->prepare($sqlcheck);
             $stmt->execute();
@@ -83,7 +84,7 @@ rebateid as rid
 
 
                 $sql2 = "
-                select ord, Customer_name, Cmp_number, cl.rebate
+                select replace(ord, 'ORD-', '') ord, Customer_name, Cmp_number, cl.rebate
                 from request as r
                 join Collections_Log as cl on cast(replace(cl.OrderNum, 'ORD-', '') as varchar(max)) = cast(replace(r.ord, 'ORD-', '') as varchar(max))
                 where cast(replace(cl.OrderNum, 'ORD-', '') as varchar(max)) = '".$ordernum."'
@@ -288,8 +289,7 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
         return true;
     }
 
-    public function invoice()
-    {
+    public function invoice() {
         $user = $_SESSION['user']['firstname'][0] . $_SESSION['user']['lastname'][0];
         $ord = $_POST['arr2'];
         $inv = $_POST['message'];
@@ -304,30 +304,37 @@ where [CommentsINVNumber] not like '' and  [DiffExclVAT] = 0";
          updateby = '" . $user . "',
          DiffExclVAT = 0,
          DateInvReceived = GETDATE(),
-         [CommentsINVNumber] = '" . $inv . "'
-         WHERE ORD = replace('" . $ordernum . "','ORD-', '') ";
+         [CommentsINVNumber] = :inv
+         WHERE ORD = replace(:ordernum,'ORD-', '')";
             $dataof = $this->sdb->prepare($sqlup);
-            $dataof->execute();
+            $dataof->execute(array(':ordernum' => $ordernum, ':inv' => $inv));
 
             $sqp = "update Collections_Log
         SET  invoiceAmt = ValueExclVAT,
-        invoiceDate = GETDATE(),
+        invoiceDate = GETDATE()
 		FROM REBATE as r with(nolock)
 		join collections_log as cl with(nolock) on
 		cl.OrderNum = r.ord
-        where  replace(ORD, '-ORD', '') = replace('" . $ordernum . "','ORD-', '')
+        where  replace(ORD, '-ORD', '') = replace(:ordernum,'ORD-', '')
                   ";
             $dataof2 = $this->sdb->prepare($sqp);
-            $dataof2->execute();
+            $dataof2->execute(array(':ordernum' => $ordernum));
 
-            $sqp = "update boosts 
-            set status = 'claimed'
-            where ord like replace('" . $ordernum . "','ORD-', '')
-                      ";
-                $dataof2 = $this->sdb->prepare($sqp);
-                $dataof2->execute();
+            Logger::getInstance("BOOST.log")->debug(
+                'process - start'
+            );
     
 
+            $sqp3 = "UPDATE boosts 
+            SET [status] = 'claimed'
+            where ord = :ordernum";
+                $dataof3 = $this->sdb->prepare($sqp3);
+                $dataof3->execute(array(':ordernum' => $ordernum));
+    
+
+                Logger::getInstance("BOOST.log")->debug(
+                    ['line'=> __LINE__]
+                );
          
         }
 

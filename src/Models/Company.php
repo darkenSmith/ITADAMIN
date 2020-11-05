@@ -409,7 +409,7 @@ class Company extends AbstractModel
                                     ':greenoak' => $webUser->company_id,
                                     ':company' => $data->CompanyName,
                                     ':cmp' => $data->CRMNumber,
-                                    ':insertedFrom' => 'cron//Company/refresh/'.__LINE__,
+                                    ':insertedFrom' => 'cron/Company/refresh/'.__LINE__,
                                 ];
                                 $result->execute($execute);
                                 Logger::getInstance("CompanyRefresh.log")->info(

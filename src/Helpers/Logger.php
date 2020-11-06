@@ -40,7 +40,7 @@ class Logger
 
         static::$instance->pushHandler(
             new StreamHandler(
-                self::DEFAULT_LOG_PATH . $logFile,
+                self::DEFAULT_LOG_PATH . date('Ymd-') . $logFile,
                 \Monolog\Logger::DEBUG,
                 true
             )

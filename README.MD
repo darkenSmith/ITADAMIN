@@ -26,7 +26,6 @@ composer update
 # Folders 
 ```
 /uploads/[images, pdf] (its symbolic link on production) 
-/booking/uploads
 /logs
 /tmp
 ```

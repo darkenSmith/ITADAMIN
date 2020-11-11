@@ -72,6 +72,7 @@ class OrderSync extends AbstractModel
         }
     }
     public function upprocess()
+    
     {
         Logger::getInstance("OrderSync1.log")->info(
             'process',

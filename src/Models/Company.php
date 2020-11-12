@@ -401,13 +401,15 @@ class Company extends AbstractModel
                         }
                         if ($comId != 0) {
                             try {
-                                $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
+                                $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP, insertedFrom) 
+                                        VALUES (:recyc,:greenoak,:company,:cmp,:insertedFrom)";
                                 $result = $this->rdb->prepare($sql);
                                 $execute = [
                                     ':recyc' => $comId,
                                     ':greenoak' => $webUser->company_id,
                                     ':company' => $data->CompanyName,
-                                    ':cmp' => $data->CRMNumber
+                                    ':cmp' => $data->CRMNumber,
+                                    ':insertedFrom' => 'cron/Company/refresh/'.__LINE__,
                                 ];
                                 $result->execute($execute);
                                 Logger::getInstance("CompanyRefresh.log")->info(
@@ -496,7 +498,7 @@ class Company extends AbstractModel
     /**
      * @return bool
      */
-    public function company_sync()
+    public function syncUpdate()
     {
         try {
             $sql = "SELECT g.company_number, s.company_id from recyc_company_sync as s
@@ -532,7 +534,7 @@ class Company extends AbstractModel
                 ]);
             }
 
-            Logger::getInstance("CompanySync.log")->debug(
+            Logger::getInstance("syncUpdate.log")->debug(
                 'Company Synced',
                 [
                     'line' => __LINE__,
@@ -543,7 +545,7 @@ class Company extends AbstractModel
 
             return true;
         } catch (Exception $e) {
-            Logger::getInstance("CompanySync.log")->error(
+            Logger::getInstance("syncUpdate.log")->error(
                 'Update Failed',
                 ['line' => __LINE__, $e->getMessage()]
             );

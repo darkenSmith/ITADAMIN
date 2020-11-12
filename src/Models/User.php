@@ -231,14 +231,16 @@ class User extends AbstractModel
 
                         $company = $this->getCompanyById($customer_id);
                         if ($company) {
-                            $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
+                            $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP, insertedFrom) 
+                                    VALUES (:recyc,:greenoak,:company,:cmp,:insertedFrom)";
                             $result = $this->rdb->prepare($sql);
                             $result->execute(
                                 [
                                     ':recyc' => $company->id,
                                     ':greenoak' => 'AWAITING UPDATE',
                                     ':company' => $company->company_name,
-                                    ':cmp' => null
+                                    ':cmp' => null,
+                                    ':insertedFrom' => 'itadadmin/User/update/'.__LINE__,
                                 ]
                             );
                         }
@@ -397,14 +399,16 @@ class User extends AbstractModel
 
                             $company = $this->getCompanyById($customerId);
                             if ($company) {
-                                $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP) VALUES (:recyc,:greenoak,:company,:cmp)";
+                                $sql = "INSERT INTO recyc_company_sync (company_id, greenoak_id, company_name, CMP, insertedFrom) 
+                                        VALUES (:recyc,:greenoak,:company,:cmp,:insertedFrom)";
                                 $result = $this->rdb->prepare($sql);
                                 $result->execute(
                                     [
                                         ':recyc' => $company->id,
                                         ':greenoak' => 'AWAITING UPDATE',
                                         ':company' => $company->company_name,
-                                        ':cmp' => null
+                                        ':cmp' => null,
+                                        ':insertedFrom' => 'itadadmin/User/add/'.__LINE__,
                                     ]
                                 );
                             }

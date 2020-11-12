@@ -25,8 +25,15 @@ composer update
 
 # Folders 
 ```
-/uploads
-/booking/uploads
+/uploads/[images, pdf] (its symbolic link on production) 
 /logs
 /tmp
 ```
+
+# Uploads/[images, pdf] folder:
+It's symbolic link in project folder that the real path synced between portal & admin servers via crontab
+
+# Logs
+The logs/*.log files should be removed periodically for size will be high.
+The logger need to be removed from production code after the test process complete.
+

@@ -298,23 +298,7 @@ class OrderSync extends AbstractModel
     
     
     
-                    if(empty($order->waste_transfer_number)){
-    
-                        
-    
-                        $sql = "SELECT * from recyc_company_sync WHERE greenoak_id = :greenoak";
-                        try {
-                            $result = $this->rdb->prepare($sql);
-                            $result->execute(array(':greenoak' => $order->company_id));
-                            $order->company = $result->fetch(\PDO::FETCH_OBJ);
-                        } catch (\Exception $e) {
-                            Logger::getInstance("OrderSync2.log")->error(
-                                'process-error',
-                                [$e->getLine(), $e->getMessage()]
-                            );
-                        }
-
-            } if (!$exists) {
+            if (!$exists) {
                     $this->newOrders[$order->sales_order_number] = $order;
                 }
             } catch (\Exception $e) {

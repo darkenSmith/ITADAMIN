@@ -7,7 +7,7 @@ use App\Helpers\Database;
 use App\Helpers\Logger;
 use Exception;
 
-
+set_time_limit(0);
 /**
  * Class OrderSync
  * @package App\Models
@@ -16,6 +16,7 @@ class OrderSync extends AbstractModel
 {
 
     public $orders;
+    public $updateorders;
     public $companies;
     public $newOrders = [];
     public $upOrders = [];
@@ -70,58 +71,65 @@ class OrderSync extends AbstractModel
                 [$e->getLine(), $e->getMessage()]
             );
         }
+
+        
+        //$this-> upprocess();
     }
     public function upprocess()
-    
+
     {
         Logger::getInstance("OrderSync1.log")->info(
-            'process',
+            'upprocess',
             []
         );
 
-    
+        $sql = 'SELECT * FROM recyc_order_information WHERE waste_transfer_number is null and sales_order_id is not null';
+        $result = $this->rdb->prepare($sql);
+        $result->execute();
+        $data = $result->fetchAll(\PDO::FETCH_OBJ);
 
-        foreach ($this->orders as $order) {
+        foreach ($data as $order) {
 
-            
-            // first check order information
-            //waste_transfer_number
-            $this->upOrders[$order->sales_order_number] = $order;
+            $sql = "SELECT
+			distinct(SO.SalesOrderNumber) as sales_order_number,
+			Cast(SO.CompanyID AS NVARCHAR(max)) as company_id,
+			Cast(DELPROD.SalesOrderID AS NVARCHAR(max)) as sales_order_id
+		FROM
+			[DeliveryProductDetail] DELPROD
+		RIGHT OUTER JOIN
+			SalesOrders SO ON DELPROD.SalesOrderID = SO.SalesOrderID
+		WHERE
+			DELPROD.SalesOrderID IN
+				(Select SalesOrderId FROM SalesOrders WHERE CompanyId IN
+					(SELECT CompanyID FROM Company )
+				AND SalesOrderId = :SalesOrderId
+				)
+		";
+
+        try {
+            $result = $this->gdb->prepare($sql);
+            $result->execute(array(':SalesOrderId' => $order->sales_order_id));
+            $this->updateorders = $result->fetch(\PDO::FETCH_OBJ);
+            Logger::getInstance("OrderSynclog.log")->debug(
+                'start-orders',
+                [$this->updateorders]
+            );
+        } catch (\Exception $e) {
+            Logger::getInstance("OrderSynclogfail.log")->error(
+                'start-error',
+                [$e->getLine(), $e->getMessage()]
+            );
+        }
+           if($this->updateorders){
+
            
 
             Logger::getInstance("orderids.log")->info(
                 'order-ids',
-                [$order->sales_order_id]
+                [$this->updateorders->sales_order_id]
             );
+            try{
 
-           
-
-                try {
-                    $sql = 'SELECT * FROM recyc_order_information WHERE sales_order_number = :order';
-                    $result = $this->rdb->prepare($sql);
-                    $result->execute(array(':order' => $order->sales_order_number));
-                    $exists = $result->fetch(\PDO::FETCH_OBJ);
-    
-    
-    
-    
-                    if(empty($order->waste_transfer_number)){
-    
-                        
-    
-                        $sql = "SELECT * from recyc_company_sync WHERE greenoak_id = :greenoak";
-                        try {
-                            $result = $this->rdb->prepare($sql);
-                            $result->execute(array(':greenoak' => $order->company_id));
-                            $order->company = $result->fetch(\PDO::FETCH_OBJ);
-                        } catch (\Exception $e) {
-                            Logger::getInstance("OrderSync2.log")->error(
-                                'process-error',
-                                [$e->getLine(), $e->getMessage()]
-                            );
-                        }
-    
-    
                         $sql = "(
                             SELECT
                                 Cast(SO.CompanyID AS NVARCHAR(max))  as 'company_id',
@@ -201,8 +209,8 @@ class OrderSync extends AbstractModel
             
                             try {
                                 $result = $this->gdb->prepare($sql);
-                                $result->execute(array(':salesorderid' => $order->sales_order_id, ':salesorderid2' => $order->sales_order_id));
-                                $order->data = $result->fetch(\PDO::FETCH_OBJ);
+                                $result->execute(array(':salesorderid' => $this->updateorders->sales_order_id, ':salesorderid2' => $this->updateorders->sales_order_id));
+                                $this->updateorders->data = $result->fetch(\PDO::FETCH_OBJ);
                             } catch (\Exception $e) {
                                 Logger::getInstance("OrderSyncgreen.log")->error(
                                     'Empty',
@@ -229,28 +237,29 @@ class OrderSync extends AbstractModel
                                 where sales_order_number = :salesOrderNumber';
             
                                 $orderInfo = array( 
-                                    ':salesOrderNumber' => $order->data->sales_order_number,
-                                    ':wtn' => $order->data->waste_transfer_number,
-                                    ':locname' => $order->data->location_name,
-                                    ':locid' => $order->data->location_id,
-                                    ':add1' => $order->data->address1,
-                                    ':add2' => $order->data->address2,
-                                    ':add3' => $order->data->address3,
-                                    ':add4' => $order->data->address4,
-                                    ':town' => $order->data->town,
-                                    ':postcode' => $order->data->postcode,
-                                    ':county' => $order->data->county,
-                                    ':country' => $order->data->country,
-                                    ':phone' => $order->data->telephone,
-                                    ':sitecode' => $order->data->sitecode,
-                                    ':siccode' => $order->data->sic_code,
-                                    ':deldate' => $order->data->actual_delivery_date
+                                    ':salesOrderNumber' => $this->updateorders->data->sales_order_number,
+                                    ':wtn' => $this->updateorders->data->waste_transfer_number,
+                                    ':locname' => $this->updateorders->data->location_name,
+                                    ':locid' => $this->updateorders->data->location_id,
+                                    ':add1' => $this->updateorders->data->address1,
+                                    ':add2' => $this->updateorders->data->address2,
+                                    ':add3' => $this->updateorders->data->address3,
+                                    ':add4' => $this->updateorders->data->address4,
+                                    ':town' => $this->updateorders->data->town,
+                                    ':postcode' => $this->updateorders->data->postcode,
+                                    ':county' => $this->updateorders->data->county,
+                                    ':country' => $this->updateorders->data->country,
+                                    ':phone' => $this->updateorders->data->telephone,
+                                    ':sitecode' => $this->updateorders->data->sitecode,
+                                    ':siccode' => $this->updateorders->data->sic_code,
+                                    ':deldate' => $this->updateorders->data->actual_delivery_date
                                 );
             
                                 $result = $this->rdb->prepare($sql);
                                 $result->execute($orderInfo);
+                                
                             
-                            }
+                            
                         }catch(Exception $e){
                             Logger::getInstance("updateerrOrderSync.log")->error(
                                 'process-error',
@@ -258,6 +267,7 @@ class OrderSync extends AbstractModel
                             );
                         }
                     }
+                }
         
     }
                         

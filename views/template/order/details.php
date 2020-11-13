@@ -67,9 +67,9 @@
                     echo '<tr>';
                     echo '<td>' . $order->detail->sales_order_number . '</td>';
                     echo '<td>' . $file->file_type . '</td>';
-                    echo '<td><a href="/order/download?newfile=' . $file->filename . '" class="btn btn-success">Download</a> </td>';
+                    echo '<td><a href="/order/download?newfile=' . $file->filename . '&format='.base64_encode($file->file_format).'" class="btn btn-success">Download</a> </td>';
                     if (isset($app) && $app->canUpload()) {
-                        echo '<td><a href="/order/delete?newfile=' . $file->filename . '&view=' . $id . '" class="btn btn-danger">Delete</a> </td>';
+                        echo '<td><a href="/order/delete?newfile=' . $file->filename . '&format='.base64_encode($file->file_format).'&view=' . $id . '" class="btn btn-danger">Delete</a>';
                     } else {
                         echo '<td></td>';
                     }

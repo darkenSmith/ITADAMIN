@@ -16,6 +16,7 @@ class OrderSync extends AbstractModel
 {
 
     public $orders;
+    public $proorders;
     public $updateorders;
     public $companies;
     public $newOrders = [];
@@ -274,33 +275,23 @@ class OrderSync extends AbstractModel
 
     public function process()
     {
-        Logger::getInstance("OrderSync1.log")->info(
-            'process',
-            []
-        );
-
-    
 
         foreach ($this->orders as $order) {
 
-            
-            // first check order information
-            //waste_transfer_number
-  
-           
-
+            Logger::getInstance("OrderSync.log")->info(
+                'process',
+                []
+            );
                 try {
                     $sql = 'SELECT * FROM recyc_order_information WHERE sales_order_number = :order';
                     $result = $this->rdb->prepare($sql);
                     $result->execute(array(':order' => $order->sales_order_number));
                     $exists = $result->fetch(\PDO::FETCH_OBJ);
     
-    
-    
-    
-            if (!$exists) {
-                    $this->newOrders[$order->sales_order_number] = $order;
-                }
+                // if (!$exists) {
+                //     $this->newOrders[$order->sales_order_number] = $order;
+                // }
+
             } catch (\Exception $e) {
                 Logger::getInstance("OrderSync.log")->error(
                     'process-error-foreach',
@@ -309,20 +300,20 @@ class OrderSync extends AbstractModel
             }
         
 
-        if (!empty($this->newOrders)) {
+        if (!empty($this->orders)) {
             Logger::getInstance("OrderSync.log")->debug(
                 'this->newOrders count',
-                [count($this->newOrders)]
+                [count($this->orders)]
             );
             // Display confirmation
             echo '
 			<div class="alert alert-success fade-in" id="reset-container" >
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h4>Order Sync Complete</h4>
-        <p>' . count($this->newOrders) . ' Imported</p>
+        <p>' . count($this->orders) . ' Imported</p>
 	    </div>';
 
-            foreach ($this->newOrders as $newOrder) {
+          
                 //Get order items
                 $sql = "SELECT
 					Cast(SO.CompanyID AS NVARCHAR(max)) AS company_id,
@@ -348,8 +339,8 @@ class OrderSync extends AbstractModel
 
                 try {
                     $result = $this->gdb->prepare($sql);
-                    $result->execute(array(':sales' => $newOrder->sales_order_id));
-                    $newOrder->items = $result->fetchAll(\PDO::FETCH_OBJ);
+                    $result->execute(array(':sales' => $order->sales_order_id));
+                    $this->proorders->items = $result->fetchAll(\PDO::FETCH_OBJ);
                 } catch (\Exception $e) {
                     Logger::getInstance("OrderSync.log")->error(
                         'process-error',
@@ -360,8 +351,8 @@ class OrderSync extends AbstractModel
                 $sql = "SELECT * from recyc_company_sync WHERE greenoak_id = :greenoak";
                 try {
                     $result = $this->rdb->prepare($sql);
-                    $result->execute(array(':greenoak' => $newOrder->company_id));
-                    $newOrder->company = $result->fetch(\PDO::FETCH_OBJ);
+                    $result->execute(array(':greenoak' => $order->company_id));
+                    $order->company = $result->fetch(\PDO::FETCH_OBJ);
                 } catch (\Exception $e) {
                     Logger::getInstance("OrderSync.log")->error(
                         'process-error',
@@ -448,8 +439,8 @@ class OrderSync extends AbstractModel
 
                 try {
                     $result = $this->gdb->prepare($sql);
-                    $result->execute(array(':salesorderid' => $newOrder->sales_order_id, ':salesorderid2' => $newOrder->sales_order_id));
-                    $newOrder->data = $result->fetch(\PDO::FETCH_OBJ);
+                    $result->execute(array(':salesorderid' => $order->sales_order_id, ':salesorderid2' => $order->sales_order_id));
+                    $this->proorders->data = $result->fetch(\PDO::FETCH_OBJ);
                 } catch (\Exception $e) {
                     Logger::getInstance("OrderSync.log")->error(
                         'process-error',
@@ -472,34 +463,34 @@ class OrderSync extends AbstractModel
 						:sitecode,:siccode, :deldate)';
 
                     $orderInfo = array(
-                        ':company' => $newOrder->company->company_id,
-                        ':salesOrderId' => $newOrder->sales_order_id,
-                        ':salesOrderNumber' => $newOrder->sales_order_number,
-                        ':wtn' => $newOrder->data->waste_transfer_number,
-                        ':locname' => $newOrder->data->location_name,
-                        ':locid' => $newOrder->data->location_id,
-                        ':add1' => $newOrder->data->address1,
-                        ':add2' => $newOrder->data->address2,
-                        ':add3' => $newOrder->data->address3,
-                        ':add4' => $newOrder->data->address4,
-                        ':town' => $newOrder->data->town,
-                        ':postcode' => $newOrder->data->postcode,
-                        ':county' => $newOrder->data->county,
-                        ':country' => $newOrder->data->country,
-                        ':phone' => $newOrder->data->telephone,
-                        ':sitecode' => $newOrder->data->sitecode,
-                        ':siccode' => $newOrder->data->sic_code,
-                        ':deldate' => $newOrder->data->actual_delivery_date
+                        ':company' => $order->company->company_id,
+                        ':salesOrderId' => $order->sales_order_id,
+                        ':salesOrderNumber' => $order->sales_order_number,
+                        ':wtn' => $this->proorders->data->waste_transfer_number,
+                        ':locname' => $this->proorders->data->location_name,
+                        ':locid' => $this->proorders->data->location_id,
+                        ':add1' => $this->proorders->data->address1,
+                        ':add2' => $this->proorders->data->address2,
+                        ':add3' => $this->proorders->data->address3,
+                        ':add4' => $this->proorders->data->address4,
+                        ':town' => $this->proorders->data->town,
+                        ':postcode' => $this->proorders->data->postcode,
+                        ':county' => $this->proorders->data->county,
+                        ':country' => $this->proorders->data->country,
+                        ':phone' => $this->proorders->data->telephone,
+                        ':sitecode' => $this->proorders->data->sitecode,
+                        ':siccode' => $this->proorders->data->sic_code,
+                        ':deldate' => $this->proorders->data->actual_delivery_date
                     );
 
                     $result = $this->rdb->prepare($sql);
                     $result->execute($orderInfo);
 
-                    foreach ($newOrder->items as $item) {
+                    foreach ($this->proorders->items as $item) {
                         $salesOrderInfo = array(
-                            ':company' => $newOrder->company->company_id,
-                            ':salesOrderId' => $newOrder->sales_order_id,
-                            ':salesOrderNumber' => $newOrder->sales_order_number,
+                            ':company' => $order->company->company_id,
+                            ':salesOrderId' => $item->sales_order_id,
+                            ':salesOrderNumber' => $item->sales_order_number,
                             ':delproddetail' => $item->delivery_product_detail_id,
                             ':productname' => $item->product_name,
                             ':ser' => $item->serial_number,
@@ -527,7 +518,7 @@ class OrderSync extends AbstractModel
                     );
                     echo $ex->getMessage();
                 }
-            }
+          
         } else {
             Logger::getInstance("OrderSync.log")->info(
                 'process-end',

@@ -36,10 +36,8 @@ if($company->auth){
             echo '<tr>
                 <td>'.$date.'</td>
                 <td>'.$collection->sales_order_number.'</td>
-                <td>'.$collection->address1.' '.$collection->address2.' '.$collection->address3.' '.$collection->addr>
+                <td>'.$collection->address1.' '.$collection->address2.' '.$collection->address3.' '.$collection->address4. '<td>';
             if($data->cod_required == 1) {
-                echo '<td>';
-
                 if ( isset( $collection->files['disposal'] ) ) {
                     echo '<span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>';
                 } else {

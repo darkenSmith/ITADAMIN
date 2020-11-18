@@ -222,6 +222,12 @@ class RSController extends AbstractController
         $this->template->view('RECBooking/pages/delline', $this->getCommonData());
     }
 
+    public function Marketing()
+    {
+        $this->template->view('RECBooking/pages/marketing', $this->getCommonData());
+    }
+
+
     public function addNewline()
     {
         $addnew = new AddLineitem();

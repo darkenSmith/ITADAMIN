@@ -7,7 +7,6 @@ use App\Helpers\Database;
 use App\Helpers\Logger;
 use Exception;
 
-set_time_limit(0);
 /**
  * Class OrderSync
  * @package App\Models
@@ -300,7 +299,7 @@ class OrderSync extends AbstractModel
             }
         
 
-        if (!empty($this->orders)) {
+        if (!$exists) {
             Logger::getInstance("OrderSync.log")->debug(
                 'this->newOrders count',
                 [count($this->orders)]

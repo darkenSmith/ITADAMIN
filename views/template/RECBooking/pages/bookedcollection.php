@@ -335,6 +335,9 @@ $cust = "\"Request_id\"";
             <a class="nav-link" href="/RS/rebatepage/">Rebates</a>
         </li>
         <li class="nav-item">
+        <a class="nav-link" href="/RS/Marketing/">Marketing</a>
+    </li>
+        <li class="nav-item">
             <a class="nav-link" href=".\admin\home\">Back</a>
         </li>
     </ul>
